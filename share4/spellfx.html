@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주문 이펙트 연구소 — 던전크래프트</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/board.css">
+<link rel="stylesheet" href="css/ui.css">
+<style>
+  body { font-family: var(--f-ui); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 40px 80px; }
+  .top { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 8px; }
+  .back { font-size: 17px; color: var(--c-text-soft); text-decoration: none; border: 1px solid var(--c-frame-shadow);
+    border-radius: 6px; padding: 6px 14px; }
+  .back:hover { color: var(--c-gold); border-color: var(--c-gold-deep); }
+
+  .lab { display: grid; grid-template-columns: 1fr 340px; gap: 24px; margin-top: 24px; align-items: start; }
+  @media (max-width: 880px) { .lab { grid-template-columns: 1fr; } }
+
+  /* 좌측 — 큰 프리뷰 스테이지 */
+  .preview { }
+  .fx-frame { position: relative; border: 4px solid var(--c-ink-800); border-top-color: #3a4170; border-left-color: #3a4170;
+    border-right-color: #05060f; border-bottom-color: #05060f; box-shadow: inset 0 0 0 2px var(--c-frame), inset 0 0 0 4px var(--c-frame-shadow);
+    background: #12152e; }
+  #fxStage { width: 100%; height: 420px; position: relative; overflow: hidden; }
+
+  /* === 스킬 컷신 (화면 중앙 시네마틱) === */
+  .cutscene { position: absolute; inset: 0; z-index: 30; pointer-events: none; overflow: hidden;
+    image-rendering: pixelated; font-family: var(--f-display); }
+  .cs-bar { position: absolute; left: 0; right: 0; height: 17%; background: #05060f; z-index: 2; }
+  .cs-bar-top { top: 0; box-shadow: 0 2px 0 var(--cs-col); }
+  .cs-bar-bot { bottom: 0; box-shadow: 0 -2px 0 var(--cs-col); }
+  .cs-slash { position: absolute; top: -10%; left: 0; width: 42%; height: 120%; z-index: 1;
+    background: linear-gradient(90deg, transparent, var(--cs-col), #fff, var(--cs-col), transparent);
+    opacity: .7; filter: blur(1px); }
+  .cs-flash { position: absolute; inset: 0; z-index: 4; background: #fff; opacity: 0; }
+  .cs-portraits { position: absolute; inset: 0; z-index: 3; display: flex; align-items: center;
+    justify-content: center; gap: 0; }
+  .cs-portraits.duo { justify-content: space-between; padding: 0 6%; }
+  .cs-portraits.multi { gap: 2%; }
+  .cs-portraits.multi .cs-portrait { height: 180px; }
+  .cs-portraits.n4 .cs-portrait { height: 150px; }
+  .cs-portraits.multi.n3 { justify-content: center; gap: 4%; }
+  .cs-pframe { display: flex; align-items: center; justify-content: center; }
+  .cs-portrait { height: 230px; image-rendering: pixelated;
+    filter: drop-shadow(3px 4px 0 rgba(0,0,0,.7)) drop-shadow(0 0 9px rgba(255,255,255,.5)); }
+  .cs-center { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
+    z-index: 5; text-align: center; }
+  .cs-tag { font-family: var(--f-small); font-size: 17px; letter-spacing: 4px; color: #05060f;
+    background: var(--cs-col); display: inline-block; padding: 2px 14px; border-radius: 3px; margin-bottom: 10px;
+    box-shadow: 0 2px 0 rgba(0,0,0,.5); }
+  .cs-name { font-family: var(--f-display); font-size: 52px; color: var(--cs-col); line-height: 1;
+    text-shadow: 4px 4px 0 #05060f, 0 0 18px rgba(255,255,255,.45);
+    -webkit-text-stroke: 2px #05060f; paint-order: stroke fill; }
+  .cs-bondmark { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-90px);
+    font-size: 40px; color: var(--cs-col); text-shadow: 0 0 14px var(--cs-col); z-index: 6;
+    animation: csBond 1.2s ease-out; }
+  @keyframes csBond { 0%{ transform: translate(-50%,-90px) scale(0) rotate(-90deg); opacity:0 }
+    40%{ transform: translate(-50%,-90px) scale(1.3) rotate(0); opacity:1 } 100%{ transform: translate(-50%,-90px) scale(1); opacity:1 } }
+  /* 스테이지 위 오버레이 명령창 (게임 느낌) */
+  .fx-msgbar { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 18px; background: rgba(10,11,22,.82);
+    border-top: 2px solid var(--c-frame); font-size: var(--t-body); pointer-events: none; }
+  .fx-head { position: absolute; left: 0; top: 0; padding: 10px 16px; display: flex; align-items: baseline; gap: 12px; }
+  .fx-head .nm { font-family: var(--f-display); font-size: 26px; color: var(--c-gold); text-shadow: 2px 2px 0 #000; }
+  .fx-head .kd { font-size: 16px; color: var(--c-text-soft); text-shadow: 1px 1px 0 #000; white-space: nowrap; }
+  .fx-head .mp { font-family: var(--f-mono); font-size: 16px; color: var(--c-mp); text-shadow: 1px 1px 0 #000; white-space: nowrap; }
+
+  .pv-controls { display: flex; gap: 8px; margin-top: 14px; align-items: center; flex-wrap: wrap; }
+  /* FP(운명) 게이지 */
+  .fp-gauge { margin-left: auto; display: inline-flex; align-items: center; gap: 7px;
+    border: 1px solid var(--c-gold-deep); border-radius: 6px; padding: 4px 9px; background: rgba(27,32,70,.35); }
+  .fp-label { font-family: var(--f-small); font-size: 14px; color: var(--c-gold); letter-spacing: .5px; }
+  .fp-val { font-family: var(--f-mono); font-size: 16px; color: var(--c-gold-glow); min-width: 34px; text-align: center; }
+  .fp-btn { font-family: var(--f-mono); font-size: 16px; line-height: 1; color: var(--c-text-soft);
+    background: var(--c-ink-700); border: 1px solid var(--c-frame-shadow); border-radius: 4px; width: 22px; height: 22px; cursor: pointer; padding: 0; }
+  .fp-btn:hover { color: var(--c-gold); border-color: var(--c-gold-deep); }
+  .si-fp-ok { color: var(--c-hp-high); }
+  .si-fp-no { color: var(--c-hp-low); }
+
+  /* 우측 — 주문 그리드 */
+  .spell-list-title { font-family: var(--f-display); font-size: 20px; color: var(--c-text-soft); margin-bottom: 12px; }
+
+  /* 스킬 정보 툴팁 */
+  .skill-info { border: 1px solid var(--c-frame-shadow); border-radius: 8px; background: rgba(27,32,70,.4);
+    padding: 14px 16px; margin-bottom: 16px; min-height: 92px; }
+  .si-empty { font-size: 15px; color: var(--c-text-mute); line-height: 1.6; }
+  .si-head { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+  .si-head .el-dot { width: 13px; height: 13px; border-radius: 50%; flex: none; box-shadow: 0 0 6px currentColor; }
+  .si-name { font-family: var(--f-display); font-size: 21px; color: var(--c-gold); }
+  .si-by { font-size: 14px; color: var(--c-text-mute); margin-left: auto; }
+  .si-rows { display: grid; grid-template-columns: auto 1fr; gap: 5px 12px; font-size: 15px; }
+  .si-rows dt { color: var(--c-text-mute); }
+  .si-rows dd { margin: 0; color: var(--c-text); }
+  .si-rows dd .num { font-family: var(--f-mono); color: var(--c-gold-glow); }
+  .si-tag { display: inline-block; font-size: 13px; padding: 0 6px; border-radius: 3px; margin-right: 4px;
+    box-shadow: inset 0 0 0 1px currentColor; }
+  .si-match { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--c-frame-shadow); font-size: 15px; }
+  .si-weak { color: var(--c-hp-high); }
+  .si-resist { color: var(--c-hp-low); }
+  .si-neutral { color: var(--c-text-soft); }
+  #spellGrid { display: grid; grid-template-columns: 1fr; gap: 6px; max-height: 470px; overflow-y: auto; padding-right: 4px; }
+  @media (max-width: 880px) { #spellGrid { grid-template-columns: 1fr 1fr; max-height: none; } }
+  .spell-card { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 6px; cursor: pointer;
+    background: rgba(27,32,70,.4); border: 1px solid var(--c-frame-shadow); position: relative; }
+  .spell-card:hover { background: rgba(255,215,102,.07); border-color: var(--c-frame-dim); }
+  .spell-card.on { background: rgba(255,215,102,.13); border-color: var(--c-gold); box-shadow: inset 2px 0 0 var(--c-gold); }
+  .spell-card .sc-name { font-size: var(--t-body); color: var(--c-text); flex: 1; }
+  .spell-card.on .sc-name { color: var(--c-gold); }
+  .sc-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: none; }
+  .sc-kind { font-size: 13px; color: var(--c-text-mute); white-space: nowrap; }
+  .sc-mp { font-size: 14px; color: var(--c-mp); white-space: nowrap; }
+  .el-dot { width: 12px; height: 12px; border-radius: 50%; flex: none; box-shadow: 0 0 6px currentColor; }
+  .el-fire { background: #e25563; color: #e25563; }
+  .el-ice { background: #56a8e8; color: #56a8e8; }
+  .el-thunder { background: #fff0b8; color: #b483f0; }
+  .el-poison { background: #9ad94f; color: #9ad94f; }
+  .el-earth { background: #c98b2c; color: #c98b2c; }
+  .el-holy { background: #ffd766; color: #ffd766; }
+  .el-heal { background: #62c46a; color: #62c46a; }
+  .el-buff { background: #e25563; color: #ffd766; }
+  .el-shield { background: #56a8e8; color: #cfe0ff; }
+  .el-sleep { background: #b59cff; color: #b59cff; }
+  .el-arrow { background: #cfd8ec; color: #fff0b8; }
+  .el-wind { background: #a8e6c8; color: #dff5e8; }
+  .el-dark { background: #6a4fb0; color: #b59cff; }
+  .el-phys { background: #e25563; color: #ffd766; }
+  .el-star { background: #9ad6ff; color: #ffd766; }
+  .el-arcane { background: #b483f0; color: #e6dcff; }
+  .el-mana { background: #56a8e8; color: #cfe0ff; }
+  .el-arcane { background: #b483f0; color: #e6dcff; }
+  .sc-cls { font-family: var(--f-small); font-size: 12px; color: var(--c-ink-900); background: var(--c-text-soft);
+    padding: 0 5px; border-radius: 3px; margin-left: 2px; }
+
+  /* 추천 AoE 그룹 */
+  .grid-divider { display: flex; align-items: center; gap: 10px; margin: 14px 2px 4px; }
+  .grid-divider .ln { flex: 1; height: 1px; background: var(--c-frame-shadow); }
+  .grid-divider span { font-family: var(--f-display); font-size: 15px; color: var(--c-gold-deep); white-space: nowrap; }
+  .spell-card .rec-badge { position: absolute; top: -6px; right: -6px; font-family: var(--f-small); font-size: 12px;
+    background: var(--c-gold); color: var(--c-ink-900); padding: 1px 6px; border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,.4); }
+  .spell-card .sc-from { font-size: 12px; color: var(--c-gold-deep); }
+
+  /* 환경 연동 매핑 카드 */
+  .wx-map { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin-top: 22px; }
+  .wx-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 8px;
+    background: rgba(27,32,70,.4); border: 1px solid var(--c-frame-shadow); }
+  .wx-card .wx-ico { width: 44px; height: 44px; flex: none; border-radius: 6px; display: flex; align-items: center;
+    justify-content: center; font-size: 22px; background: var(--c-ink-900); box-shadow: inset 0 0 0 2px var(--c-frame-shadow); }
+  .wx-card .nm { font-family: var(--f-display); font-size: 19px; color: var(--c-gold); }
+  .wx-card .fl { font-size: 15px; color: var(--c-text-soft); margin-top: 3px; }
+  .wx-card .fl b { color: var(--c-info); }
+  .wx-card .mp { font-family: var(--f-mono); font-size: 14px; color: var(--c-mp); margin-top: 2px; }
+
+  /* 상태 토글 스트립 */
+  .state-strip { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px;
+    padding: 10px 12px; border: 1px solid var(--c-frame-shadow); border-radius: 7px; background: rgba(27,32,70,.3); }
+  .ss-label { font-family: var(--f-small); font-size: 14px; color: var(--c-text-mute); letter-spacing: 1px; }
+  .state-chip { font-family: var(--f-ui); font-size: 16px; color: var(--c-text-soft); cursor: pointer;
+    background: var(--c-ink-700); border: 1px solid var(--c-frame-shadow); border-radius: 6px; padding: 5px 11px; }
+  .state-chip:hover { border-color: var(--c-frame-dim); color: var(--c-text); }
+  .state-chip .ss-eff { font-size: 12px; color: var(--c-text-mute); border: 1px solid var(--c-frame-shadow);
+    border-radius: 3px; padding: 0 4px; margin-left: 3px; }
+  .state-chip.on { color: var(--c-ink-900); font-weight: bold; }
+  .state-chip.on .ss-eff { color: var(--c-ink-900); border-color: rgba(0,0,0,.3); }
+  .state-chip[data-state="stealth"].on { background: #b483f0; border-color: #b483f0; }
+  .state-chip[data-state="rage"].on { background: #e25563; border-color: #e25563; }
+  .state-chip[data-state="charge"].on { background: #ffd766; border-color: #ffd766; }
+  .ss-hint { font-size: 14px; color: var(--c-text-mute); flex-basis: 100%; }
+
+  .legend { margin-top: 26px; }
+  .legend .note { font-size: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">SPELL FX LAB · 주문 이펙트</div>
+      <h1 class="title" style="font-size:36px">주문 이펙트 연구소</h1>
+    </div>
+    <a class="back" href="index.html">← UI 리터치 보드</a>
+  </div>
+  <p class="lede">게임의 <strong>스펠북 71종</strong>(아군 50 + 몬스터 21)에 1:1로 맞춘 픽셀 애니메이션 이펙트. 4직업과 적 전용기를
+    전부 코드(저해상도 캔버스 → 픽셀 스케일업)로 그려 새 에셋 의존이 없습니다.</p>
+
+  <div class="lab">
+    <div class="preview">
+      <div class="fx-frame">
+        <div id="fxStage"></div>
+        <div class="fx-head">
+          <span class="nm" id="fxName">화염 화살</span>
+          <span class="kd" id="fxKind">단일 · 화염</span>
+          <span class="mp" id="fxMp">MP 3</span>
+        </div>
+        <div class="fx-msgbar ui"><span id="fxMsg">주문을 선택하세요</span></div>
+      </div>
+      <div class="pv-controls">
+        <button class="btn" id="replayBtn">↻ 다시 재생</button>
+        <button class="btn on" id="autoBtn">⏸ 자동재생 중</button>
+        <span class="fp-gauge" id="fpGauge">
+          <span class="fp-label">✦ 운명</span>
+          <button class="fp-btn" data-fp="-1">−</button>
+          <span class="fp-val"><span id="fpNow">4</span>/<span id="fpCap">6</span></span>
+          <button class="fp-btn" data-fp="1">+</button>
+        </span>
+      </div>
+      <div class="state-strip">
+        <span class="ss-label">상태 토글</span>
+        <button class="state-chip" data-state="stealth">🥷 은신 <span class="ss-eff">기습</span></button>
+        <button class="state-chip" data-state="rage">🩸 분노 <span class="ss-eff">격노</span></button>
+        <button class="state-chip" data-state="charge">🔮 마력 충전 <span class="ss-eff">과부하</span></button>
+        <span class="ss-hint">토글 후 해당 직업 스킬을 재생하면 강화 연출이 적용됩니다 (은신·충전은 1회 소비, 분노는 지속).</span>
+      </div>
+    </div>
+
+    <div class="spells">
+      <div id="skillInfo" class="skill-info"><div class="si-empty">주문을 선택하면 속성 · 형식 · 예상 피해 · 상성 정보가 표시됩니다.</div></div>
+      <div class="spell-list-title">주문 · 96 <span style="font-size:14px;color:var(--c-text-mute)">(아군 50 + 쌍검사 8 + 몬스터 21 + 인연 12 + 장비 5)</span></div>
+      <div id="spellGrid"></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="cards">
+      <div class="card"><h4>원소 색 체계</h4><p>화염=적/금, 냉기=청, 뇌전=백/라일락, 독=녹, 대지=흙갈,
+        신성=골드, 회복=연녹. 토큰 팔레트와 동일한 색으로 통일했습니다.</p></div>
+      <div class="card"><h4>연출 문법</h4><p>단일기는 <b>발사체→타격 폭발</b>, 전체기는 <b>강하/낙뢰/진동</b>,
+        버프·회복은 <b>상승 오라·확장 링</b>. 타겟 수(단일/전체)를 연출로 즉시 구분합니다.</p></div>
+      <div class="card"><h4>이식 노트</h4><p>엔진은 파티클·빔·플래시·흔들림 프리미티브로 구성. PixiJS 포팅 시
+        <b>fxTexture</b> 확장 또는 ParticleContainer로 1:1 대응됩니다.</p></div>
+    </div>
+
+    <h2 class="title" style="font-size:24px;margin-top:40px">상태 강화 메커닉 — 상태가 스킬을 바꾼다</h2>
+    <p class="note" style="max-width:74ch">세 직업에 <b>상태 → 스킬 강화</b> 시스템을 넣었습니다. 위 미리보기의 <b>상태 토글</b>을 켜고
+      해당 직업 스킬을 재생하면 강화 연출이 적용됩니다.</p>
+    <div class="cards">
+      <div class="card"><h4>🥷 사냥꾼 · 은신 → 기습</h4><p><b>은신</b> 사용 시 모습을 감춰 은신 상태(소비형). 다음 스킬이
+        <b>[기습]</b> 강화 — 그림자 일격은 즉시 발동+확정 치명, 정조준은 헤드샷, 연사는 7연발, 관통은 이중 관통. 보라/금 잔상 + ‼ 표식.</p></div>
+      <div class="card"><h4>🩸 전사 · 분노 → 격노</h4><p><b>피의 갈증</b>으로 분노 상태(지속 버프). 근접 스킬(분쇄 강타·회전베기·갑옷 파괴)이
+        <b>[격노]</b> 강화 — 붉은 이중 타격·충격파↑·흡혈 핏방울·≫ 표식. 버프가 유지되는 동안 계속 적용.</p></div>
+      <div class="card"><h4>🔮 마법사 · 충전 → 과부하</h4><p><b>마력 충전</b>으로 충전 상태(소비형). 다음 주문이 <b>[과부하]</b> 강화 —
+        비전 주문(마력탄·비전 폭발)은 초대형 폭발로, <b>원소 주문(화염·얼음·뇌전·대지·바람·암흑) 전체</b>에도 금빛 증폭 레이어 + ★ 표식이 추가 부여됩니다.</p></div>
+    </div>
+  </div>
+
+  <div style="margin-top:48px">
+    <div class="eyebrow">AOE · 환경 연동</div>
+    <h2 class="title" style="font-size:28px">전체타격기 추천 — 환경 애니메이션 재활용</h2>
+    <p class="lede">기존 <strong>환경 픽셀 애니메이션(비·천둥·눈·잿불)</strong>을 그대로 전체기의 화면 비주얼로
+      재활용합니다. 화면 전체를 덮는 날씨 입자장 + 적별 임팩트로 "광역"임을 즉시 전달하고, 자산을 두 번 쓰는
+      효율도 얻습니다. 우측 목록 하단 <span class="gold">추천</span> 그룹에서 재생해 보세요.</p>
+    <div class="wx-map">
+      <div class="wx-card"><div class="wx-ico">🏹</div><div><div class="nm">화살비</div><div class="fl">환경 <b>비</b> → 화살로 치환 · 전체 물리 다단</div><div class="mp">MP 7 · 사냥꾼 시그니처</div></div></div>
+      <div class="wx-card"><div class="wx-ico">⚡</div><div><div class="nm">천둥폭풍</div><div class="fl">환경 <b>천둥</b> · 비 + 연속 낙뢰 + 섬광</div><div class="mp">MP 10 · 최상위 뇌전</div></div></div>
+      <div class="wx-card"><div class="wx-ico">❄️</div><div><div class="nm">눈보라</div><div class="fl">환경 <b>눈</b> 격화 + 얼음 파편 · 냉기+둔화</div><div class="mp">MP 9 · 민첩 디버프</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🔥</div><div><div class="nm">화염폭풍</div><div class="fl">환경 <b>잿불</b> + 화염구 낙하 · 전체 화염</div><div class="mp">MP 9 · 기존 화염폭풍 강화</div></div></div>
+      <div class="wx-card"><div class="wx-ico">☠️</div><div><div class="nm">독무</div><div class="fl">환경 <b>잿불</b> 변형(부유 안개) · 전체 독 부여</div><div class="mp">MP 8 · 지속 피해</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🌪️</div><div><div class="nm">모래폭풍</div><div class="fl"><b>신규</b> 가로 먼지장 · 물리 + 명중률↓</div><div class="mp">MP 8 · 회피 디버프</div></div></div>
+    </div>
+    <p class="note" style="margin-top:18px">밸런스 제안은 예시값입니다. 전체기는 단일기보다 <b>위력은 낮고 MP는 높게</b> 잡아
+      "여러 적 정리" 역할을 맡기는 것을 권장합니다. 모래폭풍을 제외한 5종은 기존 날씨 코드와 직접 연결됩니다.</p>
+
+    <h2 class="title" style="font-size:24px;margin-top:40px">추가 제안 — 새 원소축 · 필살기</h2>
+    <p class="note" style="max-width:72ch">전투에 새 색을 더하는 확장안. 바람·암흑 두 원소축과, 신성 공격기, 그리고 보스전용 필살기까지.</p>
+    <div class="wx-map">
+      <div class="wx-card"><div class="wx-ico">🌀</div><div><div class="nm">태풍 <span class="sc-from">바람</span></div><div class="fl">회전하는 바람 줄기 + 나뭇잎이 가로로 휩쓺 · 전체</div><div class="mp">MP 9 · 회피 무시/관통</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🌑</div><div><div class="nm">암흑 안개 <span class="sc-from">암흑</span></div><div class="fl">화면 암전 + 그림자 안개 · 전체 실명/저주</div><div class="mp">MP 9 · 디버프 특화</div></div></div>
+      <div class="wx-card"><div class="wx-ico">☀️</div><div><div class="nm">천벌 <span class="sc-from">신성</span></div><div class="fl">황금 광선이 전체에 강림 · 성스러운 빛(회복)의 공격판</div><div class="mp">MP 11 · 상위 신성기</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-gold-deep)"><div class="wx-ico">☄️</div><div><div class="nm" style="color:var(--c-gold-glow)">메테오 <span class="sc-from">필살</span></div><div class="fl">화면 암전 → 거대 운석 낙하 → 대폭발 · 단일</div><div class="mp">MP 12 · 보스전 필살기</div></div></div>
+    </div>
+    <p class="note" style="margin-top:18px">이 외에 데이터만으로 넣기 좋은 것들: <b>상태이상 확장</b>(화상·감전/마비·침묵),
+      <b>유틸</b>(재생 HoT·부활·마법방벽), <b>흡수</b>(흡혈·마나번). 연출이 필요하면 말씀해 주세요.</p>
+
+    <h2 class="title" style="font-size:24px;margin-top:44px">클래스 필살기 — 화려한 단일기</h2>
+    <p class="note" style="max-width:72ch">클래스마다 "한 방"이 있는 스펙터클한 단일 필살기. 기본 단일기보다 훨씬 긴 다단 연출로
+      각 클래스의 정체성을 살립니다. 보스전·마무리용.</p>
+    <div class="wx-map">
+      <div class="wx-card" style="border-color:var(--c-gold-deep)"><div class="wx-ico">⚔️</div><div><div class="nm">성검 강타 <span class="sc-cls">나이트</span></div><div class="fl">거대 <b>성검이 하늘에서 강림</b> → 십자 폭발 · 신성</div><div class="mp">MP 12 · 팔라딘 필살</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-gold-deep)"><div class="wx-ico">🗡️</div><div><div class="nm">무쌍난무 <span class="sc-cls">전사</span></div><div class="fl">사방에서 <b>연속 베기</b> → 필살 X참 · 물리</div><div class="mp">운명 2 · 광전사 한계돌파</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-gold-deep)"><div class="wx-ico">🏹</div><div><div class="nm">별빛 연사 <span class="sc-cls">사냥꾼</span></div><div class="fl"><b>별빛 화살 집중사</b> → 관통 일격 · 천궁</div><div class="mp">MP 10 · 명사수 필살</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-xp)"><div class="wx-ico">🌌</div><div><div class="nm" style="color:#c9a8ff">대붕괴 <span class="sc-cls">마법사</span></div><div class="fl">마법진 → <b>다원소 빛기둥</b> → 대붕괴 · 비전</div><div class="mp">MP 16 · 대마법사 궁극</div></div></div>
+    </div>
+    <p class="note" style="margin-top:18px">연출 길이가 길고(1.4~1.5초) 화면 연출(섬광·흔들림)이 강하므로, 빈도가 낮은 <b>필살기/한계기</b>로
+      배치하는 것을 권장합니다.</p>
+
+    <h2 class="title" style="font-size:24px;margin-top:44px">전사 확장 — 근접·분노·디버프</h2>
+    <p class="note" style="max-width:74ch">전사는 <b>MP가 매우 낮은 근접 브루저</b>(L20에도 ~14)인데, 기존 스킬은
+      대부분 마법/고MP라 정체성과 어긋났습니다. <b>저MP·HP비용 물리 스킬</b>로 단일 딜·디버프·방어 빈틈을 메웁니다.</p>
+    <div class="wx-map">
+      <div class="wx-card"><div class="wx-ico">🔨</div><div><div class="nm">분쇄 강타 <span class="sc-cls">전사</span></div><div class="fl">내려찍기 → <b>지면 충격파</b> · 단일 물리</div><div class="mp">MP 2 · 초반 단일 딜</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🌀</div><div><div class="nm">회전베기 <span class="sc-cls">전사</span></div><div class="fl"><b>강철 칼날</b>이 원형으로 휩쓺 · 전체 물리</div><div class="mp">MP 5 · 비마법 광역</div></div></div>
+      <div class="wx-card"><div class="wx-ico">📢</div><div><div class="nm">위협의 포효 <span class="sc-cls">전사</span></div><div class="fl">붉은 <b>함성 파동</b> · 전체 공격력↓</div><div class="mp">MP 3 · 적 약화</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🪓</div><div><div class="nm">갑옷 파괴 <span class="sc-cls">전사</span></div><div class="fl">강타 + <b>갑옷 파편</b> · 단일 방어↓</div><div class="mp">MP 3 · 방어 무력화</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🛡️</div><div><div class="nm">도발 <span class="sc-cls">전사</span></div><div class="fl"><b>방어 태세</b> + 어그로 집중 · 자기 방어↑</div><div class="mp">MP 2 · 탱킹</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-danger)"><div class="wx-ico">🩸</div><div><div class="nm" style="color:#ff8a5a">피의 갈증 <span class="sc-cls">전사</span></div><div class="fl">HP 소모 → <b>진홍 오라</b> · 자기 공격력↑↑</div><div class="mp">HP 비용 · 고위험 버프</div></div></div>
+    </div>
+    <p class="note" style="margin-top:18px">이러면 전사는 <b>근접 딜(분쇄 강타·회전베기) + 디버프(포효·갑옷 파괴) + 방어/분노(도발·피의 갈증)</b>로
+      완결된 역할군을 갖춥니다. 학습 레벨 제안: 분쇄 강타 L2 · 도발 L5 · 위협의 포효 L7 · 갑옷 파괴 L10 · 회전베기 L13 · 피의 갈증 L16.</p>
+
+    <h2 class="title" style="font-size:24px;margin-top:44px">신규 직업 · 마법사 — 원소/비전 전담</h2>
+    <p class="note" style="max-width:74ch">마법사를 새 직업으로 추가하고 <b>원소 마법 전부(화염·얼음·뇌전·대지·바람·암흑)를 이관</b>합니다.
+      목록에서 원소 주문들의 캐스터가 이제 <b>마법사</b>로 표시됩니다. 여기에 마법사만의 <b>비전 시그니처 + 유틸</b>을 더했습니다.</p>
+    <div class="wx-map">
+      <div class="wx-card"><div class="wx-ico">🔮</div><div><div class="nm">마력탄 <span class="sc-cls">마법사</span></div><div class="fl">유도 마력탄 → <b>별빛 폭발</b> · 단일 비전</div><div class="mp">MP 3 · 기본 비전기</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-xp)"><div class="wx-ico">💥</div><div><div class="nm" style="color:#c9a8ff">비전 폭발 <span class="sc-cls">마법사</span></div><div class="fl">차징 → <b>거대 폭발 + 룬 링</b> · 단일 비전</div><div class="mp">MP 7 · 고화력 단일</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🛡️</div><div><div class="nm">마력 보호막 <span class="sc-cls">마법사</span></div><div class="fl">육각 보호막으로 <b>피해 흡수</b> · 자기/아군</div><div class="mp">MP 6 · 흡수 버프</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🧘</div><div><div class="nm">명상 <span class="sc-cls">마법사</span></div><div class="fl">마나 수렴 → <b>MP 회복</b> · 저MP풀 보완</div><div class="mp">MP 0 · 자원 회복</div></div></div>
+      <div class="wx-card"><div class="wx-ico">⏩</div><div><div class="nm">가속 <span class="sc-cls">마법사</span></div><div class="fl">청백 잔상 → <b>속도↑</b> 버프 · 아군</div><div class="mp">MP 5 · 행동 가속</div></div></div>
+      <div class="wx-card"><div class="wx-ico">⏱️</div><div><div class="nm">전체 마력 가속 <span class="sc-cls">마법사</span></div><div class="fl">필드 전역 <b>가속 물결</b> · 파티 전원 속도↑</div><div class="mp">MP 9 · 광역 헤이스트</div></div></div>
+    </div>
+    <p class="note" style="margin-top:14px">이관되는 원소 마법: 화염 화살·화염 폭풍·얼음 창·뇌격·독화살·대지분쇄·자장가 +
+      환경연동 전체기(눈보라·천둥폭풍·화염폭풍·태풍·암흑 안개 등). 모두 마법사 스펠북으로 묶입니다.</p>
+
+    <h2 class="title" style="font-size:24px;margin-top:44px">사냥꾼 재정립 — 궁술/암살 (물리 원거리)</h2>
+    <p class="note" style="max-width:74ch">원소 마법을 마법사에 넘긴 대신, 사냥꾼은 <b>활·급소·암살·함정</b>의 물리 원거리 전문가가 됩니다.
+      마법 글로우 대신 <b>강철 화살·치명타·은신</b>의 절제된 연출로 정체성을 분리했습니다.</p>
+    <div class="wx-map">
+      <div class="wx-card"><div class="wx-ico">🎯</div><div><div class="nm">정조준 <span class="sc-cls">사냥꾼</span></div><div class="fl">레티클 고정 → <b>치명 일격</b> · 단일 급소</div><div class="mp">MP 3 · 치명타 특화</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🏹</div><div><div class="nm">연사 <span class="sc-cls">사냥꾼</span></div><div class="fl"><b>화살 5연발</b> 다단히트 · 단일</div><div class="mp">MP 4 · 다단 누적</div></div></div>
+      <div class="wx-card"><div class="wx-ico">➡️</div><div><div class="nm">관통 사격 <span class="sc-cls">사냥꾼</span></div><div class="fl">차징 → <b>일직선 관통</b> 화살 · 단일</div><div class="mp">MP 5 · 관통 일격</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-danger)"><div class="wx-ico">🗡️</div><div><div class="nm" style="color:#ff8a5a">그림자 일격 <span class="sc-cls">사냥꾼</span></div><div class="fl">은신 → <b>급소 암살</b> 대형 단일</div><div class="mp">MP 6 · 암살 한 방</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🪤</div><div><div class="nm">강철 덫 <span class="sc-cls">사냥꾼</span></div><div class="fl">덫 설치 → 철컥! <b>속도↓ 속박</b> · 단일</div><div class="mp">MP 4 · 컨트롤</div></div></div>
+      <div class="wx-card"><div class="wx-ico">💨</div><div><div class="nm">연막탄 <span class="sc-cls">사냥꾼</span></div><div class="fl">연막 → <b>회피↑ + 적 명중↓</b> · 자기</div><div class="mp">MP 3 · 생존/교란</div></div></div>
+    </div>
+    <p class="note" style="margin-top:14px">유지: <b>화살비</b>(전체 화살)·<b>독화살</b>(독 부여)·<b>별빛 연사</b>(필살)는 그대로 사냥꾼 소속.
+      이로써 4직업 역할이 또렷해집니다 — <b>기사</b>(신성/방어) · <b>전사</b>(근접/분노) · <b>마법사</b>(원소/비전) · <b>사냥꾼</b>(궁술/암살).</p>
+
+    <h2 class="title" style="font-size:24px;margin-top:44px">기사 확장 — 전체 회복/정화/보호 (딜탱 서포터)</h2>
+    <p class="note" style="max-width:74ch">기사를 단순 탱커가 아닌 <b>딜탱 + 파티 서포터</b>로 굳힙니다. 기존 단일 치유·정화에 더해
+      <b>파티 전원 대상 신성기</b> 3종을 추가 — 필드 전역에 효과가 퍼져 "전체"임을 연출로 전달합니다.</p>
+    <div class="wx-map">
+      <div class="wx-card"><div class="wx-ico">✨</div><div><div class="nm">전체 치유 <span class="sc-cls">기사</span></div><div class="fl">필드 전역 <b>성역의 빛</b> 강림 · 파티 전원 회복</div><div class="mp">MP 10 · 녹/금 회복</div></div></div>
+      <div class="wx-card"><div class="wx-ico">💧</div><div><div class="nm">전체 정화 <span class="sc-cls">기사</span></div><div class="fl">청백 <b>정화 물결</b>이 휩쓺 · 파티 상태이상 해제</div><div class="mp">MP 8 · 디버프 클렌즈</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-mp)"><div class="wx-ico">🛡️</div><div><div class="nm" style="color:#9ccdf0">전체 방어막 <span class="sc-cls">기사</span></div><div class="fl">금/청 <b>보호 돔</b> 전개 · 파티 전원 피해 흡수</div><div class="mp">MP 9 · 광역 실드</div></div></div>
+    </div>
+    <p class="note" style="margin-top:14px">기사 서포터 역할 완성: <b>전체 치유</b>(유지력)·<b>전체 정화</b>(디버프 해제)·<b>전체 방어막</b>(피해 경감)으로
+      파티 생존을 책임지면서, 심판의 빛·성검 강타로 딜도 냅니다.</p>
+
+    <h2 class="title" style="font-size:24px;margin-top:44px">신규 직업 · 쌍검사 — 건슬링거 (총·폭탄·투척)</h2>
+    <p class="note" style="max-width:74ch">쌍검사(duelist)는 <b>빠른 글래스캐논</b>(높은 공/속, 얇은 방/HP). 검 대신 <b>총·폭탄·표창</b>의 현대적
+      투척 전투를 씁니다 — 총구 화염·탄피 배출·작약탄 폭발 등 다른 직업과 확실히 다른 결의 연출입니다.</p>
+    <div class="wx-map">
+      <div class="wx-card"><div class="wx-ico">🔫</div><div><div class="nm">쾌속 사격 <span class="sc-cls">쌍검사</span></div><div class="fl">권총 <b>4연사</b> + 탄피 배출 · 단일 다단</div><div class="mp">MP 3 · 주력 단일</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-danger)"><div class="wx-ico">🎯</div><div><div class="nm" style="color:#ff8a5a">헤드샷 <span class="sc-cls">쌍검사</span></div><div class="fl">레이저 조준선 → <b>치명 단발</b> · 단일</div><div class="mp">MP 4 · 폭딜</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-warn)"><div class="wx-ico">💣</div><div><div class="nm" style="color:#f0c44c">작약탄 <span class="sc-cls">쌍검사</span></div><div class="fl">폭탄 투척 → <b>대폭발 + 화상</b> · 전체 화염</div><div class="mp">MP 6 · 광역 DoT</div></div></div>
+      <div class="wx-card"><div class="wx-ico">✴️</div><div><div class="nm">표창 난사 <span class="sc-cls">쌍검사</span></div><div class="fl">회전 <b>표창 5연타</b> · 단일 투척 다단</div><div class="mp">MP 4 · 다단</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-danger)"><div class="wx-ico">🔻</div><div><div class="nm" style="color:#e0606a">산탄 <span class="sc-cls">쌍검사</span></div><div class="fl">근거리 <b>부채꼴 샷건</b> → 출혈 · 전체</div><div class="mp">MP 5 · 근접 광역</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-danger)"><div class="wx-ico">⚔️</div><div><div class="nm" style="color:#e0606a">난자 <span class="sc-cls">쌍검사</span></div><div class="fl">쌍검 <b>교차 베기 3연</b> → 강한 출혈 · 단일</div><div class="mp">MP 4 · 출혈 폭딜</div></div></div>
+      <div class="wx-card"><div class="wx-ico">💨</div><div><div class="nm">연막 수류탄 <span class="sc-cls">쌍검사</span></div><div class="fl">연막 폭발 → <b>회피↑·적 명중↓</b> · 자기</div><div class="mp">MP 3 · 생존</div></div></div>
+      <div class="wx-card" style="border:2px solid var(--c-warn);background:linear-gradient(180deg,rgba(240,196,76,.12),rgba(226,85,99,.1))"><div class="wx-ico">🔥</div><div><div class="nm" style="color:#f0c44c">풀버스트 <span class="sc-cls">필살기</span></div><div class="fl">쌍권총 <b>전탄 난사 → 작약탄 대폭발</b> · 컷신 + 단일/전체</div><div class="mp">MP 12 · 필살(컷신)</div></div></div>
+    </div>
+    <p class="note" style="margin-top:14px">필살기 <b>풀버스트</b>는 다른 클래스 필살기처럼 <b>컷신</b>(쌍검사 1인 포트레이트)이 먼저 재생된 뒤 난사→대폭발로 이어집니다.
+      상태이상: <b>작약탄=화상</b>(지속 화염), <b>산탄·난자=출혈</b>(지속 물리). 산탄은 화살비(상단 강하)와 달리 <b>근거리 부채꼴</b>이라 결이 다릅니다.</p>
+
+    <h2 class="title" style="font-size:24px;margin-top:44px">몬스터 스킬 — 난이도용 적 전용기</h2>
+    <p class="note" style="max-width:74ch">지금 적은 <b>기본 공격(+보스 heavy)</b>만 합니다. 가족(family)별 스킬을 부여해 전투에
+      위협과 변수를 더합니다. 미리보기는 <b>몬스터=시전자 · 영웅=대상</b> 구도로 재생됩니다.</p>
+    <div class="wx-map">
+      <div class="wx-card"><div class="wx-ico">🔥</div><div><div class="nm">화염 브레스 <span class="sc-from">드레이크·임프</span></div><div class="fl">부채꼴 화염 분사 · 전체 화염</div><div class="mp">화상 부여</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🟢</div><div><div class="nm">맹독 분사 <span class="sc-from">마녀·거미</span></div><div class="fl">독 거품 → 중독 · 단일</div><div class="mp">독 DoT</div></div></div>
+      <div class="wx-card"><div class="wx-ico">👊</div><div><div class="nm">대지 강타 <span class="sc-from">골렘·괴인</span></div><div class="fl">내려찍기 → 충격파 · 단일</div><div class="mp">고데미지</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🟣</div><div><div class="nm">영혼 흡수 <span class="sc-from">망령·사신·군주</span></div><div class="fl">HP 흡수 → 자가 회복 · 단일</div><div class="mp">흡혈</div></div></div>
+      <div class="wx-card"><div class="wx-ico">⚡</div><div><div class="nm">감전 <span class="sc-from">도깨비불·유령</span></div><div class="fl">번개 → 마비(행동불가) · 단일</div><div class="mp">행동 봉인</div></div></div>
+      <div class="wx-card"><div class="wx-ico">❄️</div><div><div class="nm">결빙 숨결 <span class="sc-from">얼음 골렘</span></div><div class="fl">냉기 → 동결 · 단일</div><div class="mp">동결</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-xp)"><div class="wx-ico">💀</div><div><div class="nm" style="color:#c9a8ff">사령 소환 <span class="sc-from">강령술사</span></div><div class="fl">해골 졸개 3체 소환 · 증원</div><div class="mp">난이도 급상승</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🌑</div><div><div class="nm">저주 <span class="sc-from">마녀·군주</span></div><div class="fl">암흑 저주 → 파티 약화 · 전체</div><div class="mp">광역 디버프</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-danger)"><div class="wx-ico">🩸</div><div><div class="nm" style="color:#ff8a5a">광폭화 <span class="sc-from">보스</span></div><div class="fl">붉은 분노 → 공격·속도↑ · 자기</div><div class="mp">페이즈 전환</div></div></div>
+      <div class="wx-card"><div class="wx-ico">💚</div><div><div class="nm">재생 <span class="sc-from">보스·트롤</span></div><div class="fl">생명력 → 자가 회복 · 자기</div><div class="mp">장기전 유발</div></div></div>
+    </div>
+    <p class="note" style="margin-top:14px">설계: <code>monsters.js</code>에 <code>skills:[...]</code> + 사용 확률을 부여하고, <code>enemyChooseAction</code>이
+      기본 공격 대신 일정 확률로 스킬을 선택하게 합니다. 보스는 페이즈별 스킬 셋(광폭화/소환/저주)으로 패턴화하면 난이도가 살아납니다.</p>
+
+    <h2 class="title" style="font-size:24px;margin-top:44px">몬스터 스킬 — 확장 베스티어리 (2차)</h2>
+    <p class="note" style="max-width:74ch">5지역으로 늘어난 베스티어리(언데드·화염·냉기·공허·짐승)의 빈틈을 메우는 11종.
+      광역 암흑·석화·속박·음파·다단·급강하에 더해, <b>아군 몬스터를 버프하는 전열 고무</b> 같은 새 메커닉도 추가했습니다.</p>
+    <div class="wx-map">
+      <div class="wx-card" style="border-color:var(--c-xp)"><div class="wx-ico">🌑</div><div><div class="nm" style="color:#c9a8ff">공허 폭발 <span class="sc-from">사신·망령·군주</span></div><div class="fl">암흑 수렴 → 광역 폭발 · 전체</div><div class="mp">공허 핵심 광역</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🟣</div><div><div class="nm">그림자 화살 <span class="sc-from">강령술사</span></div><div class="fl">검은 구체 → 암흑 폭발 · 단일</div><div class="mp">원거리 딜</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🗿</div><div><div class="nm">석화 <span class="sc-from">메두사</span></div><div class="fl">시선 → 석화(행동불가) · 단일</div><div class="mp">강력 봉인</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🕸️</div><div><div class="nm">거미줄 <span class="sc-from">거미·여왕</span></div><div class="fl">거미줄 → 속도↓ 속박 · 단일</div><div class="mp">속도 컨트롤</div></div></div>
+      <div class="wx-card"><div class="wx-ico">📢</div><div><div class="nm">음파 비명 <span class="sc-from">박쥐·까마귀·말벌</span></div><div class="fl">음파 → 파티 명중↓ · 전체</div><div class="mp">광역 약화</div></div></div>
+      <div class="wx-card"><div class="wx-ico">👅</div><div><div class="nm">혀 채찍 <span class="sc-from">거대 두꺼비</span></div><div class="fl">혀 → 기절 · 단일</div><div class="mp">행동 봉인</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-danger)"><div class="wx-ico">🥁</div><div><div class="nm" style="color:#ff8a5a">전열 고무 <span class="sc-from">전쟁 고수</span></div><div class="fl"><b>아군 몬스터 전체</b> 공격·속도↑ · 지원</div><div class="mp">새 메커닉 · 군단 버프</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🛡️</div><div><div class="nm">석화 방벽 <span class="sc-from">가고일·룬 수호상</span></div><div class="fl">돌 비늘 → 방어↑ · 자기/아군</div><div class="mp">탱킹 강화</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🐾</div><div><div class="nm">연속 할퀴기 <span class="sc-from">들개·추적자</span></div><div class="fl">발톱 3연타 다단 · 단일</div><div class="mp">속공 누적딜</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🦅</div><div><div class="nm">급강하 <span class="sc-from">까마귀·화염 박쥐</span></div><div class="fl">급강하 충돌(고배율) · 단일</div><div class="mp">회피·일격</div></div></div>
+      <div class="wx-card"><div class="wx-ico">🌋</div><div><div class="nm">용암 분출 <span class="sc-from">마그마 골렘·드레이크</span></div><div class="fl">지면 용암 기둥 · 전체 화염</div><div class="mp">화염 광역</div></div></div>
+    </div>
+    <p class="note" style="margin-top:14px">권장 부여: <b>전열 고무</b>는 전쟁 고수가 아군 다수일 때(군단 인카운터) 위협적 —
+      <code>kind:'allyBuff', target:'allAllies'(몬스터측)</code>로 새 처리 필요. <b>석화</b>·<b>거미줄</b>·<b>음파</b>는 행동/명중 봉인이라 보스보다
+      잡몹 묶음에서 변수를 만들기 좋습니다. <b>급강하</b>는 회피 높은 비행 적의 일격기로.</p>
+
+    <h2 class="title" style="font-size:24px;margin-top:44px">운명 · 인연공격 + 스킬 컷신</h2>
+    <p class="note" style="max-width:74ch"><code>bondSkills.js</code>의 인연공격(Bond Strike) 3종에 이펙트를 입혔습니다. 또한
+      <b>클래스 필살기·인연공격은 시전 시 화면 중앙 컷신</b>(레터박스 + 포트레이트 슬라이드인 + 스킬명 슬램 + 임팩트 플래시)이 먼저 재생됩니다 —
+      필살기는 <b>1인 포트레이트</b>, 인연공격은 <b>2인 포트레이트</b>가 양쪽에서 등장하며 ✦로 조합을 강조합니다.</p>
+    <div class="wx-map">
+      <div class="wx-card" style="border-color:var(--c-gold-deep)"><div class="wx-ico">⚔️</div><div><div class="nm" style="color:#ffd766">맹세의 돌격 <span class="sc-cls">기사 × 전사</span></div><div class="fl">기사 축복 + 전사 돌격 → <b>십자 강타</b> · 단일 성속성</div><div class="mp">운명 3 · 단일 폭딜</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-gold-deep)"><div class="wx-ico">🏹</div><div><div class="nm" style="color:#ffd766">축복받은 연사 <span class="sc-cls">사냥꾼 × 기사</span></div><div class="fl">축복받은 <b>화살 3연사</b>(관통) · 전체 성속성</div><div class="mp">운명 3 · 광역</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-gold-deep)"><div class="wx-ico">🗡️</div><div><div class="nm" style="color:#ffd766">협공 <span class="sc-cls">사냥꾼 × 전사</span></div><div class="fl">전사 견제 → 사냥꾼 <b>2연타</b> · 단일 물리</div><div class="mp">운명 3 · 콤보</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-xp)"><div class="wx-ico">☀️</div><div><div class="nm" style="color:#c9a8ff">천공 심판 <span class="sc-cls">기사 × 법사</span></div><div class="fl">성+비전 → <b>광역 빛기둥</b> 강림 · 전체</div><div class="mp">운명 3 · 신성 광역</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-danger)"><div class="wx-ico">🔥</div><div><div class="nm" style="color:#ff8a5a">작열참 <span class="sc-cls">전사 × 법사</span></div><div class="fl">강철+화염 → <b>작열 대검 강타</b> · 단일 화염</div><div class="mp">운명 3 · 단일 폭딜</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-mp)"><div class="wx-ico">⚡</div><div><div class="nm" style="color:#9ad6ff">마탄 3연사 <span class="sc-cls">사냥꾼 × 법사</span></div><div class="fl">화살+비전 → <b>마탄 3연사</b>(관통) · 단일 뇌전</div><div class="mp">운명 3 · 관통 콤보</div></div></div>
+    </div>
+    <p class="note" style="margin-top:14px">컷신 시스템은 <b>재사용형</b>입니다 — <code>SpellCutscene.play(host, {title, el, kind:'ult'|'bond', portraits, onImpact})</code>.
+      <code>onImpact</code> 콜백에서 실제 스펠 이펙트가 시작돼, 컷신 → 타격이 자연스럽게 이어집니다. 법사 합류로 <b>인연공격이 6쌍</b>이 됐고
+      각 쌍에 <b>원소 색</b>(성속성 골드 · 비전 보라 · 화염 적 · 뇌전 청)을 입혔습니다. <span class="mute">※ 컷신은 실제 브라우저에서 재생됩니다 — 정지 스크린샷엔 잡히지 않을 수 있어요.</span></p>
+
+    <h3 style="font-family:var(--f-display);font-size:20px;color:var(--c-gold);margin:30px 0 4px">쌍검사 인연기 (듀오 3쌍)</h3>
+    <p class="note" style="max-width:74ch">신규 직업 쌍검사 합류로 듀오 인연기 3쌍 추가. 총·폭탄과 각 직업의 결을 섞었습니다.</p>
+    <div class="wx-map">
+      <div class="wx-card"><div class="wx-ico">🔫</div><div><div class="nm">강철 폭풍 <span class="sc-cls">쌍검사 × 전사</span></div><div class="fl">전사 견제 → 쌍검사 <b>난사</b> · 단일 물리 다단</div><div class="mp">운명 3</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-danger)"><div class="wx-ico">💥</div><div><div class="nm" style="color:#ff8a5a">소이탄 연격 <span class="sc-cls">쌍검사 × 법사</span></div><div class="fl">법사 화염 + <b>작약탄 난사</b> · 전체 화염</div><div class="mp">운명 3</div></div></div>
+      <div class="wx-card"><div class="wx-ico">⚡</div><div><div class="nm">십자포화 <span class="sc-cls">쌍검사 × 사냥꾼</span></div><div class="fl">총·화살 <b>교차 집중사</b> · 단일 다단</div><div class="mp">운명 3</div></div></div>
+    </div>
+
+    <h3 style="font-family:var(--f-display);font-size:20px;color:var(--c-gold);margin:30px 0 4px">트리플 · 쿼드 인연기</h3>
+    <p class="note" style="max-width:74ch">3인·4인이 함께하는 상위 합동기. 컷신도 <b>3·4인 포트레이트</b>가 순차 등장하며 ✦ 개수로 인원을 강조합니다.
+      운명 코스트가 크고 연출이 길어 <b>전투의 클라이맥스용</b>입니다.</p>
+    <div class="wx-map">
+      <div class="wx-card" style="border-color:var(--c-gold)"><div class="wx-ico">🔱</div><div><div class="nm" style="color:#fff0b8">삼위 강타 <span class="sc-cls">기사 × 전사 × 법사</span></div><div class="fl">강철 돌격 → 비전 폭발 → <b>신성 빛기둥</b> · 단일 초고화력</div><div class="mp">운명 5 · 트리플</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-gold)"><div class="wx-ico">🎯</div><div><div class="nm" style="color:#fff0b8">사냥의 결속 <span class="sc-cls">기사 × 사냥꾼 × 전사</span></div><div class="fl">전체 견제 다단 → <b>집중 일격</b> · 전체+단일 물리</div><div class="mp">운명 5 · 트리플</div></div></div>
+      <div class="wx-card" style="border:2px solid var(--c-gold);background:linear-gradient(180deg,rgba(255,215,102,.12),rgba(180,131,240,.1))"><div class="wx-ico">✦</div><div><div class="nm" style="color:#fff0b8">운명의 결전 <span class="sc-cls">4인 전원</span></div><div class="fl">4색 수렴 → 사방 강타 → <b>전 원소 대붕괴</b> · 전체 최강기</div><div class="mp">운명 8 · 쿼드 최종기</div></div></div>
+    </div>
+    <p class="note" style="margin-top:14px">게임 이식: <code>bondSkills.js</code>의 <code>members:[a,b,c]</code>(3인)·<code>[a,b,c,d]</code>(4인)로 확장하고,
+      파티에 해당 멤버가 모두 살아있을 때 + 운명이 충분할 때 발동 조건을 검사합니다. 쿼드는 <b>전원 생존 필수</b>라 리스크-리워드가 큰 피니셔가 됩니다.</p>
+
+    <h2 class="title" style="font-size:24px;margin-top:44px">장비 패시브 — 발동 이펙트</h2>
+    <p class="note" style="max-width:74ch">무기·방어구·장신구의 <b>✦ 특이효과(패시브)</b>가 전투 중 발동할 때 유닛 위에 뜨는 시각 신호입니다.
+      플레이어가 "지금 이 장비 효과가 터졌다"를 바로 알 수 있게 짧고 명료하게 연출합니다.</p>
+    <div class="wx-map">
+      <div class="wx-card" style="border-color:var(--c-danger)"><div class="wx-ico">⚔️</div><div><div class="nm" style="color:#ff8a5a">반격 <span class="sc-from">군주의 도끼·가시 갑옷</span></div><div class="fl">피격 직후 <b>붉은 반격 슬래시</b> · "반격!" 라벨</div><div class="mp">피격 시 20%</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-gold-deep)"><div class="wx-ico">✦</div><div><div class="nm" style="color:#ffd766">크리티컬 <span class="sc-from">대마법사 지팡이·집중의 띠</span></div><div class="fl"><b>골드 십자 폭발</b> · "CRITICAL!" 라벨</div><div class="mp">크리율 +10~15%</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-hp-high)"><div class="wx-ico">💚</div><div><div class="nm" style="color:#62c46a">HP 재생 <span class="sc-from">불사조 갑옷·부적</span></div><div class="fl">매턴 <b>녹색 생명력 회복</b> · "재생 +HP"</div><div class="mp">HP 5~6%/턴</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-mp)"><div class="wx-ico">🛡️</div><div><div class="nm" style="color:#56a8e8">상태이상 저항 <span class="sc-from">독아 단검·수호 판금</span></div><div class="fl">들어온 상태이상이 <b>깨져 무효화</b> · "저항!"</div><div class="mp">20~50% 저항</div></div></div>
+      <div class="wx-card" style="border-color:var(--c-mp)"><div class="wx-ico">🔷</div><div><div class="nm" style="color:#56a8e8">피해 감소 <span class="sc-from">무쇠 브로치</span></div><div class="fl">피격이 <b>청색 육각 가드</b>로 경감 · "피해 경감"</div><div class="mp">받는 피해 −8%</div></div></div>
+    </div>
+    <p class="note" style="margin-top:14px">게임 이식: 장비 <code>passive</code>(counter/crit/regen/resist/guard)를 전투 이벤트에 훅 — <b>피격 시</b>(반격·저항·감소),
+      <b>공격 시</b>(크리), <b>턴 시작 시</b>(재생)에 트리거하고 <code>spellFx.play(passiveFx, unit)</code>로 신호를 띄웁니다. 라벨은
+      데미지 팝업과 같은 레이어를 재사용합니다.</p>
+  </div>
+</div>
+
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<rect width="100" height="100" fill="#12152e"/>
+<circle cx="38" cy="40" r="9" fill="#f0c44c"/><circle cx="38" cy="40" r="5" fill="#fff0b8"/>
+<rect x="58" y="20" width="4" height="34" fill="#fff0b8" transform="rotate(12 60 37)"/>
+<rect x="30" y="64" width="40" height="4" fill="#c98b2c"/>
+</svg>
+</template>
+
+<script src="js/spellfx-engine.js"></script>
+<script src="js/spellfx-defs.js"></script>
+<script src="js/spellfx-aoe.js"></script>
+<script src="js/spellfx-ext.js"></script>
+<script src="js/spellfx-class.js"></script>
+<script src="js/spellfx-warrior.js"></script>
+<script src="js/spellfx-mage.js"></script>
+<script src="js/spellfx-hunter.js"></script>
+<script src="js/spellfx-knight.js"></script>
+<script src="js/spellfx-monster.js"></script>
+<script src="js/spellfx-monster2.js"></script>
+<script src="js/spellfx-bond.js"></script>
+<script src="js/spellfx-duelist.js"></script>
+<script src="js/spellfx-equip-fx.js"></script>
+<script src="js/spellfx-cutscene.js"></script>
+<script src="js/spellfx-page.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "dragon-crypt",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Dragon Quest-style turn-based RPG (PixiJS v8 + Vite). Reuses Crypt Survivors assets.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "balance": "node scripts/balance.js"
+  },
+  "dependencies": {
+    "pixi.js": "^8.18.1"
+  },
+  "devDependencies": {
+    "vite": "^7.3.3",
+    "vitest": "^3.2.4"
+  }
+}

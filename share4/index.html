@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>던전크래프트 — UI 리터치 보드</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/board.css">
+<link rel="stylesheet" href="css/ui.css">
+</head>
+<body>
+<div class="shell">
+  <!-- ============ 사이드 내비 ============ -->
+  <nav class="nav">
+    <div class="brand">던전크래프트<small>UI 리터치 · 디자인 보드 v1</small></div>
+    <ul id="navlist">
+      <li class="grp">시스템</li>
+      <li><a href="#overview">개요 · 디자인 추론</a></li>
+      <li><a href="#colors">컬러 시스템</a></li>
+      <li><a href="#type">타이포그래피</a></li>
+      <li><a href="#frames">프레임 3종</a></li>
+      <li class="grp">컴포넌트 리터치</li>
+      <li><a href="#dialog">NPC 대화창 · 토스트</a></li>
+      <li><a href="#command">전투 명령창</a></li>
+      <li><a href="#combat">HP바 · 데미지 · 상태</a></li>
+      <li><a href="#fieldhud">필드 HUD</a></li>
+      <li><a href="#menu">메뉴 상태창</a></li>
+      <li><a href="#equip">장비 · 인벤토리</a></li>
+      <li><a href="#minimap">미니맵 · 페이즈</a></li>
+      <li class="grp">픽셀 모션</li>
+      <li><a href="#weather">환경 이펙트</a></li>
+      <li><a href="spellfx.html">주문 이펙트 연구소 ↗</a></li>
+      <li><a href="#demo">인터랙티브 데모</a></li>
+    </ul>
+  </nav>
+
+  <main class="main">
+    <!-- ============ 개요 ============ -->
+    <section class="block" id="overview" data-screen-label="개요">
+      <div class="eyebrow">UI RETOUCH · 2026.05</div>
+      <h1 class="title">던전크래프트 UI 리터치</h1>
+      <p class="lede">정통 드래곤퀘스트 감성은 지키되, <strong>양피지 톤의 따뜻한 프레임</strong>과
+        <strong>의미별 색 체계</strong>, 그리고 <strong>픽셀 한글 타이포(Galmuri)</strong>로 전반을
+        다듬습니다. 모든 토큰은 <strong>DESIGN.md 체계에 매핑</strong>되어 PixiJS에 바로 이식 가능합니다.</p>
+
+      <div class="cards">
+        <div class="card"><h4>가정 1 · 톤 유지</h4><p>키보드 구동·창 기반·monospace의 클래식 RPG 문법을
+          버리지 않습니다. "새 프레임/새 폰트 크기를 만들기 전에 멈춰라"는 DESIGN.md 원칙을 존중합니다.</p></div>
+        <div class="card"><h4>가정 2 · 순백 → 양피지</h4><p>순백 테두리(#fff)는 픽셀 야간 배경에서 너무
+          쨍합니다. 양피지 백색(#f3edda)으로 눈의 피로를 줄이고 레트로 질감을 더합니다.</p></div>
+        <div class="card"><h4>가정 3 · 색은 의미다</h4><p>독·수면·약화, 자비(영입/살려주기) 등 게임의
+          시그니처 상태를 색으로 구분합니다. a11y: 색만으로 신호하지 않고 항상 라벨·아이콘과 짝.</p></div>
+        <div class="card"><h4>가정 4 · 픽셀 모션</h4><p>비/천둥/눈, 상태이상·타격 이펙트는 모두 코드(canvas/Graphics)로
+          그립니다. 새 에셋 없이 기존 톤 안에서 생동감을 더합니다.</p></div>
+      </div>
+      <p class="note" style="margin-top:24px">아래는 <b>시스템 정의 → 화면별 2~3개 변형 → 인터랙티브 데모</b> 순서입니다.
+        프레임 3종은 모든 창에 공통 적용되는 선택지이며, 화면마다 가장 잘 맞는 조합을 제안합니다.</p>
+    </section>
+
+    <!-- ============ 컬러 ============ -->
+    <section class="block" id="colors" data-screen-label="컬러 시스템">
+      <div class="eyebrow">01 · COLOR TOKENS</div>
+      <h2 class="title">컬러 시스템</h2>
+      <p class="lede">신규 팔레트. 각 토큰은 <strong>CSS Hex</strong>와 <strong>PixiJS 0x</strong>를 함께 명시하고,
+        괄호로 기존 DESIGN.md 값을 표기했습니다.</p>
+      <div id="swatches"></div>
+    </section>
+
+    <!-- ============ 타이포 ============ -->
+    <section class="block" id="type" data-screen-label="타이포그래피">
+      <div class="eyebrow">02 · TYPOGRAPHY</div>
+      <h2 class="title">타이포그래피 — 픽셀 한글 (Galmuri)</h2>
+      <p class="lede">레트로 픽셀 한글 서체 <strong>Galmuri</strong> 패밀리. 정수배 크기(11계열 12·24·36,
+        14계열 30)에서 가장 또렷합니다. 본문은 Galmuri11, 타이틀은 Galmuri14, 수치는 GalmuriMono를 사용합니다.</p>
+      <div id="typespecimens" style="margin-top:18px"></div>
+    </section>
+
+    <!-- ============ 프레임 ============ -->
+    <section class="block" id="frames" data-screen-label="프레임 3종">
+      <div class="eyebrow">03 · FRAME SYSTEM</div>
+      <h2 class="title">프레임 3종 — 동일 창, 세 가지 테두리</h2>
+      <p class="lede">windowBox 프리미티브를 대체할 세 방향. 화면마다 톤에 맞는 것을 고를 수 있고,
+        하나로 통일해도 됩니다.</p>
+      <div class="variants">
+        <div class="variant">
+          <div class="vh"><span class="vlabel">정통+</span><span class="vtag">A · classic</span></div>
+          <div class="vstage"><div class="frame-classic ui" style="width:240px">
+            <div style="font-size:var(--t-command)">기사의 공격!</div>
+            <div class="soft" style="font-size:var(--t-body);margin-top:6px">골렘에게 24 피해</div>
+          </div></div>
+          <p class="vnote">현재 스타일 정련. 둥근 모서리 + 양피지 2중 테두리 + 바닥 그림자.
+            가장 안전하고 친숙. <b>대화창·메시지</b> 추천.</p>
+        </div>
+        <div class="variant">
+          <div class="vh"><span class="vlabel">양각 베벨</span><span class="vtag">B · bevel</span></div>
+          <div class="vstage"><div class="frame-bevel ui" style="width:240px">
+            <div style="font-size:var(--t-command)">기사의 공격!</div>
+            <div class="soft" style="font-size:var(--t-body);margin-top:6px">골렘에게 24 피해</div>
+          </div></div>
+          <p class="vnote">SNES풍 픽셀 입체. 라운드 없이 4면 베벨(좌상 밝음·우하 어둠).
+            가장 "게임다운" 질감. <b>명령창·전투 UI</b> 추천.</p>
+        </div>
+        <div class="variant">
+          <div class="vh"><span class="vlabel">길디드 슬랩</span><span class="vtag">C · gilded</span></div>
+          <div class="vstage"><div class="frame-gilded ui" style="width:240px">
+            <div style="font-size:var(--t-command)">기사의 공격!</div>
+            <div class="soft" style="font-size:var(--t-body);margin-top:6px">골렘에게 24 피해</div>
+          </div></div>
+          <p class="vnote">평면 다크 + 골드 헤어라인 + 코너 장식. 프리미엄/보스전·엔딩 등
+            특별한 순간. <b>상태창·중요 모달</b> 추천.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NPC 대화창 ============ -->
+    <section class="block" id="dialog" data-screen-label="NPC 대화창">
+      <div class="eyebrow">04 · NPC DIALOG / TOAST</div>
+      <h2 class="title">NPC 대화창 · 토스트</h2>
+      <p class="lede">화자 이름표 + 말풍선 본문 + 진행 힌트. 톤 분기 대사(자비로운/무자비)를 색으로 은근히 비추는 변형도 포함.</p>
+      <div class="variants" id="dialogVariants"></div>
+    </section>
+
+    <!-- ============ 전투 명령창 ============ -->
+    <section class="block" id="command" data-screen-label="전투 명령창">
+      <div class="eyebrow">05 · BATTLE COMMAND</div>
+      <h2 class="title">전투 명령창</h2>
+      <p class="lede">공격·주문·아이템·<strong>자비</strong>·운명·방어·도망. 자비는 시그니처라 항상 보이되 조건 미달 시
+        회색 비활성 + 한 줄 사유를 노출합니다.</p>
+      <div class="variants" id="commandVariants"></div>
+    </section>
+
+    <!-- ============ HP/데미지/상태 ============ -->
+    <section class="block" id="combat" data-screen-label="전투 HUD">
+      <div class="eyebrow">06 · BARS · POPUPS · STATUS</div>
+      <h2 class="title">HP바 · 데미지 팝업 · 상태 태그</h2>
+      <p class="lede">픽셀 눈금 HP바, 부드러운 드레인 애니메이션, 떠오르는 데미지/치명타/회복 수치,
+        그리고 의미별 색 + 픽셀 아이콘 상태 태그.</p>
+      <div class="controls">
+        <span class="ctl-label">데모:</span>
+        <button class="btn" id="dmgBtn">피격</button>
+        <button class="btn" id="critBtn">치명타</button>
+        <button class="btn" id="healBtn">회복</button>
+        <button class="btn" id="resetHp">리셋</button>
+      </div>
+      <div id="combatStage" class="stage" style="height:360px;margin-top:14px"></div>
+      <div id="statusShowcase" style="margin-top:26px"></div>
+    </section>
+
+    <!-- ============ 필드 HUD ============ -->
+    <section class="block" id="fieldhud" data-screen-label="필드 HUD">
+      <div class="eyebrow">07 · FIELD HUD</div>
+      <h2 class="title">필드 상태 HUD</h2>
+      <p class="lede">좌상단 파티 HP/MP 미니바 + 골드/운명. 정보 위계를 정리하고 가독성을 높입니다.</p>
+      <div class="variants" id="fieldVariants"></div>
+    </section>
+
+    <!-- ============ 메뉴 상태창 ============ -->
+    <section class="block" id="menu" data-screen-label="메뉴 상태창">
+      <div class="eyebrow">08 · PARTY MENU</div>
+      <h2 class="title">메뉴 상태창</h2>
+      <p class="lede">파티원 레벨·HP·MP·장비. 스탯을 스캔하기 쉽게 정렬하고 장비 슬롯을 아이콘화합니다.</p>
+      <div class="variants" id="menuVariants"></div>
+    </section>
+
+    <!-- ============ 장비 · 인벤토리 ============ -->
+    <section class="block" id="equip" data-screen-label="장비·인벤토리">
+      <div class="eyebrow">08b · EQUIP · INVENTORY · STATUS</div>
+      <h2 class="title">장비 · 인벤토리 · 스테이터스</h2>
+      <p class="lede">JRPG식 풀 메뉴. 좌측 <strong>캐릭터 스테이터스</strong>, 가운데
+        <strong>장비 슬롯(무기·방어구·악세사리)</strong> + 능력치 증감 미리보기, 우측
+        <strong>인벤토리</strong>(카테고리 탭·수량). 키보드로 슬롯↔리스트 이동을 가정한 레이아웃입니다.</p>
+      <div class="controls">
+        <span class="ctl-label">프레임:</span>
+        <button class="btn on" data-eqframe="frame-bevel">양각 베벨</button>
+        <button class="btn" data-eqframe="frame-classic">정통+</button>
+        <button class="btn" data-eqframe="frame-gilded">길디드</button>
+      </div>
+      <div id="equipStage" style="margin-top:14px"></div>
+      <div class="variants" id="equipNotes"></div>
+    </section>
+
+    <!-- ============ 미니맵 / 페이즈 ============ -->
+    <section class="block" id="minimap" data-screen-label="미니맵·페이즈">
+      <div class="eyebrow">09 · MINIMAP · PHASE BANNER</div>
+      <h2 class="title">미니맵 · 페이즈 배너</h2>
+      <p class="lede">미니맵 마커 범례를 색 체계에 통합하고, 턴 전환 배너를 다듬습니다.</p>
+      <div class="variants" id="minimapVariants"></div>
+    </section>
+
+    <!-- ============ 환경 이펙트 ============ -->
+    <section class="block" id="weather" data-screen-label="환경 이펙트">
+      <div class="eyebrow">10 · PIXEL WEATHER</div>
+      <h2 class="title">환경 픽셀 애니메이션</h2>
+      <p class="lede">전부 캔버스로 그리는 경량 이펙트 — 새 에셋 없음. 비 · 천둥 번쩍임 · 눈 · 잿불.
+        전투/필드 배경 위에 레이어로 얹습니다.</p>
+      <div class="controls">
+        <span class="ctl-label">날씨:</span>
+        <button class="btn on" data-wx="rain">비</button>
+        <button class="btn" data-wx="storm">천둥</button>
+        <button class="btn" data-wx="snow">눈</button>
+        <button class="btn" data-wx="embers">잿불</button>
+        <button class="btn" data-wx="clear">맑음</button>
+      </div>
+      <div id="weatherStage" class="stage dungeon" style="height:340px;margin-top:14px;position:relative"></div>
+      <a href="spellfx.html" style="display:flex;align-items:center;gap:16px;margin-top:20px;padding:18px 22px;text-decoration:none;border:2px solid var(--c-gold-deep);border-radius:8px;background:linear-gradient(180deg,rgba(27,32,70,.6),rgba(10,11,22,.6))">
+        <span style="font-size:34px;line-height:1">✦</span>
+        <span style="flex:1">
+          <span style="display:block;font-family:var(--f-display);font-size:22px;color:var(--c-gold)">주문 이펙트 연구소 →</span>
+          <span style="display:block;font-size:17px;color:var(--c-text-soft);margin-top:4px">스펠북 13종(화염 화살·뇌격·대지분쇄·자장가…)의 발사·낙뢰·진동·오라 애니메이션을 별도 페이지에서 재생해 보세요.</span>
+        </span>
+      </a>
+    </section>
+
+    <!-- ============ 인터랙티브 데모 ============ -->
+    <section class="block" id="demo" data-screen-label="인터랙티브 데모">
+      <div class="eyebrow">11 · INTERACTIVE</div>
+      <h2 class="title">인터랙티브 전투 데모</h2>
+      <p class="lede">실제 게임처럼 동작합니다. <span class="kbd">↑</span><span class="kbd">↓</span> 이동 ·
+        <span class="kbd">Z</span> 확인 · <span class="kbd">X</span> 취소. 새 프레임·색·타이포가 통합 적용된 모습.</p>
+      <div id="demoStage" class="stage" style="height:440px;margin-top:14px;position:relative" tabindex="0"></div>
+      <p class="note" style="margin-top:12px">스테이지를 클릭해 포커스한 뒤 키보드로 조작하세요.</p>
+    </section>
+
+    <footer class="foot">던전크래프트 UI 리터치 보드 · 토큰은 <b>css/tokens.css</b>에 선언 ·
+      모든 이펙트는 코드 생성(픽셀아트/캔버스)으로 새 에셋 의존 없음.</footer>
+  </main>
+</div>
+
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<rect width="100" height="100" fill="#12152e"/>
+<rect x="30" y="30" width="40" height="40" fill="none" stroke="#f3edda" stroke-width="3"/>
+<rect x="36" y="44" width="28" height="6" fill="#ffd766"/>
+<rect x="36" y="54" width="18" height="5" fill="#62c46a"/>
+</svg>
+</template>
+
+<script src="js/pixel.js"></script>
+<script src="js/components.js"></script>
+<script src="js/equip.js"></script>
+<script src="js/weather.js"></script>
+<script src="js/demo.js"></script>
+<script src="js/board.js"></script>
+</body>
+</html>

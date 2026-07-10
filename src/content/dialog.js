@@ -1,0 +1,643 @@
+// Dialog content keyed by `talk` id (set on map objects). `lines` are shown one
+// at a time (confirm advances). `action` runs when dialog closes: 'shop' opens
+// the shop, 'inn' heals the party (charges gold), 'heal' free heal.
+
+export const DIALOG = {
+  // Opening cold-open (shown once on new game; gated by flags.intro). Establishes
+  // the shared-universe premise (these are the Crypt Survivors veterans) and the
+  // central choice the mercy mechanic embodies: cut down the lost, or free them.
+  prologue: {
+    speaker: '',
+    lines: [
+      '끝없는 밤이었다.',
+      '묘지에서, 숲에서, 잿더미 속에서 — 우리는 셀 수 없는 마수를 베어 넘겼다.',
+      '그러나 쓰러뜨린 만큼 더 일어섰다. 죽음은 끝이 아니라, 무언가의 시작이었다.',
+      '땅 밑에서 굶주림이 깨어난다. 한때 사람이었던 것들을 비틀어 괴물로 만드는 — 부패.',
+      '해골 왕도, 늑대인간 왕도, 늪의 마녀도 — 그 부패에 삼켜진 가엾은 그릇일 뿐.',
+      '세 용사가 마지막으로 검을 든다. 부패의 심장을 향해 내려간다.',
+      '베어 끝낼 것인가, 아니면 길 잃은 영혼을 구할 것인가 —',
+      '그 선택이, 이 땅의 결말을 가른다.',
+    ],
+  },
+  // First-game controls + objective primer (chained after the prologue, once).
+  tutorial: {
+    speaker: '조작 안내',
+    lines: [
+      '이동: 방향키 또는 WASD. 마을 밖에는 마수가 돌아다닌다 — 닿으면 전투.',
+      '조사 / 대화 / 확인: Z. 표지판·상자·NPC를 마주 보고 Z.',
+      '메뉴(아이템·장비·동료): X. 상점과 여관은 마을에서.',
+      '목표: 남쪽 문으로 황야를 지나 지하묘로. 부패에 삼켜진 세 군주를 막아라.',
+      '— 베어 끝낼지, 길 잃은 영혼을 구할지는 너희의 선택이다.',
+    ],
+  },
+  elder_intro: {
+    speaker: '마을 장로',
+    lines: [
+      '오, 돌아왔는가. 수많은 밤을 살아남은 자들이여.',
+      '뼈의 지하묘에서 해골 왕이 깨어났네. 한때는 이 마을을 지키던 기사였지...',
+      '이제 부패가 그를 집어삼켰어. 그를 멈추지 않으면 마을이 끝장이야.',
+      '허나 기억하게 — 그 안에 아직 사람이 남아 있을지도 모른다네.',
+      '동쪽 황야를 지나 지하묘로. 부디, 칼을 들기 전에 한 번 더 생각하게.',
+    ],
+  },
+  shop: { speaker: '상점 주인', lines: ['어서 오세요! 무엇을 사시겠어요?'], action: 'shop' },
+  // Specialized merchants (action 'shop' + shop key → ShopScene SHOPS[key]).
+  shop_smith: { speaker: '대장장이', lines: ['무기와 갑옷이라면 내 화로에서 나온 게 최고지. 골라 보게.'], action: 'shop', shop: 'smith' },
+  shop_jeweler: { speaker: '보석상', lines: ['반지에 장화에 부적까지 — 반짝이는 건 다 있다네.'], action: 'shop', shop: 'jeweler' },
+  shop_alchemist: { speaker: '연금술사', lines: ['물약과 비약, 그리고 귀환서. 여정에 필요한 건 여기서.'], action: 'shop', shop: 'alchemist' },
+  inn: {
+    speaker: '여관 주인',
+    lines: ['하룻밤 쉬어가시겠어요? (10 골드)'],
+    action: 'inn',
+  },
+  // Town companion recruits — talk once to add them to the party (main.recruitHero
+  // folds them in on close, then shows the join line). The NPC vanishes after.
+  recruit_knight: {
+    speaker: '기사',
+    lines: [
+      '자네도 저 부패와 싸우려는 건가.',
+      '나는 한때 이 마을을 지키던 검이었네. 다시 그 맹세를 들 때가 온 듯하군.',
+      '함께 가지. 내 방패가 자네의 등을 지킬 걸세.',
+    ],
+  },
+  recruit_warrior: {
+    speaker: '전사',
+    lines: [
+      '또 혼자 지하묘로 내려갈 셈인가, 기사?',
+      '그 부패, 칼맛을 좀 봐야 정신을 차리지. 내 도끼가 근질거린다.',
+      '같이 가지. 베어 넘길 게 많을 테니까.',
+    ],
+  },
+  recruit_huntress: {
+    speaker: '사냥꾼',
+    lines: [
+      '...네가 그 기사로군. 소문은 들었다.',
+      '나는 멀리서 본다. 네가 놓치는 것들을.',
+      '동행을 허락하지. 화살이 닿는 곳까진 내가 맡는다.',
+    ],
+  },
+  recruit_duelist: {
+    speaker: '쌍검사',
+    lines: [
+      '나? 떠돌이 현상금 사냥꾼이다. 저 부패엔 한 푼도 안 걸렸지만—',
+      '총이랑 폭탄이 좀이 쑤셔서 말이야. 가만히 있질 못하겠군.',
+      '앞장서. 한 발에 하나씩, 빠르게 끝내주지.',
+    ],
+  },
+  gate_sign: { speaker: '표지판', lines: ['↓ 황야로 가는 남쪽 문'] },
+  town_portal: { speaker: '귀환 포탈', lines: ['룬이 새겨진 차원의 문. 가본 적 있는 지역으로 단숨에 이동한다.'], action: 'warp' },
+  wild_sign: { speaker: '표지판', lines: ['황야 — 마수가 출몰한다. 동쪽으로 가면 지하묘.'] },
+  dungeon_sign: { speaker: '표지판', lines: ['→ 뼈의 지하묘. 해골 왕이 잠든 곳.'] },
+  dungeon_warn: { speaker: '낡은 비석', lines: ['"여기 잠든 기사, 마을을 위해 끝까지 싸우다."', '...이름은 부패에 갉아먹혀 읽을 수 없다.'] },
+  boss_intro: {
+    speaker: '해골 왕',
+    lines: ['크크크... 살아있는 자들이 감히 내 안식을 깨우는가.', '너희의 뼈로 내 왕좌를 쌓으리라!', '(잠깐 — 텅 빈 눈동자 깊은 곳에서, 무언가 애원하는 듯한 빛이 스친다.)'],
+  },
+  boss_win: {
+    speaker: '',
+    lines: ['해골 왕이 무너져 먼지가 되었다.', '동쪽 봉인이 풀렸다 — 서리첨탑으로 가는 길이 열렸다.'],
+  },
+
+  // ─── 1막 「재의 계시」 — 방랑자 에녹 (Unity 스토리 바이블 역이식, 자비 렌즈) ───
+  // 에녹의 1차 계시: 에레보스 제국 신화의 첫 조각 + 어둠숲 지목. "같은 진실, 다른
+  // 공개 속도" — 자비 톤은 황제의 비극을 일찍 암시받고, 잔혹 톤은 위협만 듣는다
+  // (진실 전체는 2막 황제전에서 동일한 독백으로 만난다). tonedDialogId가 스왑.
+  enoch_act1: {
+    speaker: '방랑자 에녹',
+    lines: [
+      '...별이 우는 밤이 잦아졌군. 자네가 그 용사인가.',
+      '옛날, 이 대륙엔 에레보스 제국이 있었네. 돌과 청동으로 도시를 세우고, 마법으로 겨울을 길들였지.',
+      '그들의 황제는 죽음을 두려워했어. 그래서 세계의 바깥 — 심연의 문을 열었네.',
+      '문은 열렸고... 들어온 것은 영생이 아니라 부패였다.',
+      '저 해골도, 늑대도, 늪의 마녀도 — 전부 그 부패가 흘려보낸 권속일 뿐이야.',
+      '황야 남쪽, 어둠숲부터 가 보게. 부패가 이 땅을 비틀기 시작한 첫 자리이니.',
+      '숲의 감시자가 아직 그곳을 지키고 있다네... 비틀린 채로, 여전히 지키고 있어.',
+    ],
+  },
+  enoch_act1_merciful: {
+    speaker: '방랑자 에녹',
+    lines: [
+      '...자네에게선 피 냄새보다 재 냄새가 나는군. 살려 보낸 자들의 재 말일세. 좋은 징조야.',
+      '옛날, 이 대륙엔 에레보스 제국이 있었네. 그들의 황제는 죽음을 두려워했지.',
+      '허나 기억해 두게 — 두려움이 전부는 아니었을지도 몰라. 지키려던 것이 있는 자만이 그렇게까지 무너지는 법이니.',
+      '황제는 심연의 문을 열었고, 들어온 것은 영생이 아니라 부패였다.',
+      '자네가 살려 보내는 것들 — 그 안에 아직 사람이 남아 있다는 걸 자네는 이미 알고 있군.',
+      '황야 남쪽, 어둠숲으로 가 보게. 부패의 첫 자리에, 아직 제 소임을 잊지 못한 감시자가 있으니.',
+    ],
+  },
+  enoch_act1_ruthless: {
+    speaker: '방랑자 에녹',
+    lines: [
+      '...자네에게선 강철 냄새가 나는군. 베어 넘긴 것들의 숫자만큼.',
+      '옛날, 이 대륙엔 에레보스 제국이 있었네. 그들의 황제는 죽음을 거부했고, 심연의 문을 열었지.',
+      '들어온 것은 부패였다. 그게 전부야 — 지금은, 그게 전부라고만 해 두지.',
+      '자네의 검이 답이라면, 답이 무엇을 남기는지는 끝에 가서 보게 될 걸세.',
+      '황야 남쪽, 어둠숲. 부패의 첫 자리다. 감시자가 기다리고 있어 — 자네 같은 자를.',
+    ],
+  },
+
+  // 에녹 재대화 리마인더 (`_done` 스왑 — 계시는 막마다 한 번, 반복 대화는 목표만 짚는다).
+  enoch_act1_done: {
+    speaker: '방랑자 에녹',
+    lines: ['...길은 이미 일러 주었네. 황야 남쪽 어둠숲 — 그리고 지하묘.', '별이 우는 밤이 길어지고 있어. 서두르게.'],
+  },
+  enoch_act2_done: {
+    speaker: '방랑자 에녹',
+    lines: ['...돌에 새겨진 것은 거짓말을 못 하네. 폐허 남쪽, 지하 의식장을 잊지 말게.', '끝은 옥좌에서 기다리고 있어.'],
+  },
+  enoch_act3_done: {
+    speaker: '방랑자 에녹',
+    lines: ['...남쪽 잿길, 별무덤일세. 그 너머 — 심부, 그리고 균열.', '이제 길은 자네의 것이야. 우리는 여기서 기다리지.'],
+  },
+
+  // ─── 2막 「잿더미의 진실」 — 에녹 2차 계시 (서리첨탑 입구) ───
+  // 자비 톤 = 황제의 동기를 한 발 더 암시("지키려던 자"), 잔혹 톤 = 위협만.
+  // 진실 전체는 옥좌의 독백(empire_boss_win — 톤 무관 동일 대사)에서 만난다.
+  enoch_act2: {
+    speaker: '방랑자 에녹',
+    lines: [
+      '...여기까지 왔군. 지하묘의 왕이 잠들었다는 소문은 바람보다 빨랐네.',
+      '이 얼음 너머의 왕도, 늪의 마녀도 — 전부 제국이 무너지던 밤에 태어난 것들이야.',
+      '들어 보게. 부패는 가장 먼저 황제를 삼켰고, 그 다음 제국 전체를 집어삼켰네.',
+      '폐허의 시가지 남쪽, 지하로 내려가는 계단이 있어. 황제가 문을 연 바로 그 의식장이지.',
+      '옥좌로 가기 전에, 그곳을 보게. 돌에 새겨진 것은 거짓말을 못 하니.',
+    ],
+  },
+  enoch_act2_merciful: {
+    speaker: '방랑자 에녹',
+    lines: [
+      '...자네로군. 살려 보낸 것들의 소문이 얼음보다 먼저 도착했다네.',
+      '이 너머의 왕도, 늪의 마녀도 — 제국이 무너지던 밤에 태어난 것들이야.',
+      '부패는 가장 먼저 황제를 삼켰네. 헌데 이상하지 않은가 — 왜 하필 황제가 가장 먼저였을까.',
+      '문 앞에 제일 가까이 서 있던 자가, 문을 열기만 한 자였을까... 아니면 막아서던 자였을까.',
+      '폐허 시가지 남쪽, 지하 의식장으로 내려가 보게. 돌에 새겨진 것은 거짓말을 못 하니.',
+      '자네처럼 살리는 자라면 — 그 돌이 하는 말을 알아들을 걸세.',
+    ],
+  },
+  enoch_act2_ruthless: {
+    speaker: '방랑자 에녹',
+    lines: [
+      '...검이 무거워 보이는군. 벤 만큼 실린 무게겠지.',
+      '이 너머의 왕도, 늪의 마녀도 — 제국이 무너지던 밤에 태어난 것들이야. 자네 방식대로라면, 벨 것이 많겠어.',
+      '황제가 문을 열었고, 부패가 들어왔다. 지금 자네에게 필요한 건 그게 전부겠지.',
+      '폐허 시가지 남쪽에 지하 의식장이 있네. 보든 안 보든 — 끝은 옥좌에서 기다리고 있어.',
+    ],
+  },
+
+  // ─── 3막 「최후의 등반」 — 에녹 3차 계시 (불의 분화구) + 별무덤 ───
+  enoch_act3: {
+    speaker: '방랑자 에녹',
+    lines: [
+      '...옥좌의 이야기를 들었네. 황제가 무엇을 가두려 했는지도.',
+      '균열의 목소리가 더 크게 울고 있어. 들리는가 — 그건 제국의 비명이 아니야. 세계의 바깥, 닿아선 안 될 것의 숨소리지.',
+      '남쪽 잿길 끝에 별무덤이 있네. 균열이 열리던 밤, 별들이 그걸 막으려 제 몸을 던져 떨어진 들판이야.',
+      '가장 크게 떨어진 별이 아직 크레이터에 박혀 있다네. 부패에 붙들린 채로... 여전히 빛나면서.',
+      '그 별을 지나야 심부로 가는 길이 온전해져. 그리고 그 너머 — 공허의 군주가 기다린다.',
+      '이것이 마지막 계시일세. 우리는 더 올라갈 수 없으니, 이제 길은 자네의 것이야.',
+    ],
+  },
+  enoch_act3_merciful: {
+    speaker: '방랑자 에녹',
+    lines: [
+      '...자네로군. 황제를 용서한 자. 그의 자비가 오만이었다면, 자네의 자비는 무엇이 될까.',
+      '균열의 목소리가 더 크게 울고 있어. 세계의 바깥, 닿아선 안 될 것의 숨소리지.',
+      '남쪽 잿길 끝, 별무덤으로 가게. 균열이 열리던 밤 별들이 제 몸을 던져 떨어진 들판이야.',
+      '가장 크게 떨어진 별이 아직 부패에 붙들린 채 빛나고 있네. 자네라면... 그 별을 해방할 수 있을지도 몰라.',
+      '황제는 가두려다 삼켜졌고, 별은 막으려다 떨어졌지. 자비가 늘 지는 건 아니라는 걸 — 자네가 증명해 보게.',
+      '이것이 마지막 계시일세. 이제 길은 자네의 것이야.',
+    ],
+  },
+  enoch_act3_ruthless: {
+    speaker: '방랑자 에녹',
+    lines: [
+      '...옥좌에서 진실을 들었을 텐데도, 검은 여전히 무겁군.',
+      '균열의 목소리가 더 크게 울고 있어. 자네가 벤 모든 것들 너머에서 — 아직 베어지지 않은 것이.',
+      '남쪽 잿길 끝에 별무덤이 있네. 별들조차 그것과 싸우다 떨어졌지. 자네의 방식과 같아 — 부딪히고, 부서지는.',
+      '크레이터의 별은 부패에 붙들려 있어. 자네라면 어떻게 할지, 묻지 않겠네.',
+      '이것이 마지막 계시일세. 끝에서 무엇을 만나든 — 그건 자네가 고른 끝이야.',
+    ],
+  },
+  starfall_sign: {
+    speaker: '잿빛 비석',
+    lines: ['"별무덤 — 균열의 밤, 하늘이 스스로를 던진 곳."', '재 아래에서 희미한 빛이 맥박처럼 새어 나온다.'],
+  },
+  starfall_crater_sign: {
+    speaker: '금간 표석',
+    lines: ['"동쪽 크레이터 — 가장 큰 별이 잠든 자리."', '"빛이 꺼지기 전에는 아무도 그 잠을 깨우지 못했다."'],
+  },
+  starfall_tomb_sign: {
+    speaker: '크레이터 가장자리의 비문',
+    lines: ['"떨어진 것은 패배가 아니다. 막아선 것이다."'],
+  },
+  fallen_star_intro: {
+    speaker: '떨어진 별',
+    lines: [
+      '(크레이터 중앙, 금빛 잔해가 천천히 떠오른다. 그 빛의 결을 따라 검은 부패가 실핏줄처럼 얽혀 있다.)',
+      '(별은 말이 없다 — 다만, 우는 소리가 들린다. 에녹이 말하던 바로 그 소리다.)',
+    ],
+  },
+  fallen_star_win: {
+    speaker: '',
+    lines: ['별의 잔해가 흩어지며 빛이 잦아든다.', '잿빛 들판에 처음으로 — 진짜 별빛이 내려앉는다.', '심부로 가는 길이 온전해졌다.'],
+  },
+  fallen_star_win_merciful: {
+    speaker: '',
+    lines: [
+      '부패가 벗겨진 자리에서, 별이 마지막으로 온전하게 빛났다.',
+      '우는 소리가 멎었다. 하늘로 돌아가지는 못해도 — 이제 편히 잠들 수 있다.',
+      '잿빛 들판에 진짜 별빛이 내려앉는다. 심부로 가는 길이 온전해졌다.',
+    ],
+  },
+  fallen_star_win_ruthless: {
+    speaker: '',
+    lines: [
+      '별의 잔해가 산산이 부서졌다. 빛도, 울음도 함께 끝났다.',
+      '별들조차 부딪혀 떨어진 싸움을 — 너희는 부수는 것으로 끝냈다.',
+      '심부로 가는 길이 온전해졌다.',
+    ],
+  },
+
+  // 지하 의식장 (2막 스토리 존) — 환경 스토리텔링: 황제 재해석의 사전 씨앗.
+  ruins_rite_sign: {
+    speaker: '금간 비석 — 의식의 기록',
+    lines: [
+      '"...균열은 의식 이전부터 새고 있었다. 사흘 밤, 별이 울었다."',
+      '"현자들은 도주를 간했다. 폐하께서는 남으셨다."',
+    ],
+  },
+  ruins_oath_sign: {
+    speaker: '제단 아래 비문 — 황제의 맹세',
+    lines: [
+      '"넘치는 것이 있어야 한다면, 그 그릇은 짐이 될 것이다."',
+      '"제국 대신, 나 하나로." — 서명은 불에 그을려 읽을 수 없다.',
+    ],
+  },
+  seal_guardian_intro: {
+    speaker: '봉인의 파수병',
+    lines: [
+      '(금빛 서약 인장이 창끝에서 타오른다.)',
+      '"돌아가라... 이곳은 폐하의 마지막 명이 잠든 곳. 누구도... 의식장을 어지럽힐 수 없다."',
+    ],
+  },
+  seal_guardian_win: {
+    speaker: '',
+    lines: ['파수병이 무너져 내렸다. 금빛 인장이 천천히 식는다.', '제단의 비문이 이제 온전히 드러났다.'],
+  },
+  seal_guardian_win_merciful: {
+    speaker: '',
+    lines: [
+      '파수병이 창을 거두었다. "...폐하의 명을, 그대가 이어 주겠는가."',
+      '수백 년의 보초가 끝났다. 금빛 인장이 편안하게 식어 간다.',
+      '제단의 비문이 이제 온전히 드러났다.',
+    ],
+  },
+  seal_guardian_win_ruthless: {
+    speaker: '',
+    lines: [
+      '파수병은 마지막까지 제단을 등지고 스러졌다.',
+      '수백 년을 지킨 서약이, 한순간에 끝났다.',
+      '제단의 비문이 이제 온전히 드러났다.',
+    ],
+  },
+
+  // 어둠숲 (1막 스토리 존)
+  darkforest_sign: {
+    speaker: '이끼 낀 표지판',
+    lines: ['"어둠숲 — 묘지기의 숲"', '"...개를 조심하시오. 아니, 개였던 것을."'],
+  },
+  dark_warden_intro: {
+    speaker: '어둠숲의 감시자',
+    lines: [
+      '크르르르... (거대한 사냥개가 보랏빛으로 물든 눈을 치켜뜬다.)',
+      '(부패에 비틀린 몸으로도, 여전히 무언가를 지키려는 듯 무덤가를 벗어나지 않는다.)',
+    ],
+  },
+  dark_warden_win: {
+    speaker: '',
+    lines: ['감시자가 쓰러졌다. 숲의 어둠이 옅어진다.', '동쪽, 지하묘의 봉인이 흔들리는 소리가 들린다.'],
+  },
+  dark_warden_win_merciful: {
+    speaker: '',
+    lines: [
+      '감시자가 으르렁거림을 멈추고 — 처음으로, 개처럼 낑낑거렸다.',
+      '부패 아래 아직 남아 있던 것: 주인을 기다리던 충직한 눈.',
+      '숲이 숨을 돌린다. 동쪽 지하묘의 봉인이 흔들리는 소리가 들린다.',
+    ],
+  },
+  dark_warden_win_ruthless: {
+    speaker: '',
+    lines: [
+      '감시자는 마지막까지 무덤가를 지키다 스러졌다.',
+      '무엇을 지키고 있었는지는, 이제 아무도 모른다.',
+      '동쪽, 지하묘의 봉인이 흔들리는 소리가 들린다.',
+    ],
+  },
+  frost_gate: { speaker: '얼어붙은 문', lines: ['거대한 얼음 문. 해골 왕의 봉인이 막고 있다...'] },
+  frost_warn: { speaker: '얼음 비석', lines: ['"달의 군주는 본디 사냥꾼들의 수호자였다."', '"부패가 그의 긍지를 굶주림으로 바꾸기 전까지는."'] },
+  frost_boss_intro: {
+    speaker: '늑대인간 왕',
+    lines: ['크르릉... 인간의 냄새. 오랜만이군.', '너희의 온기로 이 겨울을 녹이겠다!', '(그의 울부짖음 끝에, 잃어버린 무리를 부르는 슬픔이 배어 있다.)'],
+  },
+  frost_boss_win: {
+    speaker: '',
+    lines: ['늑대인간 왕이 달빛 속으로 흩어졌다.', '동쪽 얼음벽이 갈라졌다 — 마녀의 늪으로 가는 길이 열렸다.'],
+  },
+  // Optional minibosses (spareable field bosses; no story gating).
+  frost_queen_intro: {
+    speaker: '서리 여왕',
+    lines: ['감히 내 동토를 밟는 자가 있다니.', '얼어붙은 왕좌의 주인 앞에서 — 너희의 온기가 얼마나 가는지 보자.'],
+  },
+  frost_queen_win: { speaker: '', lines: ['서리 여왕이 빛나는 얼음 가루가 되어 흩어졌다.', '동토에 잠시, 봄의 기척이 스민다.'] },
+  blood_count_intro: {
+    speaker: '핏빛 백작',
+    lines: ['폐허에 발을 들인 어린 양들이군.', '제국이 무너져도 나의 갈증은 영원하지. 너희의 피로 그것을 달래주마.'],
+  },
+  blood_count_win: { speaker: '', lines: ['핏빛 백작이 한 줌의 재로 부서졌다.', '시가지를 떠돌던 핏빛 안개가 비로소 걷힌다.'] },
+
+  swamp_gate: { speaker: '독기 어린 안개', lines: ['짙은 독무가 길을 막는다. 늑대인간 왕의 봉인이 풀려야 지나갈 수 있다...'] },
+  swamp_warn: { speaker: '썩은 표지판', lines: ['"마녀는 모든 길 잃은 영혼을 늪으로 거둬들였다."', '"구원이었을까, 아니면 부패의 시작이었을까 — 이제 와선 아무도 모른다."'] },
+  swamp_boss_intro: {
+    speaker: '늪의 마녀',
+    lines: ['후후... 신선한 영혼이 제 발로 찾아왔구나.', '이 가마솥은 부패의 심장. 모든 게 여기서 시작됐지.', '끝내러 왔느냐, 아니면... 구하러 왔느냐?'],
+  },
+  swamp_boss_win: {
+    speaker: '',
+    lines: ['늪의 마녀가 독무와 함께 스러졌다.', '"부패의 뿌리는... 더 동쪽에 있다... 무너진 제국에..."', '동쪽 독무가 걷혔다 — 폐허가 된 제국으로 가는 길이 열렸다.'],
+  },
+
+  // --- Mercy-ratio ending branches (selected by main.js via `${win}_${tone}`).
+  // merciful (≥70% spared/recruited) / ruthless (≥70% slain) / else neutral. ---
+  boss_win_merciful: { speaker: '', lines: ['해골 왕이 스러지며 중얼거렸다. "자비를 아는 자라니..."', '쓰러진 마수들의 영혼이 너희를 따른다. 동쪽 봉인이 풀렸다.'] },
+  boss_win_ruthless: { speaker: '', lines: ['해골 왕이 산산이 부서졌다. 자비는 없었다.', '두려움이 황야에 퍼진다. 동쪽 봉인이 풀렸다.'] },
+  frost_boss_win_merciful: { speaker: '', lines: ['늑대인간 왕이 달빛 속에 미소 지었다. "넌... 사냥꾼이 아니구나."', '얼음벽이 갈라진다 — 마녀의 늪으로.'] },
+  frost_boss_win_ruthless: { speaker: '', lines: ['늑대인간 왕의 비명이 첨탑을 울렸다. 너희는 멈추지 않았다.', '얼음벽이 갈라진다 — 마녀의 늪으로.'] },
+  swamp_boss_win_merciful: {
+    speaker: '',
+    lines: ['늪의 마녀가 눈을 감았다. "이 땅을... 부탁하마. 동쪽의 그분도... 한때는 자비로웠지."', '구원받은 영혼들이 빛이 되어 동쪽을 가리킨다 — 무너진 제국으로.'],
+  },
+  swamp_boss_win_ruthless: {
+    speaker: '',
+    lines: ['늪의 마녀가 저주를 내뱉으며 스러졌다. "가라... 동쪽의 황제도 너희처럼 멈추지 않았다..."', '독무가 걷힌다 — 무너진 제국으로 가는 길이 열렸다.'],
+  },
+
+  // --- Fallen Empire (fourth region). Theme = RESPECT (존경/멸시): a fallen
+  // knight who tests whether you honor a worthy foe, and the emperor whose end
+  // is the true finale. Win lines + _merciful/_ruthless variants via main.js. ---
+  empire_gate_locked: { speaker: '독무에 잠긴 성문', lines: ['무너진 성문이 독무에 잠겨 있다. 늪의 마녀가 쓰러져야 길이 열린다...'] },
+  empire_gate_sign: { speaker: '무너진 비문', lines: ['"여기 영원의 제국이 섰노라."', '글귀의 절반은 깨져 나갔고, 나머지는 이끼가 삼켰다.'] },
+  empire_camp_sign: { speaker: '낡은 팻말', lines: ['"피란민 야영 — 들어오라, 그러나 무기는 거두라."', '제국이 무너진 뒤, 살아남은 자들이 폐허에 깃들었다.'] },
+  // Court mage who survived the empire's fall — joins as the 4th hero (mage class).
+  recruit_mage: {
+    speaker: '궁정 마법사',
+    lines: [
+      '...살아있는 자라니. 그것도 칼이 아닌 의지를 든 자들이.',
+      '나는 한때 황제의 곁에서 별을 읽던 마법사. 제국이 부패에 삼켜질 때, 막지 못했지.',
+      '그대들의 여정 끝에 폐하가 있다면 — 내 불꽃과 서리를, 그 빚을 갚는 데 쓰고 싶다.',
+      '동행하지. 마법은 멀리서 적을 태우고 얼린다 — 다만 나는 약하니, 부디 앞을 맡아다오.',
+    ],
+  },
+  empire_camp_veteran: {
+    speaker: '늙은 병사',
+    lines: ['황제 폐하는... 한때 위대하셨소. 부패가 그분을 삼키기 전까진.', '옥좌로 가려거든, 내성의 타락한 기사를 지나야 하오.', '그자도 한땐 충신이었지. 어떻게 대할지는... 그대들 몫이오.'],
+  },
+  empire_camp_veteran_merciful: {
+    speaker: '늙은 병사',
+    lines: ['적조차 살려 보낸다는 그 소문, 여기까지 들렸소.', '어쩌면... 그대들이라면 폐하의 안에 남은 무언가를 깨울지도 모르겠군.'],
+  },
+  empire_camp_veteran_ruthless: {
+    speaker: '늙은 병사',
+    lines: ['그대들이 지나온 길엔 잿더미뿐이라더군.', '폐하를 끝장낼 힘은 충분하겠소. 다만... 끝이 평화일지는 모르겠소.'],
+  },
+  empire_camp_refugee: {
+    speaker: '겁먹은 피란민',
+    lines: ['제발... 우릴 해치지 말아요. 우린 그저 살아남았을 뿐이에요.', '내성에서 비명이 들려와요. 기사님이... 아직도 문을 지키고 있어요.'],
+  },
+  empire_camp_refugee_merciful: {
+    speaker: '안도한 피란민',
+    lines: ['당신들은... 다르군요. 칼을 거두는 손이라니.', '부디 그 마음으로 황제 폐하께도 가 주세요.'],
+  },
+  empire_camp_refugee_ruthless: {
+    speaker: '떠는 피란민',
+    lines: ['당신들 눈빛이... 황제 폐하를 닮았어요. 무서워요.', '그래도... 이 지옥을 끝내 준다면, 그걸로 됐어요.'],
+  },
+  empire_city_sign: { speaker: '갈라진 도로 표석', lines: ['"내성 — 옥좌의 길."', '무너진 거리 너머, 단 한 사람의 그림자가 길을 막고 서 있다.'] },
+  // 자비 셋피스 — the caged beast. Freeing it (on dialog close, recruitAlly) lets
+  // it join. The empire chained it as a weapon; you choose mercy instead.
+  caged_hound: {
+    speaker: '갇힌 사냥개',
+    lines: [
+      '쇠창살 너머, 잿불빛 눈이 너를 올려다본다.',
+      '제국이 무기로 길들이려 가둔 짐승 — 굶주리고, 지쳐 있다.',
+      '...너는 검을 뽑지 않았다. 우리 문을 열었을 뿐.',
+    ],
+  },
+  // 협곡 다리 옵션 지역 (C단계 붕괴다리). The bridge sign + the spareable warden.
+  empire_bridge_sign: { speaker: '부서진 이정표', lines: ['"심연의 다리 — 건너는 자, 파수꾼의 시험을 받으라."', '발밑의 돌다리가 위태롭게 흔들린다. 저 너머에 무언가 잠들어 있다.'] },
+  bridge_warden_intro: {
+    speaker: '다리 파수꾼',
+    lines: ['…거대한 석상이 사슬을 끌며 깨어난다.', '제국이 이 다리를 지키라 명한 뒤로, 그는 수백 년을 홀로 서 있었다.', '명령은 사라졌으나, 사슬은 남았다 — 그를 풀어줄 것인가, 부술 것인가.'],
+  },
+  bridge_warden_win: { speaker: '', lines: ['다리 파수꾼이 무릎을 꿇었다. 심연 너머의 길이 열린다.'] },
+  bridge_warden_win_merciful: { speaker: '', lines: ['파수꾼의 눈에서 빛이 누그러졌다. "…사슬을, 풀어주는 손이라니."', '그는 처음으로, 명령이 아닌 의지로 고개를 숙였다.'] },
+  bridge_warden_win_ruthless: { speaker: '', lines: ['파수꾼이 돌조각이 되어 흩어졌다. 수백 년의 파수가 끝났다.', '심연 너머의 길이 열렸다.'] },
+
+  // 도덕 선택 방 (C단계) — a captured imperial deserter the refugees would execute.
+  // The terminal `choices` make dialogScene show a selector; main.resolveMoral
+  // applies the outcome (mercy→mercied++, ruthless→slain++ — feeds the tone/ending)
+  // and shows the matching follow-up. One-time (flag), so the NPC then vanishes.
+  moral_deserter: {
+    speaker: '사로잡힌 탈영병',
+    lines: [
+      '쇠사슬에 묶인 제국 병사가 고개를 든다 — 앳된 얼굴이다.',
+      '"나는… 도망쳤소. 황제의 명을 더는 따를 수 없어서."',
+      '"피란민들은 나를 베라 하오. 제국의 개였으니. ...당신들은, 어찌하겠소?"',
+    ],
+    choices: ['살려 보낸다 (자비)', '처형한다 (잔혹)'],
+  },
+  moral_deserter_spared: {
+    speaker: '풀려난 탈영병',
+    lines: ['"…고맙소. 이 은혜, 잊지 않겠소."', '그는 품에서 낡은 부적을 꺼내 쥐여주고 폐허 너머로 사라졌다.', '(피란민들이 너희를 바라보는 눈빛이 조금 누그러졌다.)'],
+  },
+  moral_deserter_slain: {
+    speaker: '',
+    lines: ['탈영병은 끝내 변명할 기회를 얻지 못했다.', '그의 군낭에서 약간의 보급품이 나왔다.', '(피란민들이 숨을 죽이고 너희를 피한다.)'],
+  },
+
+  // 서리 도덕 선택 — a hunter frozen alive in the spire's ice.
+  moral_frozen_hunter: {
+    speaker: '얼음에 갇힌 사냥꾼',
+    lines: [
+      '두꺼운 얼음 속, 사냥꾼 하나가 산 채로 갇혀 있다 — 아직 눈을 깜빡인다.',
+      '"…살아… 있소. 늑대 군주를 쫓다… 얼어붙었지."',
+      '얼음을 녹여 구할 수도, 그대로 부숴 그가 지닌 것을 취할 수도 있다.',
+    ],
+    choices: ['녹여 구한다 (자비)', '얼음을 부숴 약탈한다 (잔혹)'],
+  },
+  moral_hunter_spared: {
+    speaker: '구출된 사냥꾼',
+    lines: ['"…고맙소. 이 은혜는 사냥꾼의 긍지로 갚으리다."', '그는 자신의 수호 부적을 건네고, 절뚝이며 빛 속으로 향했다.'],
+  },
+  moral_hunter_slain: {
+    speaker: '',
+    lines: ['얼음이 깨지는 소리와 함께, 사냥꾼의 눈빛이 사그라들었다.', '얼어붙은 그의 짐에서 쓸 만한 것들을 챙겼다.'],
+  },
+
+  // 늪 도덕 선택 — a soul half-drowned in the mire, neither living nor dead.
+  moral_mire_soul: {
+    speaker: '늪에 잠긴 영혼',
+    lines: [
+      '늪 한가운데, 반쯤 잠긴 형체가 희미하게 빛난다 — 마녀가 거둔 길 잃은 영혼.',
+      '"놓아… 주오. 아니면… 내 안의 것을… 가져가든지."',
+      '안식을 줄 수도, 그 잔존한 마력을 흡수할 수도 있다.',
+    ],
+    choices: ['안식을 준다 (자비)', '마력을 흡수한다 (잔혹)'],
+  },
+  moral_soul_spared: {
+    speaker: '풀려난 영혼',
+    lines: ['"…고맙소. 부패의 사슬이… 비로소 풀렸소."', '영혼은 빛으로 흩어지며, 작은 부적 하나를 남겼다.'],
+  },
+  moral_soul_slain: {
+    speaker: '',
+    lines: ['너는 영혼의 잔존한 마력을 빨아들였다 — 손끝이 저릿하다.', '늪이 잠시 더 어두워진 듯하다.'],
+  },
+  empire_gate_choice: { speaker: '두 갈래 문', lines: ['옥좌로 향하는 두 개의 문. 정문과 뒷문.', '어느 쪽이 열릴지는 — 네가 기사를 어떻게 보냈는가에 달렸다.'] },
+  empire_frontgate_locked: { speaker: '굳게 닫힌 정문', lines: ['정문은 기사에게 경의를 표한 자에게만 열린다. 아직은 굳게 닫혀 있다.'] },
+  empire_backgate_locked: { speaker: '무너진 뒷문', lines: ['뒷문은 기사를 베고 지나간 자리에만 열린다. 아직은 잔해가 막고 있다.'] },
+  empire_knight_intro: {
+    speaker: '타락한 기사',
+    lines: ['멈춰라. 이 문은 내가 지킨다 — 죽어서도, 부패해서도.', '폐하께 닿고 싶다면, 먼저 나를 넘어야 한다.', '(그의 검끝은 떨리고 있다. 명예였을까, 아니면 두려움일까.)'],
+  },
+  empire_knight_win: {
+    speaker: '',
+    lines: ['타락한 기사가 한쪽 무릎을 꿇었다. 길이 열린다.'],
+  },
+  empire_knight_win_merciful: {
+    speaker: '',
+    lines: ['타락한 기사가 검을 내렸다. "...경의를. 오랜만에 느껴 보는군."', '그는 정문을 손수 열어 주었다. "폐하를, 부디 같은 눈으로 보아 주시오."'],
+  },
+  empire_knight_win_ruthless: {
+    speaker: '',
+    lines: ['타락한 기사가 잔해 속으로 무너졌다. 마지막 숨이 잦아든다.', '막혔던 뒷문이 그 무게에 함께 허물어졌다.'],
+  },
+  empire_throne_sign: { speaker: '옥좌의 비문', lines: ['"짐이 곧 제국이다."', '먼지가 글자를 덮었지만, 오만만은 아직 또렷하다.'] },
+  empire_boss_intro: {
+    speaker: '타락한 황제',
+    lines: ['…손님인가. 짐의 폐허에 발을 들인 간 큰 자들이.', '제국은 무너졌다. 허나 그 원한은 짐과 함께 영원하리라.', '와서 보아라 — 끝까지 멈추지 않은 자의 말로를!'],
+  },
+  // 황제의 최종 독백 (2막 반전 — "잘못된 자비" 재해석). 원칙: 독백은 톤과 무관하게
+  // **한 글자도 다르지 않다** — 진실은 하나, 듣는 자만 다르다. 톤 변형은 독백 뒤의
+  // 리액션 라인과 결말 표어만 분기 (D7: 장면 2벌 복제 금지 — 같은 진실, 다른 청자).
+  empire_boss_win: {
+    speaker: '',
+    lines: [
+      '타락한 황제가 옥좌 아래로 무너져 내렸다. 부패가 재처럼 흩어진다.',
+      '"...내가 문을 열었다. 하지만, 영생을 위해서가 아니었다."',
+      '"균열은 이미 새고 있었다. 나는 그것을 가두려 했다 — 제국 대신, 나 하나로."',
+      '"그 자비가... 오만이었지. 그릇은 넘쳤고, 제국이 대가를 치렀다."',
+      '"이제야 죽을 수 있구나. ...북녘으로 가라. 봉우리 아래, 그것이 아직 숨 쉰다."',
+      '— 던전크래프트: 제국의 끝. 영웅들의 여정이 완성됐다. —',
+    ],
+  },
+  empire_boss_win_merciful: {
+    speaker: '',
+    lines: [
+      '타락한 황제가 옥좌 아래로 무너져 내렸다. 부패가 재처럼 흩어진다.',
+      '"...내가 문을 열었다. 하지만, 영생을 위해서가 아니었다."',
+      '"균열은 이미 새고 있었다. 나는 그것을 가두려 했다 — 제국 대신, 나 하나로."',
+      '"그 자비가... 오만이었지. 그릇은 넘쳤고, 제국이 대가를 치렀다."',
+      '"이제야 죽을 수 있구나. ...북녘으로 가라. 봉우리 아래, 그것이 아직 숨 쉰다."',
+      '너희는 끝까지 그 손을 놓지 않았다. 황제는 용서받은 자의 얼굴로 잠들었다 — 그의 자비를, 너희의 자비가 증명했으니.',
+      '— 던전크래프트: 자비의 결말. 구원이 곧 힘이었다. —',
+    ],
+  },
+  empire_boss_win_ruthless: {
+    speaker: '',
+    lines: [
+      '타락한 황제가 옥좌 아래로 무너져 내렸다. 부패가 재처럼 흩어진다.',
+      '"...내가 문을 열었다. 하지만, 영생을 위해서가 아니었다."',
+      '"균열은 이미 새고 있었다. 나는 그것을 가두려 했다 — 제국 대신, 나 하나로."',
+      '"그 자비가... 오만이었지. 그릇은 넘쳤고, 제국이 대가를 치렀다."',
+      '"이제야 죽을 수 있구나. ...북녘으로 가라. 봉우리 아래, 그것이 아직 숨 쉰다."',
+      '너희는 끝까지 검을 거두지 않았다. 심판받은 자의 고백을 들은 것은 — 죽음을 거부하는 힘에 기대 온, 너희 자신이었다.',
+      '— 던전크래프트: 정복의 결말. 두려움이 평화를 대신한다. —',
+    ],
+  },
+
+  // --- Volcanic Crater (불의 분화구) — post-game superboss. Win lines branch on
+  // the run's mercy ratio like other bosses, but it's NOT an ending (resume). ---
+  lava_sign: { speaker: '그을린 비석', lines: ['"여기서부터는 불의 영역. 부패조차 타 버린 땅."', '열기가 살갗을 핥는다. 황제를 넘은 자만이 여기 설 수 있다.'] },
+  lava_core_sign: { speaker: '검게 탄 비문', lines: ['"심부의 용은 부패보다 오래되었다."', '"그것은 멸하지도, 구원받지도 않는다 — 그저 타오를 뿐."'] },
+  lava_boss_intro: {
+    speaker: '마그마 드레이크',
+    lines: ['크아아 — 또 다른 불나방인가.', '제국도, 마녀도 넘었다고? 가소롭군. 나는 이 산이 끓기 전부터 있었다.', '재가 되어라!'],
+  },
+  lava_boss_win: {
+    speaker: '',
+    lines: ['마그마 드레이크가 용암 속으로 무너졌다.', '분화구가 잠잠해지고, 그 비늘 하나가 식어 남았다.', '— 불의 시련을 넘었다. (포스트게임 도전 클리어) —'],
+  },
+  lava_boss_win_merciful: {
+    speaker: '',
+    lines: ['용은 마지막 숨에 으르렁댔다. "…네 손엔 피가 적군. 드물어."', '식은 비늘이 빛난다 — 자비로운 자에게 바치는 산의 선물.'],
+  },
+  lava_boss_win_ruthless: {
+    speaker: '',
+    lines: ['용의 포효가 분화구를 무너뜨렸다. 너희는 끝까지 불태웠다.', '재 속에서 비늘 하나가 식어 남았다 — 정복자의 전리품.'],
+  },
+
+  // --- The Void Rift (공허의 균열) — deepest post-game superboss. Win lines
+  // branch on the run's mercy ratio; NOT an ending (resume). ---
+  void_sign: { speaker: '부서진 비석', lines: ['"별이 닿지 않는 곳. 부패도, 불도, 여기선 의미가 없다."', '발밑의 바닥이 우주처럼 깊다. 황제도 용도 넘은 자만이 여기 선다.'] },
+  // Optional void miniboss (망령 리치). Not an ending — resumes the field.
+  wraith_lich_intro: {
+    speaker: '망령 리치',
+    lines: ['…산 자의 온기가 균열을 더럽힌다.', '나는 무너진 제국의 마지막 술사 — 죽음조차 나를 놓지 못했지.', '너희의 영혼으로 이 굶주림을 잠시 달래 주마.'],
+  },
+  wraith_lich_win: { speaker: '', lines: ['망령 리치의 룬이 깨지고, 뼈가 먼지로 흩어졌다.', '오래 묶여 있던 술사의 한이 공허 속으로 풀려난다.'] },
+  void_core_sign: { speaker: '명멸하는 룬', lines: ['"심연의 군주는 시작도 끝도 아니다."', '"그것은 모든 것이 무너진 뒤에 남는 것 — 침묵, 그리고 굶주림."'] },
+  void_boss_intro: {
+    speaker: '심연의 군주',
+    lines: ['…기어이 여기까지 왔는가. 빛을 등진 작은 불씨들이.', '제국이 무너지고, 산이 식고 — 결국 남는 건 나, 공허뿐.', '와라. 너희의 이야기를 끝의 끝에서 삼켜 주마.'],
+  },
+  void_boss_win: {
+    speaker: '',
+    lines: ['심연의 군주가 별빛 없는 어둠 속으로 무너졌다.', '균열이 닫히고, 차원이 다시 숨을 쉰다.', '— 공허의 끝을 보았다. 그리고 그 너머, 꺼졌던 별이 하나둘 돌아온다. —'],
+  },
+  void_boss_win_merciful: {
+    speaker: '',
+    lines: ['군주가 스러지며 속삭였다. "자비라니… 공허에 그런 게 남아 있었군."', '닫히는 균열 사이로 한 줄기 빛이 새어 든다 — 구원의 증표.'],
+  },
+  void_boss_win_ruthless: {
+    speaker: '',
+    lines: ['군주를 끝까지 짓밟았다. 공허는 비명조차 없이 삼켜졌다.', '균열이 닫힌다 — 정복의 끝, 그 너머의 침묵.'],
+  },
+
+  // --- Reactive town dialogue (elder reacts to the party's playstyle). ---
+  elder_intro_merciful: {
+    speaker: '마을 장로',
+    lines: ['자네들 소문을 들었네 — 적조차 살려 보낸다고.', '그 마음이 이 땅을 구할 걸세. 부디 그 길을 잃지 말게.'],
+  },
+  elder_intro_ruthless: {
+    speaker: '마을 장로',
+    lines: ['자네들이 지나간 자리엔 아무것도 남지 않는다더군...', '힘은 강하나, 두려움은 또 다른 적을 부른다네. 조심하게.'],
+  },
+};
+
+export function getDialog(id) { return DIALOG[id] || null; }
+
+// Playstyle tone from the run's mercy/slain tally. ≥70% mercy → 'merciful',
+// ≥70% slain → 'ruthless', otherwise 'mixed'. <4 resolved enemies → 'mixed'
+// (too early to judge — avoids snap-labeling the player after one fight).
+export function toneFromFlags(flags = {}) {
+  const m = flags.mercied || 0;
+  const s = flags.slain || 0;
+  const total = m + s;
+  if (total < 4) return 'mixed';
+  const ratio = m / total;
+  return ratio >= 0.7 ? 'merciful' : (ratio <= 0.3 ? 'ruthless' : 'mixed');
+}
+
+// Resolve a dialog id to its tone variant when one exists, else the base id.
+export function tonedDialogId(id, flags) {
+  const tone = toneFromFlags(flags);
+  return DIALOG[`${id}_${tone}`] ? `${id}_${tone}` : id;
+}

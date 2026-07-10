@@ -1,0 +1,36 @@
+{"ts":"2026-05-29T00:42:44.249Z","cmd":"js","args":"localStorage.removeItem('dragon_crypt_save_v1')","origin":"about:blank","durationMs":4,"status":"error","hasCookies":false,"mode":"launched","error":"evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at eval (<anonymous>)\n    at UtilityScript.evaluate (<anonymous>:290:30)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"}
+{"ts":"2026-05-29T00:42:44.303Z","cmd":"reload","args":"","origin":"about:blank","durationMs":8,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:42:46.857Z","cmd":"press","args":"z","origin":"about:blank","durationMs":1,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:42:48.945Z","cmd":"screenshot","args":"/tmp/dragon_town_new.png","origin":"about:blank","durationMs":33,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:42:48.991Z","cmd":"console","args":"","origin":"about:blank","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:43:01.044Z","cmd":"console","args":"","origin":"about:blank","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:43:09.604Z","cmd":"goto","args":"http://localhost:9153/","origin":"http://localhost:9153/","durationMs":118,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:43:12.198Z","cmd":"press","args":"z","origin":"http://localhost:9153/","durationMs":2,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:43:14.315Z","cmd":"screenshot","args":"/tmp/dragon_town_new2.png","origin":"http://localhost:9153/","durationMs":48,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:43:14.372Z","cmd":"console","args":"","origin":"http://localhost:9153/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:22.512Z","cmd":"goto","args":"http://localhost:9153/","origin":"http://localhost:9153/","durationMs":41,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:25.071Z","cmd":"press","args":"z","origin":"http://localhost:9153/","durationMs":1,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:26.627Z","cmd":"press","args":"w","origin":"http://localhost:9153/","durationMs":1,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:26.992Z","cmd":"press","args":"w","origin":"http://localhost:9153/","durationMs":1,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:27.346Z","cmd":"press","args":"w","origin":"http://localhost:9153/","durationMs":1,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:27.694Z","cmd":"press","args":"w","origin":"http://localhost:9153/","durationMs":3,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:28.041Z","cmd":"press","args":"a","origin":"http://localhost:9153/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:28.395Z","cmd":"press","args":"a","origin":"http://localhost:9153/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:28.749Z","cmd":"press","args":"a","origin":"http://localhost:9153/","durationMs":1,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:29.098Z","cmd":"press","args":"a","origin":"http://localhost:9153/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:29.450Z","cmd":"press","args":"w","origin":"http://localhost:9153/","durationMs":1,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:29.861Z","cmd":"press","args":"z","origin":"http://localhost:9153/","durationMs":2,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:30.560Z","cmd":"screenshot","args":"/tmp/dragon_shoptalk.png","origin":"http://localhost:9153/","durationMs":43,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:30.604Z","cmd":"console","args":"","origin":"http://localhost:9153/","durationMs":1,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:47.647Z","cmd":"viewport","args":"1280 720","origin":"http://localhost:9153/","durationMs":0,"status":"error","hasCookies":false,"mode":"launched","error":"Unexpected positional arg: 720. Usage: viewport [WxH] [--scale <n>]"}
+{"ts":"2026-05-29T00:44:47.690Z","cmd":"press","args":"z","origin":"http://localhost:9153/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:48.379Z","cmd":"screenshot","args":"/tmp/dragon_shop.png","origin":"http://localhost:9153/","durationMs":37,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:48.422Z","cmd":"press","args":"s","origin":"http://localhost:9153/","durationMs":1,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:48.671Z","cmd":"press","args":"z","origin":"http://localhost:9153/","durationMs":1,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:49.162Z","cmd":"screenshot","args":"/tmp/dragon_shop_buy.png","origin":"http://localhost:9153/","durationMs":39,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:44:49.204Z","cmd":"console","args":"","origin":"http://localhost:9153/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:45:19.681Z","cmd":"viewport","args":"1280 720","origin":"http://localhost:9153/","durationMs":0,"status":"error","hasCookies":false,"mode":"launched","error":"Unexpected positional arg: 720. Usage: viewport [WxH] [--scale <n>]"}
+{"ts":"2026-05-29T00:45:19.725Z","cmd":"press","args":"x","origin":"http://localhost:9153/","durationMs":1,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:45:20.081Z","cmd":"press","args":"x","origin":"http://localhost:9153/","durationMs":1,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:45:20.464Z","cmd":"screenshot","args":"/tmp/dragon_menu.png","origin":"http://localhost:9153/","durationMs":33,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-29T00:45:20.523Z","cmd":"console","args":"","origin":"http://localhost:9153/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
