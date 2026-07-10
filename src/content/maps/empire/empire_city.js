@@ -84,6 +84,13 @@ export default {
     // The lever frees the cage door (23,18); the captive then joins as an ally.
     { x: 22, y: 16, kind: 'trigger', effect: 'switch', wallId: 'hound_cage', fireMsg: '녹슨 지렛대를 당기자 우리 문이 삐걱이며 열린다.' },
     { x: 23, y: 20, kind: 'npc', art: 'enemy', ref: 'ember_hound', dir: 'west', talk: 'caged_hound', recruitAlly: 'ember_hound', flag: 'freedHound', label: '갇힌 사냥개' },
+    // 지하 의식장 계단 입구 (10,21) — 브레이지어 두 개가 내려가는 계단을 액자처럼
+    // 감싸고 표지판이 알린다 (맨 구멍이던 입구에 시각 표지).
+    // walkable — 남쪽 회랑은 동쪽 정문/뒷문으로 가는 유일한 통로이므로 절대 막지 않는다
+    // (solid였을 때 content.test 완주 가드가 정확히 RED를 냈다).
+    { x: 9, y: 20, kind: 'prop', ref: 'prop_broken_brazier', tiles: 1.6, walkable: true },
+    { x: 11, y: 20, kind: 'prop', ref: 'prop_broken_brazier', tiles: 1.6, walkable: true },
+    { x: 9, y: 19, kind: 'sign', talk: 'city_stair_sign' },
   ],
   portals: [
     { x: 0, y: 8, to: 'empire_camp', tx: 14, ty: 6 },

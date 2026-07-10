@@ -300,6 +300,20 @@ export const DIALOG = {
     ],
   },
 
+  // 입구 표지판 (신규 존으로 내려가는 통로 — 시각 표지 + 안내)
+  darkforest_gate_sign: {
+    speaker: '기울어진 표지판',
+    lines: ['"↓ 남쪽 — 어둠숲"', '"묘지기의 숲. 밤이 낮보다 길다."'],
+  },
+  city_stair_sign: {
+    speaker: '그을린 안내석',
+    lines: ['"↓ 지하 의식장"', '"황제 폐하 외 출입 금지" — 명령문은 반쯤 지워져 있다.'],
+  },
+  ashpath_sign: {
+    speaker: '재에 묻힌 표지판',
+    lines: ['"↓ 남쪽 잿길 — 별무덤"', '"별이 떨어진 밤 이후, 아무도 돌아오지 않았다."'],
+  },
+
   // 어둠숲 (1막 스토리 존)
   darkforest_sign: {
     speaker: '이끼 낀 표지판',

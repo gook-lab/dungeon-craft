@@ -67,6 +67,7 @@ const CLIFF = {
   swamp:   { face: 0x45402e, overhang: 0x3f5a2a },
   empire:  { face: 0x463a3c, overhang: 0x3a2024 },
   lava:    { face: 0x3a1810, overhang: 0x8a2c18 },
+  starfall: { face: 0x5c5c7e, overhang: 0x9a9ac8 }, // 별무덤 — 어두운 무드 위에서도 읽히는 잿빛 절벽
   void:    { face: 0x2a1a48, overhang: 0x6a5a8a },
   default: { face: 0x40404a, overhang: 0x5a5a52 },
 };
@@ -732,7 +733,7 @@ export class FieldScene {
     const { w, h } = map;
     const mood = REGION_MOOD[map.mood || map.tileset] || REGION_MOOD.default;
     const rimColor = lighten(mood.tint.color, 0.5);
-    const cliff = CLIFF[map.tileset] || CLIFF.default;
+    const cliff = CLIFF[map.mood] || CLIFF[map.tileset] || CLIFF.default; // 무드 전용 절벽색 우선
     const rng = createRng((hashStr(map.id || 'c') ^ 0x51515151) >>> 0);
     const g = new PIXI.Graphics();
     // Out-of-bounds neighbour → treat as SAME level (no edge) so a plateau touching
@@ -1026,7 +1027,12 @@ export class FieldScene {
         // Field boss scale. 1.3 → 1.0: 보스가 캐릭터(HERO_SCALE=1.35타일)보다
         // ~1.44배라 "거대"하게 보였음. 1.0 이면 1.5타일 ~1.11배 — 캐릭터보다
         // 살짝 큰 정도. 모든 필드 보스(드라큘라 백작/얼음여왕 등)에 공통 적용.
-        sp.scale.set(PROP_SCALE * 1.0);
+        // 팔레트 스왑 보스(monster.tint/spriteScale — 감시자/파수병/떨어진 별/파수꾼)는
+        // 필드에서도 같은 변형을 적용 — 전투 스프라이트와 외형이 일치해야 한다.
+        // spriteScale은 ×1.5로 캡 (필드 타일 그리드에서 과대 방지).
+        const bossDef = getMonster(o.ref);
+        if (bossDef && bossDef.tint != null) sp.tint = bossDef.tint;
+        sp.scale.set(PROP_SCALE * Math.min((bossDef && bossDef.spriteScale) || 1, 1.5));
       } else if (o.kind === 'sign') {
         // A small wooden signpost (post + board) — less obtrusive than a gold block,
         // bottom-anchored at (0,0) so it stands on its tile like the other billboards.

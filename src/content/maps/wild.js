@@ -100,6 +100,11 @@ export default {
     { x: 31, y: 17, kind: 'chest', loot: { item: 'oak_staff' } }, // atop the SE bluff
     // Hidden treasure tucked in the wilds' far south (off the minimap).
     { x: 3, y: 24, kind: 'chest', loot: { gold: 120 }, hidden: true },
+    // 어둠숲 입구 게이트 — 죽은 나무 두 그루가 남쪽 통로(16-17열)를 액자처럼 감싸고
+    // 표지판이 길을 알린다 (맨 구멍이던 입구에 시각 표지).
+    { x: 15, y: 26, kind: 'prop', ref: 'prop_dead_tree_hd', tiles: 2.4 },
+    { x: 18, y: 26, kind: 'prop', ref: 'prop_dead_tree_hd', tiles: 2.4 },
+    { x: 15, y: 25, kind: 'sign', talk: 'darkforest_gate_sign' },
   ],
   portals: [
     { x: 10, y: 0, to: 'town', tx: 7, ty: 11 },

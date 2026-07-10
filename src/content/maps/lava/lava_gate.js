@@ -58,6 +58,11 @@ export default {
     // teleporter fits this molten rift's fiction (unlike the grounded crypt).
     { x: 2, y: 18, kind: 'trigger', effect: 'warp', tx: 24, ty: 18, fireMsg: '용암 균열이 타오르며 몸이 건너편으로 빨려든다…' },
     { x: 24, y: 18, kind: 'trigger', effect: 'warp', tx: 2, ty: 18, fireMsg: '용암 균열이 타오르며 몸이 건너편으로 빨려든다…' },
+    // 별무덤 잿길 입구 (12,21) — 흑요석 기둥 두 개가 남쪽 통로를 액자처럼 감싸고
+    // 표지판이 알린다 (맨 구멍이던 입구에 시각 표지).
+    { x: 11, y: 20, kind: 'prop', ref: 'prop_obsidian_pillar_hd', tiles: 2.2 },
+    { x: 13, y: 20, kind: 'prop', ref: 'prop_obsidian_pillar_hd', tiles: 2.2 },
+    { x: 11, y: 19, kind: 'sign', talk: 'ashpath_sign' },
   ],
   portals: [
     { x: 0, y: 8, to: 'town', tx: 7, ty: 9 },            // recall home on foot
