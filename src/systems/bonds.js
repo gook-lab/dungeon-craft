@@ -83,3 +83,21 @@ export function partnersWithEmotion(bonds, refId, emotion) {
 export function hasEmotion(bonds, a, b, emotion) {
   return !!(bonds[bondKey(a, b)] || []).includes(emotion);
 }
+
+// 파티 유대의 전체 극성 (톤↔유대 커플링 v1) — 부정 극이 긍정 극보다 많으면
+// 'dark', 반대면 'light', 유대가 없거나 동수면 'none'. 대사 톤(mercied/slain
+// 비율)과는 독립된 축: 서사가 "파티 안의 공기"에 반응할 때 쓴다 —
+// main.openDialog가 `${id}_grim` 변형을 이 판정으로 스왑 (에녹 계시 등).
+export function bondPolarity(bonds) {
+  let pos = 0, neg = 0;
+  for (const emotions of Object.values(bonds || {})) {
+    if (!Array.isArray(emotions)) continue;
+    for (const e of emotions) {
+      if (POSITIVE_EMOTIONS.includes(e)) pos++;
+      else if (NEGATIVE_EMOTIONS.includes(e)) neg++;
+    }
+  }
+  if (neg > pos) return 'dark';
+  if (pos > neg) return 'light';
+  return 'none';
+}

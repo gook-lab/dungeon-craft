@@ -34,6 +34,8 @@ export default {
   spawn: { x: 15, y: 1 },
   objects: [
     { x: 13, y: 1, kind: 'sign', talk: 'starfall_sign' },
+    // 로어 사이드퀘: 자비 카운터 퀘스트 (별의 방식 = 살려 보내는 것).
+    { x: 17, y: 1, kind: 'npc', ref: 'elder', dir: 'south', quest: 'q_star_mercy', label: '! 별지기' },
     { x: 26, y: 12, kind: 'sign', talk: 'starfall_crater_sign' },
     { x: 3, y: 16, kind: 'chest', loot: { gold: 600 } },
     { x: 26, y: 3, kind: 'chest', loot: { item: 'awakening' }, hidden: true },

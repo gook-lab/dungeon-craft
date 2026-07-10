@@ -50,6 +50,9 @@ export default {
     { x: 5, y: 9, kind: 'npc', ref: 'mage', art: 'hero', dir: 'south', talk: 'recruit_mage', recruit: 'mage', flag: 'joinedMage', label: '마법사' },
     // Quest giver — the bog witch bounty (turn in here after clearing the swamp).
     { x: 11, y: 4, kind: 'npc', ref: 'elder', dir: 'south', quest: 'q_witch', label: '! 의뢰' },
+    // 로어 사이드퀘 기버: 봉인의 파수병(2막 존) / 핏빛 백작(옵셔널 미니보스) 지목.
+    { x: 4, y: 7, kind: 'npc', ref: 'priest', dir: 'south', quest: 'q_broken_oath', label: '! 유물 학자' },
+    { x: 13, y: 7, kind: 'npc', ref: 'guard', dir: 'south', quest: 'q_bloods_madness', label: '! 떠도는 검객' },
     // Late-game restock — alchemist (potions / return scrolls) in the camp.
     { x: 11, y: 9, kind: 'npc', ref: 'alchemist', dir: 'south', talk: 'shop_alchemist', label: '연금술사' },
     // Every town has a smith + jeweler. The refugees rebuilt a forge + a gem stall

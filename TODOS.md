@@ -127,7 +127,11 @@ To ship it:
 
 ## Deferred from C-mechanic eng review (2026-05-29)
 
-### Monster-specific recruit skills + species dialog
+### Monster-specific recruit skills + species dialog — ✅ 이미 출하됨 (기록 정리 2026-07-10)
+- `joinSkill` + `recruitLine`은 전 몬스터에 배포 완료 (progression.js:102 buildAllyUnit이
+  joinSkill을 spells[]로 폴드). 이 항목은 출하 후 정리 누락 — 닫음.
+
+### (원안) Monster-specific recruit skills + species dialog
 - **What:** Recruited allies speak species-specific lines on join and carry
   species-unique skills (not just a generic attack).
 - **Why:** Deepens the recruit payoff — a recruited goblin should feel different
@@ -272,7 +276,13 @@ v1 = 시작 3쌍(기사|전사·기사|사냥꾼·전사|사냥꾼) 듀오 합�
   먼저 정리. 신규 라이더 필요 시 resolver 분기도 함께(데이터-only 아님).
 - **Depends on**: 합동기 대상 영입 동료 선별.
 
-### bondStrike 밸런스 하니스 모델링 — DEFERRED v2
+### bondStrike 밸런스 하니스 모델링 — ✅ DONE (2026-07-10)
+- balance.js: 보스전 뱅킹 FP(mercy 4/ruthless 3) → knight×warrior 듀오 '맹세의 돌격'
+  전투당 1회 발동(bondUsed 게이트, commitBondStrike 계약 그대로 base+mod 라이더).
+- 3-pass 재실측: MERCY 보스 deaths 0.03~0.79 / RUTHLESS 0.03~0.89 — "clutch, not
+  a free pass" 밴드 유지. DRAKE MERCY 90→99%는 모델이 더 현실적이 된 것(게임 무변경).
+
+### (원안) bondStrike 밸런스 하니스 모델링 — DEFERRED v2
 - **What**: `scripts/balance.js` `chooseStateAction`에 bondStrike를 넣어 MERCY/RUTHLESS
   패스가 합동기 데미지를 자동 측정.
 - **Why**: 현재 scene-side라 하니스 미측정(affinity와 동일) → 수동 손계산이 유일 방어선.
@@ -379,9 +389,16 @@ drops 보유 맵은 포탈에서 역-플러드해 "모든 도달 타일이 출�
   리액션만 분기) + empire moral-choice/caged-hound 셋피스와 에녹 2차 계시 동선 확정
   (맵 분리로 물리 겹침 없음 — 대사 포어섀도잉만 연결).
 - **3막**: 빙하 동굴 존 + 에녹 3차 계시 + void_lord 후일담 내레이션 (trueEnding 유지).
-- **후속(별도)**: 클래스 에필로그 5종 + NG+ 훅, 로어 사이드퀘 6종 (Unity docs/story/ 참조).
+- **후속(별도)**: ~~클래스 에필로그 5종 + NG+ 훅, 로어 사이드퀘 6종~~ → ✅ 전부 출하
+  (에필로그/NG+ 2026-07-10 볼륨 확장, 사이드퀘 6종 q_warden_rest/q_frozen_kin/
+  q_broken_oath/q_bloods_madness/q_star_mercy/q_scale_forge — 기버 6명 배치).
 
-## 톤↔유대 커플링 (서사가 bonds를 조회) — ⬜ 리팩터 노트 (2026-07-10)
+## 톤↔유대 커플링 (서사가 bonds를 조회) — ✅ DONE v1 (2026-07-10)
+- `bonds.bondPolarity(bonds)` PURE ('dark'|'light'|'none' — 부정/긍정 극 다수결) +
+  main.openDialog가 `${id}_grim` 변형을 톤 변형보다 우선 스왑. 저술: enoch_act3_grim
+  (어두운 유대 파티 전용 3차 계시). 새 grim 대사는 dialog.js 엔트리만 추가하면 됨.
+
+## (원안) 톤↔유대 커플링 리팩터 노트 (2026-07-10)
 
 - **What:** 현재 대사 톤은 `toneFromFlags`(mercied/slain)만 읽고 bonds는 의도적으로
   분리(설계 문서 "톤↔유대 비대칭" 항목). 향후 서사가 유대 상태에 반응하려면(예: 증오

@@ -20,7 +20,7 @@ import { WarpScene } from './scenes/warpScene.js';
 import { EndingScene } from './scenes/endingScene.js';
 import { levelForXp, spellsLearnedBetween, statsAtLevel, xpToReach } from './systems/progression.js';
 import { spoils, branchOutcome } from './systems/battle.js';
-import { addEmotion, NEGATIVE_EMOTIONS, bondKey } from './systems/bonds.js';
+import { addEmotion, NEGATIVE_EMOTIONS, bondKey, bondPolarity } from './systems/bonds.js';
 import { BOND_SKILLS, bondModForCombo, availableBondStrikes } from './content/bondSkills.js';
 import { getSpell } from './content/spells.js';
 import { getItem, rollDrops } from './content/items.js';
@@ -238,7 +238,12 @@ async function main() {
     // 계시를 반복하는 대신 짧은 리마인더로 스왑 (에녹 — 막마다 한 번의 계시).
     const baseId = (obj && obj.npcId && (game.runtime.talkedNpcs || []).includes(obj.npcId)
       && getDialog(`${dialogId}_done`)) ? `${dialogId}_done` : dialogId;
-    const resolved = tonedDialogId(baseId, game.runtime.flags);
+    // 톤↔유대 커플링 v1: 파티 유대가 어둡게 물들었으면(부정 극 우세) `${id}_grim`
+    // 변형을 톤 변형보다 우선 스왑 — 대사가 자비 비율뿐 아니라 "파티 안의 공기"에도
+    // 반응한다 (현재 에녹 3차 계시만 저술; 변형이 없으면 톤 경로로 폴백).
+    const grim = bondPolarity(game.runtime.bonds) === 'dark' && getDialog(`${baseId}_grim`)
+      ? `${baseId}_grim` : null;
+    const resolved = grim || tonedDialogId(baseId, game.runtime.flags);
     // Companion-recruit NPC: on dialog close, fold the hero into the party (once).
     // recruitHero chains its own join-line dialog → resume, so DON'T also resume
     // here on that path (would resume the field under the join-line dialog).

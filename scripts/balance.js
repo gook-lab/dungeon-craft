@@ -18,6 +18,8 @@ import { STARTING_PARTY } from '../src/content/party.js';
 import { getSpell } from '../src/content/spells.js';
 import { getItem } from '../src/content/items.js';
 import { createRng } from '../src/util/rng.js';
+import { BOND_SKILLS, bondModForCombo } from '../src/content/bondSkills.js';
+import { bondKey } from '../src/systems/bonds.js';
 
 // Region scenarios: expected party level + gear tier + encounter pool / boss.
 const SCENARIOS = [
@@ -138,7 +140,15 @@ function runBattle(sc, rng, opts = {}) {
   if (opts.ruthless) {
     for (const h of heroes) { h.atk += 3; h.atkBuff = (h.atkBuff || 0) + 0.12; }
   }
-  const fp = { count: opts.mercy ? 2 : (opts.ruthless ? 1 : 0), inspired: false }; // ~+1 mercy +1 Crisis / fight; ruthless skips the mercy FP
+  // FP 모델: 트래시전은 전투 내 수급(~+1 mercy +1 Crisis)만, 보스전은 트래시에서
+  // 뱅킹해 온 풀을 가정(실제 경제: FP는 전투 간 이월, 캡 6) — 듀오 인연공격(3 FP)
+  // 이 보스전에서 발동 가능해진다 (전투당 1회, bondUsed 게이트 = state.bondStrikeUsed 모델).
+  const banked = sc.boss ? (opts.mercy ? 4 : 3) : (opts.mercy ? 2 : 1);
+  const fp = { count: (opts.mercy || opts.ruthless) ? banked : 0, inspired: false, bondUsed: false };
+  // 대표 유대 (bondModForCombo 라이더): mercy=긍정 극 / ruthless=부정 극.
+  const REP_BONDS = opts.mercy
+    ? { [bondKey('knight', 'warrior')]: ['loyalty', 'admiration'] }
+    : { [bondKey('knight', 'warrior')]: ['mistrust', 'contempt'] };
   const monsters = sc.boss ? [sc.boss] : (() => {
     const n = rng.int(sc.min, sc.max); const out = [];
     for (let i = 0; i < n; i++) out.push(rng.pick(sc.pool));
@@ -162,6 +172,19 @@ function runBattle(sc, rng, opts = {}) {
         const ko = state.units.find((u) => u.side === 'hero' && !u.alive);
         if (ko && fp.count >= 2) { fp.count -= 2; resolveAction(state, { type: 'rally', actorId: actor.id, targetId: ko.id }, rng); enrageBosses(state); advanceTurn(state); continue; }
         if (!fp.inspired && living(state, 'enemy').length >= 2 && fp.count >= 1) { fp.count -= 1; fp.inspired = true; resolveAction(state, { type: 'inspire', actorId: actor.id }, rng); advanceTurn(state); continue; }
+      }
+      // 인연공격 모델 (보스전, 전투당 1회): 기사가 전사와의 듀오 '맹세의 돌격'을
+      // FP 3으로 발동 — scene의 commitBondStrike 계약 그대로 (base + bond mod 라이더).
+      if ((opts.mercy || opts.ruthless) && sc.boss && !fp.bondUsed && fp.count >= 3 && actor.refId === 'knight') {
+        const partner = state.units.find((u) => u.side === 'hero' && u.refId === 'warrior' && u.alive);
+        const target = living(state, 'enemy')[0];
+        const combo = BOND_SKILLS[bondKey('knight', 'warrior')];
+        if (partner && target && combo) {
+          fp.count -= 3; fp.bondUsed = true;
+          const mod = bondModForCombo(REP_BONDS, 'knight', ['warrior']);
+          resolveAction(state, { type: 'bondStrike', actorId: actor.id, partnerIds: [partner.id], comboId: combo.id, base: combo.base, mod, targetId: target.id }, rng);
+          enrageBosses(state); advanceTurn(state); continue;
+        }
       }
       action = chooseHeroAction(state, actor, herbs);
       if (action.type === '_herb') { actor.hp = Math.min(actor.maxHp, actor.hp + (getItem('herb').effect.hp || 22)); advanceTurn(state); continue; }

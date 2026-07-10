@@ -1,8 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import {
-  bondKey, addEmotion, pairsFor, bondStrength, emotionCount, partnersWithEmotion, hasEmotion,
-  POSITIVE_EMOTIONS, NEGATIVE_EMOTIONS, OPPOSITE,
-} from './bonds.js';
+import { bondKey, addEmotion, pairsFor, bondStrength, emotionCount, partnersWithEmotion, hasEmotion,
+  POSITIVE_EMOTIONS, NEGATIVE_EMOTIONS, OPPOSITE, bondPolarity } from './bonds.js';
 
 describe('bonds model', () => {
   it('bondKey is order-independent', () => {
@@ -72,5 +70,16 @@ describe('bonds model', () => {
     expect(emotionCount(b, 'knight', 'contempt')).toBe(1);
     expect(emotionCount(b, 'knight', 'hatred')).toBe(1);
     expect(partnersWithEmotion(b, 'knight', 'hatred')).toEqual(['warrior']);
+  });
+});
+
+describe('bondPolarity (톤↔유대 커플링)', () => {
+  it('no bonds → none; positive-heavy → light; negative-heavy → dark', () => {
+    expect(bondPolarity({})).toBe('none');
+    expect(bondPolarity(null)).toBe('none');
+    expect(bondPolarity({ 'a|b': ['loyalty', 'affection'] })).toBe('light');
+    expect(bondPolarity({ 'a|b': ['hatred'], 'a|c': ['mistrust'] })).toBe('dark');
+    expect(bondPolarity({ 'a|b': ['loyalty', 'hatred'] })).toBe('none'); // 동수
+    expect(bondPolarity({ 'a|b': 5 })).toBe('none'); // 손상 값 방어
   });
 });

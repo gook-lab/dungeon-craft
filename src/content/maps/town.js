@@ -70,6 +70,9 @@ export default {
     { x: 13, y: 5, kind: 'npc', ref: 'guard', dir: 'south', quest: 'q_crypt', label: '! 위병대장' },
     { x: 4, y: 9, kind: 'npc', ref: 'priest', dir: 'south', quest: 'q_mercy', label: '! 사제' },
     { x: 13, y: 10, kind: 'npc', ref: 'herbalist', dir: 'south', quest: 'q_herbs', label: '! 약초꾼' },
+    // 로어 사이드퀘 기버 (2026-07-10): 어둠숲 감시자 / 용비늘 단조.
+    { x: 14, y: 8, kind: 'npc', ref: 'guard', dir: 'south', quest: 'q_warden_rest', label: '! 늙은 사냥꾼' },
+    { x: 3, y: 11, kind: 'npc', ref: 'blacksmith', dir: 'south', quest: 'q_scale_forge', label: '! 노장장이' },
     // Specialized merchants (placeholder sprites until PixelLab art lands).
     { x: 5, y: 11, kind: 'npc', ref: 'blacksmith', dir: 'south', talk: 'shop_smith', label: '대장장이' },
     { x: 9, y: 9, kind: 'npc', ref: 'jeweler', dir: 'south', talk: 'shop_jeweler', label: '보석상' },

@@ -113,6 +113,73 @@ export const QUESTS = {
   },
 };
 
+// --- 로어 사이드퀘 (Unity QUEST_TEXT.md 재서술 — 자비 렌즈). 전부 기존 cond/
+// 플래그/아이템만 사용 (신규 메커니즘 0): 옵셔널 미니보스를 지목해 발견성을 올리고,
+// 지역마다 로어를 한 겹 얹는다. ---
+
+Object.assign(QUESTS, {
+  // 어둠숲 — 감시자의 정체 (1막 로어). 마을의 늙은 사냥꾼이 옛 동료의 개를 부탁한다.
+  q_warden_rest: {
+    id: 'q_warden_rest', name: '묘지기의 안식', giver: '늙은 사냥꾼',
+    desc: '어둠숲의 감시자를 잠재워라 — 베든, 살려 보내든.',
+    cond: { type: 'boss', flag: 'darkWardenDefeated' },
+    reward: { gold: 100, item: 'antidote' },
+    offer: ['남쪽 어둠숲의 그 짐승... 원래는 묘지기 노인의 사냥개였네. 주인이 부패에 스러진 뒤에도 무덤가를 안 떠났지.', '부패가 그 충직함마저 비틀어 버렸어. 부탁하네 — 어떤 식으로든, 그 아이를 쉬게 해 주게.'],
+    active: ['숲의 개는 아직 무덤가를 배회하고 있네. 황야 남쪽일세.'],
+    done: ['...그런가. 고맙네. 그 아이도, 노인도 이제야 편하겠지. 이걸 받게 — 숲에선 독이 흔하니.'],
+  },
+  // 서리첨탑 — 서리 여왕 미니보스 지목 (기존 옵셔널 콘텐츠 발견성).
+  q_frozen_kin: {
+    id: 'q_frozen_kin', name: '얼어붙은 동족', giver: '산사람 생존자',
+    desc: '서리첨탑의 서리 여왕을 잠재워라.',
+    cond: { type: 'boss', flag: 'frostQueenDefeated' },
+    reward: { gold: 150, item: 'frost_blade' },
+    offer: ['우리 산사람들은 첨탑 그늘에서 대대로 살았소. 여왕이라 불리는 그것이 오기 전까지는.', '그녀도 한때는 산을 지키던 정령이었다 하오. 탑 깊은 곳 — 부디, 동족들의 한을 풀어 주시오.'],
+    active: ['여왕은 아직 탑의 서쪽 그늘에 있소. 냉기에 대비하시오.'],
+    done: ['산바람이 부드러워졌소... 느껴지오? 이 검은 여왕의 얼음으로 벼린 것 — 그대의 것이오.'],
+  },
+  // 지하 의식장 — 수호 기사단 서약 로어 (2막 존과 연계).
+  q_broken_oath: {
+    id: 'q_broken_oath', name: '부서진 서약', giver: '유물 학자',
+    desc: '지하 의식장의 봉인의 파수병을 잠재워라.',
+    cond: { type: 'boss', flag: 'sealGuardianDefeated' },
+    reward: { gold: 200, item: 'guardian_shield' },
+    offer: ['폐허 시가지 남쪽 지하에 옛 의식장이 있다네. 수호 기사단의 마지막 파수병이 아직 그곳을 지키지.', '수백 년을... 이미 무너진 서약을 지키면서 말일세. 그 서약을 끝내 주게 — 학자로서, 그 끝을 기록하고 싶네.'],
+    active: ['파수병은 아직 제단을 지키고 있네. 시가지 남쪽 계단일세.'],
+    done: ['서약의 끝을 기록했네... 장엄했겠지. 이 방패는 기사단의 유물 — 서약을 이어받을 자격이 자네에게 있네.'],
+  },
+  // 핏빛 백작 — 광기의 칼날 로어 (쌍검사 결, 옵셔널 미니보스 지목).
+  q_bloods_madness: {
+    id: 'q_bloods_madness', name: '광기의 핏줄', giver: '떠도는 검객',
+    desc: '폐허 시가지의 핏빛 백작을 잠재워라.',
+    cond: { type: 'boss', flag: 'bloodCountDefeated' },
+    reward: { gold: 200, item: 'duelist_gunblade' },
+    offer: ['시가지 서쪽 그늘에 백작이라 불리는 것이 있소. 나와 같은 유파의 검객이었지 — 광기가 그를 삼키기 전까지는.', '그의 검은 내가 거둬야 했소. 늦었지만... 그대가 대신 끝내 준다면, 내 예비 검을 드리리다.'],
+    active: ['백작은 아직 시가지 서쪽에 도사리고 있소.'],
+    done: ['...끝났구려. 유파의 빚을 그대가 갚아 주었소. 약속한 검이오 — 반격의 결을 익힌 물건이지.'],
+  },
+  // 별무덤 — 자비 카운터 퀘스트 (자비=파워 테마의 사이드퀘 변주).
+  q_star_mercy: {
+    id: 'q_star_mercy', name: '살려 보낸 빛', giver: '별지기',
+    desc: '부패에 붙들린 것들을 열둘, 베지 말고 살려 보내라 (자비 / 영입).',
+    cond: { type: 'mercy', count: 12 },
+    reward: { gold: 250, item: 'lucky_charm' },
+    offer: ['별들은 균열과 싸울 때 아무것도 베지 않았소. 제 몸을 던져 막았을 뿐.', '부패에 붙들린 것들을 열둘, 살려 보내 보시오. 별의 방식이 무엇을 남기는지 — 지켜보겠소.'],
+    active: ['아직이오. 검을 거두는 손이 더 필요하오.'],
+    done: ['보았소. 그대 안에 별과 같은 것이 있구려. 이 부적은 떨어진 별의 파편 — 행운은 살리는 자를 따르는 법이오.'],
+  },
+  // 용비늘 단조 — collect 사이드퀘 (lava_gate 보물/상점의 dragon_scale 회수 동기).
+  q_scale_forge: {
+    id: 'q_scale_forge', name: '용비늘 단조', giver: '완고한 노장장이',
+    desc: '용비늘 갑옷 한 벌을 구해 노장장이에게 가져가라.',
+    cond: { type: 'collect', item: 'dragon_scale', count: 1 },
+    reward: { gold: 800, item: 'elixir' },
+    offer: ['평생 강철만 두드렸지만, 용의 비늘만은 만져 본 적이 없네.', '분화구 어딘가에 용비늘 갑옷이 잠들어 있다 들었네. 한 벌만 구해다 주게 — 값은 섭섭잖게 치르지.'],
+    active: ['용비늘 갑옷 한 벌일세. 분화구를 뒤져 보게. (지금 가진 것을 확인해 보게.)'],
+    done: ['오오... 이것이 용의 비늘인가. 여한이 없네. 약속한 값일세 — 그리고 이 영약은 덤이야.'],
+  },
+});
+
 export function getQuest(id) { return QUESTS[id] || null; }
 
 // PURE: is a single condition satisfied by the current runtime state? The ONE

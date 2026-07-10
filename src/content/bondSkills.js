@@ -52,8 +52,9 @@ export const POLE_RIDER = {
 // physical spell fed to battle.js `skillDamage` (atk-scaled — stays on the tuned
 // ladder, unlike maxMp magic). `power`/`hits` are STARTING tuning values: aim for a
 // "Crisis-이후 역전 한 방" landing ~25-35% of a boss's maxHp (skeleton_king 320 /
-// bog_witch 660 / fallen_emperor 760) — hand-verify + playtest, the harness does NOT
-// model bond strikes (scene-side, like affinity). `fx` keys a DEFS choreography.
+// bog_witch 660 / fallen_emperor 760) — the harness NOW MODELS the duo strike
+// (2026-07-10: balance.js 보스전 뱅킹 FP → knight×warrior 듀오 1회; power 오타·보스
+// 트리비얼화가 회귀로 잡힌다). `fx` keys a DEFS choreography.
 export const BOND_SKILLS = {
   // 기사 × 전사 — 성기사가 전사의 돌격을 축복: 단일 대상 성속성 강타(분노 시 가중).
   [bondKey('knight', 'warrior')]: {
