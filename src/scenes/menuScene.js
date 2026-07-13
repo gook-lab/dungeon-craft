@@ -52,8 +52,8 @@ export class MenuScene {
     if (!isTop) return;
     const input = this.game.input;
     const n = this.options.length;
-    if (input.pressed('up')) { this.index = (this.index + n - 1) % n; this.menu.setIndex(this.index); this.updateTip(); }
-    if (input.pressed('down')) { this.index = (this.index + 1) % n; this.menu.setIndex(this.index); this.updateTip(); }
+    if (input.pressed('up')) { this.index = (this.index + n - 1) % n; this.moveCursor(); }
+    if (input.pressed('down')) { this.index = (this.index + 1) % n; this.moveCursor(); }
     if (input.pressed('cancel')) return this.back();
     if (input.pressed('confirm')) return this.confirm();
   }
@@ -61,6 +61,14 @@ export class MenuScene {
   render() {
     this.renderStatus();
     this.renderMenu();
+  }
+
+  // 커서 이동 후처리: 긴 리스트는 창이 밀리므로 renderMenu 재호출, 짧은 리스트는
+  // 기존처럼 setIndex만 (윈도잉 도입 전과 동일 비용).
+  moveCursor() {
+    if (this.longList) this.renderMenu();
+    else this.menu.setIndex(this.index);
+    this.updateTip();
   }
 
   renderStatus() {
@@ -150,12 +158,35 @@ export class MenuScene {
     else if (this.mode === 'item') options = [...this.consumables().map(formatItem), '← 뒤로'];
     else if (this.mode === 'pickAlly') options = [...this.game.runtime.party.map((p) => memberName(p.refId)), '← 뒤로'];
     else if (this.mode === 'roster') options = [...this.rosterLabels(), '← 뒤로'];
-    const m = menuList(options, { width: 240 });
+    this.index = Math.min(this.index, options.length - 1);
+    // 긴 리스트 윈도잉 (퀘스트 15종 + 퀘스트라인 체크리스트가 화면 높이를 넘을 수
+    // 있음 — battleScene.panelMenu/shop 스크롤과 같은 패턴): 커서 주변 maxVis 행만
+    // 잘라 그리고, 커서 이동 시 update()가 renderMenu를 다시 불러 창을 민다.
+    // this.options는 항상 풀 리스트 (confirm의 index 시맨틱 불변).
+    const maxVis = Math.max(6, Math.floor((h - 130) / 30));
+    this.longList = options.length > maxVis;
+    this._winStart = this.longList
+      ? Math.min(Math.max(0, this.index - Math.floor(maxVis / 2)), options.length - maxVis)
+      : 0;
+    const display = this.longList ? options.slice(this._winStart, this._winStart + maxVis) : options;
+    const m = menuList(display, { width: 240 });
     // Right-anchor: a widened box (long bond rows) grows leftward and stays
     // on-screen instead of overflowing the right edge.
     m.container.x = Math.max(20, w - m.width - 30); m.container.y = 40;
     this.menuLayer.addChild(m.container);
-    this.menu = m; this.index = Math.min(this.index, options.length - 1); m.setIndex(this.index);
+    if (this.longList) { // ▲/▼ 더-있음 마커 (프레임 위·아래)
+      if (this._winStart > 0) {
+        const up = label('▲', FS.caption, HEX.textMute);
+        up.anchor = { x: 0.5, y: 1 }; up.x = m.container.x + m.width / 2; up.y = 38;
+        this.menuLayer.addChild(up);
+      }
+      if (this._winStart + maxVis < options.length) {
+        const dn = label('▼', FS.caption, HEX.textMute);
+        dn.anchor = { x: 0.5, y: 0 }; dn.x = m.container.x + m.width / 2; dn.y = 42 + m.height;
+        this.menuLayer.addChild(dn);
+      }
+    }
+    this.menu = m; m.setIndex(this.index - this._winStart);
     this.options = options;
 
     // Item-effect tooltip below the list (consistent with battle/shop/equip).

@@ -3,7 +3,14 @@
 See also: [CLAUDE.md](CLAUDE.md) (shipped architecture) · [DESIGN.md](DESIGN.md) (UI vocabulary) · [docs/map-roadmap.md](docs/map-roadmap.md) (HD-2D 맵 작업 핸드오프 — 다음 세션 이어받기).
 
 
-## Monster skill: 사령 소환(summon) — DEFERRED v2 (2026-05-30)
+## Monster skill: 사령 소환(summon) — ✅ 이미 출하됨 (기록 정리 2026-07-14)
+
+리졸버 `kind:'summon'` 분기(battle.js:836 — noSpoils/스페어·영입 불가/slain 비오염/
+fieldCap) + battle.test 커버 + battleScene 미드배틀 스프라이트 스폰(:1604) + spellFx
+안무 + necromancer 킷(chance 0.35, max 1) 전부 라이브. 아래 원안의 우려 3건은 구현에
+모두 반영돼 있음. joinSkill과 같은 "출하 후 정리 누락" 케이스 — 닫음.
+
+### (원안) 사령 소환 — DEFERRED v2 (2026-05-30)
 
 The monster-skill system (9 skills) shipped 2026-05-30; `summon` was deferred because
 it mutates `state.units` mid-battle, touching three invariants the other 9 skills don't.

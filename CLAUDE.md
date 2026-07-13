@@ -17,11 +17,11 @@ See also: [DESIGN.md](DESIGN.md) (UI vocabulary) · [TODOS.md](TODOS.md) (deferr
 |---|---|
 | `npm install` | First-time install |
 | `npm run dev` | Dev server (http://localhost:9153/) |
-| `npm test` | Vitest unit tests (252; must pass before committing) — `npx vitest run` |
+| `npm test` | Vitest unit tests (317+; must pass before committing) — `npx vitest run` |
 | `npm run balance` | Headless battle harness — 3 passes: BASELINE (kill build, no bonds), MERCY (positive bonds: tanky + clutch FP), RUTHLESS (negative bonds: glass cannon + less FP). Read avgRounds/deaths; win% saturates under optimal AI. |
 | `npm run build` | Production bundle → `dist/` |
 
-No git repo yet. PixelLab MCP available for pixel art (`mcp__pixellab__*`).
+Git: 로컬 저장소 (2026-07-10 init, 원격 없음 — 로컬 커밋만). PixelLab MCP available for pixel art (`mcp__pixellab__*`).
 
 ## Project Structure
 

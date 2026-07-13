@@ -562,9 +562,10 @@ export class FieldScene {
       this.fieldHud.addChild(mpb);
     });
 
-    // Footer: gold (◆) and Fabula (✦) badges
+    // Footer: gold (◆) and Fabula (✦) badges (+ 회차 배지 — NG+ 플레이 중 상시 인지)
     const footY = top + panelH - 20;
-    const gold = label(`◆ ${this.game.runtime.gold}`, 12, HEX.gold);
+    const ng = this.game.runtime.ngPlus || 0;
+    const gold = label(ng > 0 ? `◆ ${this.game.runtime.gold} · ${ng + 1}회차` : `◆ ${this.game.runtime.gold}`, 12, HEX.gold);
     gold.x = x + pad; gold.y = footY;
     this.fieldHud.addChild(gold);
 
