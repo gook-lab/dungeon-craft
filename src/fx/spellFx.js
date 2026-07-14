@@ -1696,6 +1696,17 @@ export const DEFS = {
     const targets = S.targets(); const from = { x: S.caster.x + 6, y: S.caster.y - 10 }; castHop(S); S.tint(PAL.fireDeep, 0.3, 1.3); let t = 0; const next = targets.map(() => rnd(0.05, 0.2));
     return { update(dt) { t += dt; targets.forEach((e, i) => { next[i] -= dt; if (next[i] <= 0 && t < 1.0) { next[i] = rnd(0.08, 0.18); gunshot(S, from, e, Math.random() < 0.5 ? DL.spark : PAL.fireY); } }); if (t > 0.5 && t < 0.54) { S.doFlash(PAL.fireW, 0.6); S.doShake(6); for (const e of targets) burst(S, e.x, e.y - 9, [PAL.fireW, PAL.fireY, PAL.fireR], 20, 170, { additive: true, up: 6, g: 20 }); } }, done: (tt) => tt > 1.25 };
   },
+  // 팬파이어 — 부채꼴 전체 연사(강철 트레이서 소나기 + 출혈 방울). fullburst의
+  // 하위 캐던스 버전: 짧고 건조한 강철 탄막 (post-game L19 learn).
+  fanfire(S) {
+    const targets = S.targets(); const from = { x: S.caster.x + 6, y: S.caster.y - 10 }; castHop(S); let t = 0; const next = targets.map((_, i) => 0.06 + i * 0.05);
+    return { update(dt) { t += dt; targets.forEach((e, i) => { next[i] -= dt; if (next[i] <= 0 && t < 0.7) { next[i] = rnd(0.1, 0.16); gunshot(S, from, e, DL.steel); } }); if (t > 0.45 && t < 0.49) { S.doShake(4); for (const e of targets) { burst(S, e.x, e.y - 9, [DL.steel, DL.blood, '#fff'], 10, 120, { additive: true }); bloodDrops(S, e.x, e.y); } } }, done: (tt) => tt > 1.0 };
+  },
+  // 처형탄 — headshot의 처형 상위기: 더 긴 조준 응집 → 관통 일섬 + 이중 링.
+  executioner(S) {
+    const tgt = S.primary() || S.caster; const from = { x: S.caster.x + 6, y: S.caster.y - 11 }; castHop(S); let t = 0, hit = false;
+    return { update(dt) { t += dt; if (t < 0.45 && Math.random() < 0.7) S.p({ x: from.x + rnd(-4, 4), y: from.y + rnd(-4, 4), life: 0.22, max: 0.22, size: 2, color: Math.random() < 0.5 ? PAL.gold : DL.blood, additive: true }); if (!hit && t >= 0.45) { hit = true; gunshot(S, from, tgt, DL.blood); S.beam({ x1: from.x, y1: from.y, x2: tgt.x + 26, y2: tgt.y - 9, color: PAL.goldGlow, width: 3, life: 0.18, max: 0.18 }); burst(S, tgt.x, tgt.y - 9, [PAL.goldGlow, DL.blood, '#fff'], 26, 190, { additive: true }); S.floatSpr({ kind: 'critMark', x: tgt.x, y: tgt.y - 12, vy: -14, life: 0.6, max: 0.6 }); S.floatSpr({ kind: 'ring', x: tgt.x, y: tgt.y - 9, life: 0.4, max: 0.4, r0: 3, grow: 22, col: PAL.goldGlow }); bloodDrops(S, tgt.x, tgt.y); S.doFlash(DL.blood, 0.45); S.doShake(6); } }, done: (tt) => tt > 1.05 };
+  },
 
   // 쌍검사 인연기 (duelist duos) — multi-origin gunfire (S.caster + S.partner).
   duo_steelstorm(S) {
@@ -1715,6 +1726,33 @@ export const DEFS = {
   duo_symbiosis(S) {
     const tgt = S.primary() || S.caster; const co = S.caster; const po = S.partner || S.caster; for (const o of [co, po]) o.hop = 4; let t = 0, n = 0; const times = [0.08, 0.2, 0.32, 0.44];
     return { update(dt) { t += dt; while (n < times.length && t >= times[n]) { const fr = n % 2 ? po : co; S.beam({ x1: fr.x + 6, y1: fr.y - 10, x2: tgt.x, y2: tgt.y - 9, color: n % 2 ? PAL.gold : PAL.iceW, width: 2, life: 0.12, max: 0.12 }); burst(S, tgt.x, tgt.y - 9, [PAL.gold, PAL.iceW, '#fff'], 8, 110, { additive: true }); n++; } if (Math.abs(t - 0.48) < dt) { S.doFlash('#fff', 0.35); S.doShake(4); } }, done: (tt) => tt > 0.85 };
+  },
+
+  // === 종별 동료 전용 합동기 (ALLY_COMBOS — 스토리 영입 5종). 기존 프리미티브만. ===
+  // 숲의 사냥 (dark_warden) — 보랏빛 몰이 궤적이 교차하며 3연격 + 출혈.
+  ally_wildhunt(S) {
+    const tgt = S.primary() || S.caster; const co = S.caster; const po = S.partner || S.caster; for (const o of [co, po]) o.hop = 5; let t = 0, n = 0; const times = [0.1, 0.26, 0.42];
+    return { update(dt) { t += dt; while (n < times.length && t >= times[n]) { const fr = n % 2 ? po : co; S.beam({ x1: fr.x + 6, y1: fr.y - 8, x2: tgt.x + (n % 2 ? 14 : -14), y2: tgt.y - 4, color: '#b483f0', width: 3, life: 0.14, max: 0.14 }); burst(S, tgt.x, tgt.y - 9, ['#b483f0', DL.blood, '#fff'], 10, 120, { additive: true }); n++; } if (Math.abs(t - 0.46) < dt) { bloodDrops(S, tgt.x, tgt.y); S.doFlash('#b483f0', 0.35); S.doShake(4); } }, done: (tt) => tt > 0.9 };
+  },
+  // 파수꾼의 낙추 (bridge_warden) — 낙하 그림자 응집 → 단일 대강타 + 흙먼지 링.
+  ally_wardenslam(S) {
+    const tgt = S.primary() || S.caster; castHop(S); if (S.partner) S.partner.hop = 7; let t = 0, hit = false;
+    return { update(dt) { t += dt; if (t < 0.4 && Math.random() < 0.6) S.p({ x: tgt.x + rnd(-10, 10), y: tgt.y - 30 - rnd(0, 10), vy: 60, life: 0.25, max: 0.25, size: 2, color: PAL.earth, additive: true }); if (!hit && t >= 0.4) { hit = true; burst(S, tgt.x, tgt.y - 6, [PAL.earth, PAL.earthD, PAL.dust, '#fff'], 26, 170, { additive: true, up: 4, g: 40 }); S.floatSpr({ kind: 'ring', x: tgt.x, y: tgt.y - 4, life: 0.5, max: 0.5, r0: 4, grow: 30, col: PAL.dust }); S.doFlash(PAL.earthD, 0.4); S.doShake(7); } }, done: (tt) => tt > 1.0 };
+  },
+  // 서약의 뇌창 (seal_guardian) — 금빛 서약광 응집 → 관통 뇌창 일섬 + 감전 스파크.
+  ally_sealspear(S) {
+    const tgt = S.primary() || S.caster; const po = S.partner || S.caster; po.hop = 5; const from = { x: po.x + 8, y: po.y - 12 }; let t = 0, hit = false;
+    return { update(dt) { t += dt; if (t < 0.35 && Math.random() < 0.7) S.p({ x: from.x + rnd(-4, 4), y: from.y + rnd(-4, 4), life: 0.2, max: 0.2, size: 2, color: Math.random() < 0.5 ? PAL.gold : PAL.thunderB, additive: true }); if (!hit && t >= 0.35) { hit = true; S.beam({ x1: from.x, y1: from.y, x2: tgt.x + 24, y2: tgt.y - 9, color: PAL.gold, width: 3, life: 0.18, max: 0.18 }); S.beam({ x1: from.x, y1: from.y, x2: tgt.x + 24, y2: tgt.y - 9, color: PAL.thunderB, width: 1, life: 0.14, max: 0.14 }); burst(S, tgt.x, tgt.y - 9, [PAL.gold, PAL.thunderB, '#fff'], 22, 180, { additive: true }); for (let k = 0; k < 4; k++) S.p({ x: tgt.x + rnd(-10, 10), y: tgt.y - 9 + rnd(-8, 8), life: 0.3, max: 0.3, size: 2, color: PAL.thunderB, additive: true }); S.doFlash(PAL.gold, 0.45); S.doShake(5); } }, done: (tt) => tt > 0.95 };
+  },
+  // 별빛 낙하 (fallen_star) — 하늘에서 금빛 별똥 2파가 전체에 낙하 (FX_ALL_TARGET).
+  ally_starburst(S) {
+    const targets = S.targets(); castHop(S); S.tint('#1a1430', 0.3, 1.1); let t = 0; const waves = [0.2, 0.55]; let w = 0;
+    return { update(dt) { t += dt; if (w < waves.length && t >= waves[w]) { for (const e of targets) { S.p({ x: e.x + 16, y: e.y - 44, vx: -40, vy: 130, life: 0.18, max: 0.18, size: 2, color: PAL.gold, streak: 9, head: true, headColor: '#fff', fade: false }); S.schedule(0.16, () => { burst(S, e.x, e.y - 9, [PAL.gold, PAL.star, '#fff'], 14, 140, { additive: true, up: 5 }); S.floatSpr({ kind: 'cross', x: e.x, y: e.y - 14, vy: -10, life: 0.4, max: 0.4, col: PAL.goldGlow }); }); } if (w === 1) S.schedule(0.18, () => { S.doFlash(PAL.goldGlow, 0.5); S.doShake(5); }); w++; } }, done: (tt) => tt > 1.15 };
+  },
+  // 잿불 질주 (ember_hound) — 두 갈래 화염 돌진 궤적 + 불꽃 폭발 + 화상 불씨.
+  ally_emberdash(S) {
+    const tgt = S.primary() || S.caster; const co = S.caster; const po = S.partner || S.caster; for (const o of [co, po]) o.hop = 5; let t = 0, n = 0; const times = [0.12, 0.34];
+    return { update(dt) { t += dt; while (n < times.length && t >= times[n]) { const fr = n % 2 ? po : co; S.beam({ x1: fr.x + 6, y1: fr.y - 6, x2: tgt.x, y2: tgt.y - 6, color: PAL.fireY, width: 3, life: 0.16, max: 0.16 }); burst(S, tgt.x, tgt.y - 9, [PAL.fireW, PAL.fireY, PAL.fireR], 12, 130, { additive: true, up: 5, g: 25 }); for (let k = 0; k < 4; k++) S.p({ x: tgt.x + rnd(-8, 8), y: tgt.y - 6, vy: -rnd(15, 45), g: 60, life: 0.5, max: 0.5, size: 2, color: PAL.fireR }); n++; } if (Math.abs(t - 0.38) < dt) { S.doFlash(PAL.fireY, 0.4); S.doShake(4); } }, done: (tt) => tt > 0.9 };
   },
 
   // === Monster skills (enemy-side kit) — ported from share4/js/spellfx-monster.js.
@@ -2025,7 +2063,7 @@ export const FX_ALL_TARGET = new Set([
   // 인연공격 AoE (축복받은 연사 rains on every foe; 천공의 심판 nova washes the line).
   'duo_hallowed_volley', 'duo_radiant_nova',
   // 쌍검사 AoE (작약탄/산탄/풀버스트 + 소이탄 연격이 전열을 덮는다).
-  'fragbomb', 'buckshot', 'fullburst', 'duo_incendiary',
+  'fragbomb', 'buckshot', 'fullburst', 'fanfire', 'duo_incendiary', 'ally_starburst',
 ]);
 
 export function hasSpellFx(id) { return !!DEFS[id]; }

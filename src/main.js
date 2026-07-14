@@ -558,9 +558,13 @@ async function main() {
         }
         // Ending branch by mercy ratio: merciful (≥70% spared) / ruthless
         // (≥70% slain) / mixed. Boss win dialog can opt in via win_merciful /
-        // win_ruthless keys; falls back to the neutral win line.
+        // win_ruthless keys; falls back to the neutral win line. 톤↔유대 커플링:
+        // 파티 유대가 부정 극 우세면 `${win}_grim`이 톤 변형보다 우선한다
+        // (openDialog의 grim 스왑과 같은 규칙 — 저술된 보스만 opt-in).
         endTone = toneFromFlags(game.runtime.flags);
-        const branched = getDialog(`${opts.bossObj.win}_${endTone}`);
+        const grimWin = bondPolarity(game.runtime.bonds) === 'dark'
+          ? getDialog(`${opts.bossObj.win}_grim`) : null;
+        const branched = grimWin || getDialog(`${opts.bossObj.win}_${endTone}`);
         const winDialog = branched || getDialog(opts.bossObj.win);
         if (winDialog) msgs.push(...winDialog.lines);
         isFinal = !!opts.bossObj.final;

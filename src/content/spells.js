@@ -77,6 +77,11 @@ export const SPELLS = {
   buckshot: { id: 'buckshot', name: '산탄', mpCost: 5, kind: 'damage', power: 11, target: 'allEnemies', element: 'physical', physical: true, inflict: 'bleed', inflictChance: 0.5, inflictTurns: 2 },
   headshot: { id: 'headshot', name: '헤드샷', mpCost: 4, kind: 'damage', power: 22, target: 'one', element: 'physical', physical: true, critBonus: 0.4 },
   fullburst: { id: 'fullburst', name: '풀버스트', mpCost: 12, kind: 'damage', power: 18, hits: 3, atkScale: 0.85, target: 'allEnemies', element: 'fire', physical: true, inflict: 'burn', inflictChance: 0.7, inflictTurns: 3, ult: true }, // duelist ult — 다단 탄막(hits) so it out-damages the cheap multi-hit basics; cutscene via ult:true
+  // Post-game learns (L17+, past the harness ladder — duelist is off the tuned
+  // 3-hero sim anyway). 팬파이어 = buckshot의 상위 전체 연사(다단 탄막 + 출혈),
+  // 처형탄 = headshot의 상위 단일 처형(고크리 + 관통).
+  fanfire: { id: 'fanfire', name: '팬파이어', mpCost: 9, kind: 'damage', power: 12, hits: 3, atkScale: 0.6, target: 'allEnemies', element: 'physical', physical: true, inflict: 'bleed', inflictChance: 0.5, inflictTurns: 2 },
+  executioner: { id: 'executioner', name: '처형탄', mpCost: 9, kind: 'damage', power: 28, target: 'one', element: 'physical', physical: true, pierce: true, critBonus: 0.6 },
 
   // ===== Mage — arcane / elemental (magic; scales with maxMp) =====
   arcanebolt: { id: 'arcanebolt', name: '비전 화살', mpCost: 3, kind: 'damage', power: 11, target: 'one', element: 'arcane' },

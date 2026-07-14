@@ -71,15 +71,18 @@ export const PARTY_MEMBERS = {
   // 쌍검사 (duelist) — fast glass-cannon gunslinger (총·폭탄·투척). Own kit now
   // (2026-05-30): multi-hit shooters + bombs that inflict 출혈(bleed)/화상, a 연막
   // self-buff, and the 풀버스트 ult. High atk/spd, thin def/HP/MP → punished by
-  // single-target focus. Still NOT in STARTING_PARTY / no recruit NPC yet (defined +
-  // ready; seed it into the party to play). Damage is physical (atk-scaled) — the
-  // low maxMp would starve magic; element only drives affinity + the inflict.
+  // single-target focus. NOT in STARTING_PARTY, but reachable: pick as leader in
+  // CharacterSelect OR recruit via the bounty-hunter NPC in town (11,5). Damage is
+  // physical (atk-scaled) — the low maxMp would starve magic; element only drives
+  // affinity + the inflict.
   duelist: {
     id: 'duelist', name: '쌍검사', sprite: 'duelist',
     base: { maxHp: 24, maxMp: 18, atk: 13, def: 4, spd: 13 },
     growth: { maxHp: 3.5, maxMp: 2, atk: 2, def: 0.8, spd: 2 },
     spells: ['quickdraw'],
-    learn: { 3: 'rend', 5: 'shurikenflurry', 7: 'smokegrenade', 9: 'fragbomb', 11: 'buckshot', 13: 'headshot', 16: 'fullburst' },
+    // 팬파이어/처형탄 L19/L23 — post-game growth parity with the other classes
+    // (별무덤 L21 ~ 공허 L35 구간). Off the harness ladder (duelist non-sim).
+    learn: { 3: 'rend', 5: 'shurikenflurry', 7: 'smokegrenade', 9: 'fragbomb', 11: 'buckshot', 13: 'headshot', 16: 'fullburst', 19: 'fanfire', 23: 'executioner' },
   },
 };
 

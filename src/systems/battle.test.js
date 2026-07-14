@@ -1327,3 +1327,28 @@ describe('bleed status (출혈)', () => {
     expect(u.hp).toBe(94); // 6% once, not stacked
   });
 });
+
+// 쌍검사 post-game learns (L19 팬파이어 / L23 처형탄) — 포스트게임 성장 대칭.
+describe('duelist post-game skills', () => {
+  it('fanfire (L19) hits every living enemy and can inflict bleed', () => {
+    const d = buildHeroUnit('duelist', 19);
+    expect(d.spells).toContain('fanfire');
+    const e1 = buildEnemyUnit('star_husk'); // undead 아님(void) → bleed 가능
+    const e2 = buildEnemyUnit('star_moth');
+    const state = createBattle([d], [e1, e2]);
+    resolveAction(state, { type: 'spell', actorId: 'duelist', spellId: 'fanfire', targetId: e1.id }, fixedRng());
+    expect(e1.hp).toBeLessThan(e1.maxHp);
+    expect(e2.hp).toBeLessThan(e2.maxHp);
+  });
+
+  it('executioner (L23) pierces def — out-damages an equal-power non-pierce hit on a heavy tank', () => {
+    const d = buildHeroUnit('duelist', 23);
+    expect(d.spells).toContain('executioner');
+    // pierce = flat 0.7 (def-independent), so it wins only where def ratio < 0.7
+    // (atk/(atk+def) — the anti-armour executioner niche, not a universal buff).
+    const tank = makeUnit({ id: 't', side: 'enemy', maxHp: 400, hp: 400, def: 60, alive: true });
+    const plain = skillDamage({ power: 28, physical: true }, d, tank, null);
+    const pierced = skillDamage({ power: 28, physical: true, pierce: true }, d, tank, null);
+    expect(pierced).toBeGreaterThan(plain);
+  });
+});

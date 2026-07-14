@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  BOND_SKILLS, BOND_ULTS, POLE_RIDER, BOND_STRIKE_COST,
+  BOND_SKILLS, BOND_ULTS, POLE_RIDER, BOND_STRIKE_COST, ALLY_COMBOS,
   bondMod, bondModForCombo, canBondStrike, availableBondStrikes,
 } from './bondSkills.js';
 import { bondKey, addEmotion, EMOTIONS } from '../systems/bonds.js';
@@ -204,5 +204,28 @@ describe('동료 인연기 (ally combo — 공생 연격)', () => {
     expect(availableBondStrikes(st, {}, 2, 'knight').some((e) => e.id === 'duo_symbiosis')).toBe(false); // below cost
     st.bondStrikeUsed = true;
     expect(availableBondStrikes(st, {}, 6, 'knight')).toEqual([]); // shares the per-battle gate
+  });
+
+  it('story-recruit allies get their species combo INSTEAD of the generic one', () => {
+    const st = createBattle([hero('knight'), ally('dark_warden')], [enemy()]);
+    const avail = availableBondStrikes(st, {}, 3, 'knight');
+    const wild = avail.find((e) => e.id === 'ally_wildhunt');
+    expect(wild).toBeTruthy();
+    expect(wild.name).toBe('숲의 사냥');
+    expect(wild.partnerRefs).toEqual(['dark_warden']);
+    expect(avail.some((e) => e.id === 'duo_symbiosis')).toBe(false); // 전용기가 generic을 대체
+  });
+
+  it('every ALLY_COMBOS entry has a physical base + fx and rides costs ≥ BOND_STRIKE_COST', () => {
+    for (const [refId, combo] of Object.entries(ALLY_COMBOS)) {
+      expect(combo.base.physical, refId).toBe(true); // atk-scaled — the tuned ladder
+      expect(typeof combo.fx, refId).toBe('string');
+      expect(combo.cost, refId).toBeGreaterThanOrEqual(BOND_STRIKE_COST);
+    }
+  });
+
+  it('an ally without a species combo still falls back to 공생 연격', () => {
+    const st = createBattle([hero('knight'), ally('yeti')], [enemy()]);
+    expect(availableBondStrikes(st, {}, 3, 'knight').some((e) => e.id === 'duo_symbiosis')).toBe(true);
   });
 });

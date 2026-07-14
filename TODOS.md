@@ -275,13 +275,15 @@ v1 = 시작 3쌍(기사|전사·기사|사냥꾼·전사|사냥꾼) 듀오 합�
   라이브 QA: 독거미→기사 3피해(dmgReduce 감소 작동 확인). 라벨은 _popups 부유 시스템
   verbatim 재사용(데미지숫자와 동일 경로).
 
-### 수집 동료 쌍 합동기 — DEFERRED v2
-- **What**: 영입(수집) 몬스터 동료를 포함한 쌍 합동기.
-- **Why**: 영입 보상 강화(자비=파워) — 영입한 동료와의 인연공격.
-- **Context**: bondSkills.js `BOND_SKILLS`에 쌍 키 + base + fx만 추가. 단 동료 refId가
-  동적(몬스터별)이라 어떤 동료를 합동기 대상으로 삼을지 선별 + 그 동료 스프라이트 정합성
-  먼저 정리. 신규 라이더 필요 시 resolver 분기도 함께(데이터-only 아님).
-- **Depends on**: 합동기 대상 영입 동료 선별.
+### 수집 동료 쌍 합동기 — ✅ DONE (2026-07-14, 종별 전용기 5종)
+- `bondSkills.ALLY_COMBOS` (refId 키): 스토리 영입 셋피스 5종이 generic 공생 연격
+  대신 전용기를 낸다 — **숲의 사냥**(dark_warden, 3연격+출혈) / **파수꾼의 낙추**
+  (bridge_warden, 대강타+방어약화) / **서약의 뇌창**(seal_guardian, 관통 뇌전+감전) /
+  **별빛 낙하**(fallen_star, 전체 성속 2연 — FX_ALL_TARGET) / **잿불 질주**
+  (ember_hound, 2연 돌진+화상). availableBondStrikes가 배치 동료 refId로 조회, 없으면
+  ALLY_COMBO 폴백. 순수 데이터+FX 확장(리졸버의 기존 base.inflict/pierce/hits 경로
+  재사용 — resolver/scene 비접촉). spellFx DEFS 5종 + bondSkills.test 3케이스(전용기
+  대체/불변식/폴백). 그 외 일반 영입 몹은 공생 연격 유지.
 
 ### bondStrike 밸런스 하니스 모델링 — ✅ DONE (2026-07-10)
 - balance.js: 보스전 뱅킹 FP(mercy 4/ruthless 3) → knight×warrior 듀오 '맹세의 돌격'
@@ -321,14 +323,13 @@ drops 보유 맵은 포탈에서 역-플러드해 "모든 도달 타일이 출�
 - **쌍검사 전용무기 3종**: 쌍아 권총(crit)/결투의 건블레이드(counter)/할로우포인트 리볼버(crit)
   — items.js + DROP_GEAR(mid/high) + 대장간 stock. (슬롯 기반이라 하드 클래스락 아님.)
 - 256 테스트 통과. 밸런스 불변(duelist는 튜닝 3인 sim 밖, bleed는 적이 안 검 → 하니스 무관).
-- **여전히 STARTING_PARTY 아님 + 영입 NPC 없음** — 정의·완성됐으나 시드로만 플레이 가능.
-  영입 동선(또는 STARTING_PARTY 추가)이 reachable 만드는 남은 작업.
+- ~~여전히 STARTING_PARTY 아님 + 영입 NPC 없음~~ → **해소됨 (기록 정리 2026-07-14)**:
+  캐릭터 선택에서 리더로 선택 가능 + 마을 (11,5) 현상금 사냥꾼 영입 NPC(recruit_duelist,
+  joinedDuelist 플래그) 존재. STARTING_PARTY만 여전히 3인(의도 — 튜닝 사다리 유지).
 
-## ⚠️ BUILD BROKEN (사용자 WIP, 2026-05-30)
-- `src/main.js`(13행)가 `./scenes/characterSelectScene.js`를 import하는데 **파일 없음** →
-  `npm run build` 실패(Could not resolve). 캐릭터 선택/슬롯 세이브 시스템 진행 중인 듯.
-  Vite dev 서버는 새-게임 경로 전까지 동작. **쌍검사 작업과 무관**(main.js/scenes 미접촉).
-  characterSelectScene.js 생성(또는 import 제거)하면 빌드 복구.
+## ~~⚠️ BUILD BROKEN~~ — ✅ 해소됨 (기록 정리 2026-07-14)
+- 당시 없던 `scenes/characterSelectScene.js`는 출전 편성/캐릭터 선택 시스템과 함께
+  출하됐고(CLAUDE.md "Character select + active lineup" 참조) 빌드는 그린. 스테일 닫음.
 
 ## QA 디버그 훅 (window.__game / __dbg) — ✅ DONE (2026-05-30)
 - main.js 끝에 `import.meta.env.DEV` 게이트로 dev 전용 노출(프로덕션 빌드엔 제거).
@@ -371,15 +372,13 @@ drops 보유 맵은 포탈에서 역-플러드해 "모든 도달 타일이 출�
   생기고 그땐 무의미. 캡 6은 클러치 쿼드(cost 6) 뱅킹용으로 의도적. **튜닝된 경제라 변경은 리스크**.
 - 더 타이트한 느낌 원하면 레버: 캡 6→5, 또는 인연기 cost 미세조정. 현 상태로 균형 잡힘.
 
-## 쌍검사(duelist) 포스트게임 학습 공백 — ⬜ 풍부성 갭 (2026-07-14 밸런스 감사)
+## 쌍검사(duelist) 포스트게임 학습 공백 — ✅ DONE (2026-07-14)
 
-- **What:** duelist 학습셋이 L16 fullburst에서 끝 — 다른 4클래스는 L17+ 학습 2~3개
-  (포스트게임 성장)가 있는데 쌍검사만 0. 별무덤(L21)~공허(L35) 구간에서 새 스킬 없음.
-- **Why:** 클래스 풍부성 대칭. 쌍검사는 튜닝 3인 사다리 밖(하니스 비영향)이라 안전.
-- **Context:** spells.js 신규 1~2종(physical, atk-scale — 쌍검사 결) + party.js learn
-  L19/L23 + spellFx DEFS + battle.test. 후보 컨셉: 팬파이어(전체 저배율 연사),
-  처형탄(단일 고크리 headshot 상위기).
-- **Depends on:** 없음 (독립 데이터+FX 작업).
+- **팬파이어**(L19 — 전체 3연 강철 탄막 + 출혈 0.5) + **처형탄**(L23 — 단일 관통
+  pierce + critBonus 0.6, headshot 상위 처형기) 출하. spells.js 2종 + party.js learn
+  19/23 + spellFx DEFS 2종(fanfire는 FX_ALL_TARGET) + battle.test 2케이스(fanfire
+  전체 히트+bleed 경로, executioner pierce가 중장갑에서만 이기는 니치 검증 — pierce
+  0.7 고정이라 def비율 <0.7일 때만 이득). 하니스 비접촉(duelist 비-sim) — balance 불변.
 
 ## 서사 고도화 2·3막 증축 — ✅ DONE (2026-07-10, 볼륨 확장 세션)
 ### 완료 기록 (2026-07-10 볼륨 확장):
@@ -410,10 +409,16 @@ drops 보유 맵은 포탈에서 역-플러드해 "모든 도달 타일이 출�
   (에필로그/NG+ 2026-07-10 볼륨 확장, 사이드퀘 6종 q_warden_rest/q_frozen_kin/
   q_broken_oath/q_bloods_madness/q_star_mercy/q_scale_forge — 기버 6명 배치).
 
-## 톤↔유대 커플링 (서사가 bonds를 조회) — ✅ DONE v1 (2026-07-10)
+## 톤↔유대 커플링 (서사가 bonds를 조회) — ✅ DONE v1 (2026-07-10) + 증보 (2026-07-14)
 - `bonds.bondPolarity(bonds)` PURE ('dark'|'light'|'none' — 부정/긍정 극 다수결) +
   main.openDialog가 `${id}_grim` 변형을 톤 변형보다 우선 스왑. 저술: enoch_act3_grim
   (어두운 유대 파티 전용 3차 계시). 새 grim 대사는 dialog.js 엔트리만 추가하면 됨.
+- **증보 (2026-07-14)**: enoch_act1_grim / enoch_act2_grim (막마다 에녹이 "일행
+  사이의 공기"를 읽는다 — 퀘스트 동선 지목은 동일 유지) + **보스 win grim 라우팅**:
+  endBattle이 bondPolarity dark면 `${win}_grim`을 톤 변형보다 우선(openDialog와 같은
+  규칙, 저술된 보스만 opt-in). 저술 4종: boss_win_grim(해골왕) / frost_boss_win_grim
+  (늑대왕) / empire_boss_win_grim(황제 — D7 준수: 독백 5행 동일, 리액션+표어만 분기) /
+  void_boss_win_grim(공허). 엔딩 씬 톤은 불변(grim은 대사 레이어만).
 
 ## (원안) 톤↔유대 커플링 리팩터 노트 (2026-07-10)
 

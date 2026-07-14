@@ -145,6 +145,44 @@ export const ALLY_COMBO = {
   fx: 'duo_symbiosis',
 };
 
+// 종별 동료 전용 합동기 — 스토리 영입 셋피스 5종은 generic 공생 연격 대신 제 결의
+// 전용기를 가진다 (자비=파워 보상 밀도: 살려 준 그 존재가 제 방식으로 갚는다).
+// availableBondStrikes가 배치 동료의 refId로 조회, 없으면 ALLY_COMBO 폴백 — 순수
+// 데이터 확장이라 resolver/scene 비접촉. 튜닝은 공생 연격(20×4@0.5)과 등가 밴드
+// (scene-side, 하네스 미측정 — 인연기 power 튜닝 노트의 다단 탄막 원칙 준수).
+export const ALLY_COMBOS = {
+  // 어둠숲의 감시자 — 숲의 후각으로 몰이하는 협격: 단일 3연격 + 출혈.
+  dark_warden: {
+    id: 'ally_wildhunt', name: '숲의 사냥', cost: BOND_STRIKE_COST,
+    base: { physical: true, target: 'one', power: 24, hits: 3, atkScale: 0.55, element: 'physical', inflict: 'bleed', inflictChance: 0.7, inflictTurns: 3 },
+    fx: 'ally_wildhunt',
+  },
+  // 다리 파수꾼 — 사슬 끊긴 거상의 낙추: 단일 대강타 + 방어약화.
+  bridge_warden: {
+    id: 'ally_wardenslam', name: '파수꾼의 낙추', cost: BOND_STRIKE_COST,
+    base: { physical: true, target: 'one', power: 42, element: 'earth', inflict: 'defdown', inflictChance: 0.8, inflictTurns: 2 },
+    fx: 'ally_wardenslam',
+  },
+  // 봉인의 파수병 — 서약의 뇌창: 단일 관통 뇌전 + 감전.
+  seal_guardian: {
+    id: 'ally_sealspear', name: '서약의 뇌창', cost: BOND_STRIKE_COST,
+    base: { physical: true, target: 'one', power: 30, element: 'thunder', pierce: true, inflict: 'shock', inflictChance: 0.5, inflictTurns: 2 },
+    fx: 'ally_sealspear',
+  },
+  // 떨어진 별 — 해방된 별빛의 낙하: 전체 성속성 2연 폭발.
+  fallen_star: {
+    id: 'ally_starburst', name: '별빛 낙하', cost: BOND_STRIKE_COST,
+    base: { physical: true, target: 'all', power: 16, hits: 2, atkScale: 0.7, element: 'holy' },
+    fx: 'ally_starburst',
+  },
+  // 잿불 사냥개 — 우리에서 풀려난 질주: 단일 2연 돌진 + 화상.
+  ember_hound: {
+    id: 'ally_emberdash', name: '잿불 질주', cost: BOND_STRIKE_COST,
+    base: { physical: true, target: 'one', power: 24, hits: 2, atkScale: 0.65, element: 'fire', inflict: 'burn', inflictChance: 0.7, inflictTurns: 3 },
+    fx: 'ally_emberdash',
+  },
+};
+
 // Compose the rider `mod` from a pair's bond emotions. PURE — battleScene calls this
 // and rides the result in on the action payload, so battle.js never reads bonds.
 // Axis-exclusive poles mean Object.assign can't collide (dmgMult has one source).
@@ -220,10 +258,14 @@ export function availableBondStrikes(state, bonds, fp, actorRef) {
     out.push({ id: u.id, name: u.name, cost: u.cost, base: u.base, fx: u.fx, partnerRefs: partners.slice(0, u.size - 1), size: u.size });
   }
   // Ally combo — a real hero (not the ally itself) + the deployed monster ally.
+  // 스토리 영입 5종은 종별 전용기(ALLY_COMBOS)를, 그 외는 generic 공생 연격을 낸다.
   const actorU = state.units.find((u) => u.refId === actorRef && u.alive && u.side === 'hero');
   const allyU = state.units.find((u) => u.side === 'hero' && u.alive && u.ally);
-  if (allyU && actorU && !actorU.ally && (fp || 0) >= ALLY_COMBO.cost) {
-    out.push({ id: ALLY_COMBO.id, name: ALLY_COMBO.name, cost: ALLY_COMBO.cost, base: ALLY_COMBO.base, fx: ALLY_COMBO.fx, partnerRefs: [allyU.refId], size: 2 });
+  if (allyU && actorU && !actorU.ally) {
+    const combo = ALLY_COMBOS[allyU.refId] || ALLY_COMBO;
+    if ((fp || 0) >= combo.cost) {
+      out.push({ id: combo.id, name: combo.name, cost: combo.cost, base: combo.base, fx: combo.fx, partnerRefs: [allyU.refId], size: 2 });
+    }
   }
   return out;
 }
