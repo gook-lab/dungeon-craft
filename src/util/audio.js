@@ -1,7 +1,15 @@
 // Audio — ZzFX wrapper with a polyphony cap + per-sound throttle (ported from
-// the Crypt Survivors pattern). All SFX are procedurally synthesized (no asset
-// files). Sound params tuned per the game-feel spec. The AudioContext is
-// unlocked lazily on the first key press (browser autoplay policy).
+// the Crypt Survivors pattern). Base SFX are procedurally synthesized. The
+// AudioContext is unlocked lazily on the first key press (browser autoplay policy).
+//
+// ASSET LAYER (전투 사운드 이식, 2026-07-14): real tracks transcoded from the
+// Unity sibling's packs (MagicArsenal element SFX + 25 RPG Game Tracks battle
+// loop/victory + Resources/Bgm boss) live in public/audio/*.m4a. They ride the
+// same shared zzfx AudioContext as WebAudio buffers. Every asset path FALLS
+// BACK to the ZzFX layer (missing file / not yet decoded / disabled), so the
+// game sounds identical to before until a buffer is ready. AAC pads ~45ms of
+// encoder-delay silence — buffers are silence-trimmed on decode (loopStart/End
+// + start offset) so impacts stay punchy and BGM loops don't hiccup.
 
 import { zzfx, zzfxContext } from './zzfx.js';
 
@@ -53,6 +61,110 @@ export function createAudio() {
 
   function unlock() {
     try { const c = zzfxContext(); if (c.state === 'suspended') c.resume(); } catch { /* none */ }
+    preload();
+  }
+
+  // --- Asset audio layer -------------------------------------------------
+  const ASSET_BGM = { battle: 'bgm_battle', boss: 'bgm_boss' };
+  const JINGLES = { victory: 'jingle_victory' };
+  // spells.js element → public/audio/sfx_{cast|impact}_<element>.m4a. 'heal' is a
+  // pseudo-element the scene passes for heal/cure casts (MagicArsenal 'life' set).
+  const SFX_ELEMENTS = ['fire', 'ice', 'thunder', 'holy', 'dark', 'earth', 'arcane', 'wind', 'poison', 'heal'];
+  const BGM_ASSET_VOL = 0.35; // music sits under the SFX
+  const buffers = new Map(); // name → {buf, trim:[s,e]} | 'loading' | 'failed'
+  let bgmSrc = null;
+  let bgmGain = null;
+  let preloadedAssets = false;
+
+  function ctx() { try { return zzfxContext(); } catch { return null; } }
+
+  // Trim AAC encoder-delay silence: first/last sample above threshold, in seconds.
+  function trimRange(buf) {
+    const d = buf.getChannelData(0);
+    const th = 0.002;
+    let s = 0; let e = d.length - 1;
+    while (s < e && Math.abs(d[s]) < th) s++;
+    while (e > s && Math.abs(d[e]) < th) e--;
+    return [s / buf.sampleRate, (e + 1) / buf.sampleRate];
+  }
+
+  function loadBuffer(name) {
+    if (buffers.has(name)) return;
+    const c = ctx();
+    if (!c) return;
+    buffers.set(name, 'loading');
+    fetch(`/audio/${name}.m4a`)
+      .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
+      .then((ab) => c.decodeAudioData(ab))
+      .then((buf) => {
+        buffers.set(name, { buf, trim: trimRange(buf) });
+        // If this track's BGM mode is already active on the chiptune fallback,
+        // swap the real track in now (covers a battle that started pre-decode).
+        if (enabled && ASSET_BGM[musicMode] === name && !bgmSrc) {
+          if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
+          startAssetBgm(musicMode);
+        }
+      })
+      .catch(() => buffers.set(name, 'failed'));
+  }
+
+  function preload() {
+    if (preloadedAssets) return;
+    preloadedAssets = true;
+    Object.values(ASSET_BGM).forEach(loadBuffer);
+    Object.values(JINGLES).forEach(loadBuffer);
+    for (const el of SFX_ELEMENTS) { loadBuffer(`sfx_cast_${el}`); loadBuffer(`sfx_impact_${el}`); }
+  }
+
+  function stopAssetBgm() {
+    if (bgmSrc) { try { bgmSrc.stop(); } catch { /* already stopped */ } }
+    bgmSrc = null; bgmGain = null;
+  }
+
+  function startAssetBgm(mode) {
+    const entry = buffers.get(ASSET_BGM[mode]);
+    if (!entry || typeof entry === 'string') return false;
+    const c = ctx();
+    if (!c) return false;
+    stopAssetBgm();
+    const src = c.createBufferSource();
+    src.buffer = entry.buf;
+    src.loop = true;
+    src.loopStart = entry.trim[0];
+    src.loopEnd = entry.trim[1];
+    const g = c.createGain();
+    g.gain.value = BGM_ASSET_VOL * volume;
+    src.connect(g); g.connect(c.destination);
+    src.start(0, entry.trim[0]);
+    bgmSrc = src; bgmGain = g;
+    return true;
+  }
+
+  // One-shot asset playback. false → not ready/missing (caller keeps its ZzFX
+  // fallback); kicks off the load so the NEXT play lands the real sample.
+  function playBuffer(name, vol) {
+    if (!enabled || volume <= 0) return false;
+    const entry = buffers.get(name);
+    if (!entry || typeof entry === 'string') { loadBuffer(name); return false; }
+    const c = ctx();
+    if (!c) return false;
+    const src = c.createBufferSource();
+    src.buffer = entry.buf;
+    const g = c.createGain();
+    g.gain.value = (vol ?? 1) * volume;
+    src.connect(g); g.connect(c.destination);
+    src.start(0, entry.trim[0]);
+    return true;
+  }
+
+  // kind 'cast'|'impact' keyed by the spell's element ('heal' for heal/cure).
+  function playElement(kind, element) {
+    if (!element || !SFX_ELEMENTS.includes(element)) return false;
+    return playBuffer(`sfx_${kind}_${element}`, kind === 'impact' ? 0.7 : 0.55);
+  }
+
+  function playJingle(name) {
+    return !!JINGLES[name] && playBuffer(JINGLES[name], 0.8);
   }
 
   // --- BGM engine: simple looping note sequences (pentatonic so they never
@@ -95,7 +207,14 @@ export function createAudio() {
     if (musicMode === mode) return;
     musicMode = mode;
     if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
+    stopAssetBgm();
     beatIdx = 0;
+    // Asset track for this mode (battle/boss)? Play the real loop; if it isn't
+    // decoded yet, fall through to the chiptune and let loadBuffer swap it in.
+    if (ASSET_BGM[mode]) {
+      loadBuffer(ASSET_BGM[mode]);
+      if (enabled && startAssetBgm(mode)) return;
+    }
     const t = TRACKS[mode];
     if (!t) return;
     playNote(t);
@@ -106,7 +225,19 @@ export function createAudio() {
     play,
     unlock,
     setMusic,
-    setEnabled: (v) => { enabled = v; if (!v && musicTimer) { clearInterval(musicTimer); musicTimer = null; musicMode = 'off'; } },
-    setVolume: (v) => { volume = Math.max(0, Math.min(1, v)); },
+    playElement,
+    playJingle,
+    setEnabled: (v) => {
+      enabled = v;
+      if (!v) {
+        stopAssetBgm();
+        if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
+        musicMode = 'off';
+      }
+    },
+    setVolume: (v) => {
+      volume = Math.max(0, Math.min(1, v));
+      if (bgmGain) bgmGain.gain.value = BGM_ASSET_VOL * volume;
+    },
   };
 }

@@ -2,6 +2,22 @@
 
 See also: [CLAUDE.md](CLAUDE.md) (shipped architecture) · [DESIGN.md](DESIGN.md) (UI vocabulary) · [docs/map-roadmap.md](docs/map-roadmap.md) (HD-2D 맵 작업 핸드오프 — 다음 세션 이어받기).
 
+## 전투 사운드 asset 이식 1차 — ✅ DONE (2026-07-14) / 리전 BGM 2차 — ⬜
+- **1차 출하**: 유니티 형제 프로젝트의 팩을 afconvert(AAC m4a)로 변환해
+  `public/audio/` (총 3.2MB, 23파일). ① MagicArsenal 원소별 시전/임팩트 SFX 10쌍
+  (fire/ice/thunder/holy/dark/earth/arcane/wind→storm/poison→water/heal→life) —
+  playSpellFx·playMonsterSkillFx의 castStart에서 시전음, flashFromEvents에서
+  임팩트음. ② 전투 BGM(25RPG Action 1 Loop) + 보스 BGM(Resources/Bgm boss) —
+  setMusic asset 레이어. ③ 승리 징글(Victory) — handleEnd에서 BGM off 후 재생.
+- **설계**: util/audio.js asset 레이어 — 공유 zzfx AudioContext 위 WebAudio 버퍼,
+  **모든 경로가 ZzFX 폴백**(파일 없음/미디코드/비활성 → 기존과 동일). AAC 인코더
+  딜레이 ~45ms는 디코드 시 무음 트림(trimRange → loopStart/End + start offset)으로
+  해결 — 임팩트 펀치 유지 + BGM 루프 무단절. unlock()에서 전 버퍼 프리로드.
+- **2차 (⬜)**: 리전 BGM 11곡(`Resources/Bgm` town/wild/forest/frost/dungeon/ruins/
+  castle/graveyard/meadow/ascent) — 웹 리전과 이름 거의 1:1. ASSET_BGM에 모드 추가
+  + main.js setMusic('field')를 리전별 모드로 분기하면 됨. 곡당 m4a ~1.5MB.
+- **유의**: 에셋스토어 팩 → 유니티 외 사용은 라이선스 회색지대 (로컬 토이라 수용).
+
 
 ## Monster skill: 사령 소환(summon) — ✅ 이미 출하됨 (기록 정리 2026-07-14)
 
@@ -222,9 +238,9 @@ To ship it:
   Documents the no-`window.__game` reality + recipes (운명/FP, Crisis surge+flaw,
   equip delta, dialogue tone) and the low-hp-Crisis / bonds / fabula seed tricks.
 
-### 4-direction hero sprites
-- Field art is side-view only (`player.facing` E/W). Up/down reuses horizontal
-  facing. Add north/south walk art + extend `facing`/sprite selection when ready.
+### 4-direction hero sprites — ✅ 이미 출하됨 (기록 정리 2026-07-14)
+- 5영웅 전원 north/south/east/west 스틸 + 8프레임 워크 사이클 라이브 (2026-05-30,
+  PixelLab 4-dir 번들 — CLAUDE.md §7 참조). 이 항목은 출하 후 정리 누락 — 닫음.
 
 
 ## 인연공격(bondStrike) 후속 (2026-05-30, /plan-eng-review에서 분리)

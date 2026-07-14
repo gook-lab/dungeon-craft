@@ -776,9 +776,13 @@ export class BattleScene {
         if (!fxOwned) this.spawnHitFx(tid, 'spark');
       }
       if (ev.type === 'attack') this.game.audio.play(this.viewOf.get(ev.targetId)?.unit.side === 'hero' ? 'player_hurt' : 'hit_physical');
-      else if (ev.type === 'spellHit' || ev.type === 'monsterSkillHit' || ev.type === 'bondHit') this.game.audio.play('hit_magic');
-      else if (ev.type === 'heal') this.game.audio.play('heal_chime');
-      else if (ev.type === 'death') this.game.audio.play('enemy_death');
+      else if (ev.type === 'spellHit' || ev.type === 'monsterSkillHit' || ev.type === 'bondHit') {
+        // 원소별 임팩트음 (asset) — 없거나 미로드면 기존 ZzFX hit_magic 폴백.
+        const def = ev.type === 'monsterSkillHit' ? getMonsterSkill(ev.spellId) : getSpell(ev.spellId);
+        if (!this.game.audio.playElement?.('impact', def && def.element)) this.game.audio.play('hit_magic');
+      } else if (ev.type === 'heal') {
+        if (!this.game.audio.playElement?.('impact', 'heal')) this.game.audio.play('heal_chime');
+      } else if (ev.type === 'death') this.game.audio.play('enemy_death');
     }
   }
 
@@ -906,7 +910,11 @@ export class BattleScene {
   playSpellFx(action, events) {
     if (!this.spellFx) return;
     const cast = events.find((e) => e.type === 'castStart');
-    if (!cast || !hasSpellFx(cast.spellId)) return;
+    if (!cast) return;
+    // 원소별 시전음 (asset 레이어 — 없거나 미로드면 무음, 임팩트가 ZzFX로 커버).
+    const sfxSpell = getSpell(cast.spellId);
+    if (sfxSpell) this.game.audio.playElement?.('cast', sfxSpell.kind === 'heal' || sfxSpell.kind === 'cure' ? 'heal' : sfxSpell.element);
+    if (!hasSpellFx(cast.spellId)) return;
     const av = this.viewOf.get(action.actorId);
     if (!av) return;
     const spell = getSpell(cast.spellId);
@@ -936,7 +944,10 @@ export class BattleScene {
   playMonsterSkillFx(action, events) {
     if (!this.spellFx) return;
     const cast = events.find((e) => e.type === 'castStart');
-    if (!cast || !hasSpellFx(cast.spellId)) return;
+    if (!cast) return;
+    const sfxSkill = getMonsterSkill(cast.spellId);
+    if (sfxSkill) this.game.audio.playElement?.('cast', sfxSkill.element);
+    if (!hasSpellFx(cast.spellId)) return;
     const av = this.viewOf.get(action.actorId);
     if (!av) return;
     const skill = getMonsterSkill(cast.spellId);
@@ -2057,8 +2068,11 @@ export class BattleScene {
 
   handleEnd(outcome) {
     this.menuLayer.removeChildren();
-    if (outcome === 'victory') this.game.audio.play('victory_fanfare');
-    else if (outcome === 'defeat') this.game.audio.play('defeat_thud');
+    if (outcome === 'victory') {
+      // 전투 BGM을 멈추고 승리 징글 (asset — 미로드면 기존 ZzFX 팡파르 폴백).
+      this.game.audio.setMusic('off');
+      if (!this.game.audio.playJingle?.('victory')) this.game.audio.play('victory_fanfare');
+    } else if (outcome === 'defeat') this.game.audio.play('defeat_thud');
     // Fled (or any non win/lose) ends immediately — no transition flourish.
     if (outcome !== 'victory' && outcome !== 'defeat') {
       this.phase = 'over';
