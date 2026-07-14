@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { inBounds, canMove, portalAt, objectAt, buildEncounter, rollEncounter, tryMove, resolveTrigger, triggerKey, elevAt, isStair, isDrop, canStep } from './field.js';
+import { inBounds, canMove, portalAt, objectAt, buildEncounter, rollEncounter, tryMove, resolveTrigger, triggerKey, elevAt, isStair, isDrop, canStep, capEncounter } from './field.js';
 import { createRng } from '../util/rng.js';
 
 // 3x3 map: center walkable, a wall at (1,0), a portal at (2,2), an npc at (0,0)
@@ -235,5 +235,21 @@ describe('resolveTrigger (pure trigger effects)', () => {
     const opened = resolveTrigger(tmap, door, { flags: { crypt_key: true } });
     expect(opened).toMatchObject({ openWall: 'wallA' });
     expect(opened.locked).toBeUndefined();
+  });
+});
+
+// 조우 규모 캡 (2026-07-15 초반 완화) — 랜덤 조우를 파티 수+1로 자른다.
+describe('capEncounter', () => {
+  it('trims a random group to partySize+1, keeps smaller groups intact', () => {
+    const enc = { monsters: ['goblin', 'wolf', 'spider'] };
+    expect(capEncounter(enc, 1).monsters).toEqual(['goblin', 'wolf']); // 솔로 → 최대 2
+    const duo = { monsters: ['goblin', 'wolf', 'spider'] };
+    expect(capEncounter(duo, 3).monsters).toHaveLength(3); // 풀파티 → no-op
+  });
+
+  it('passes through null / missing party size (scripted formations skip the cap)', () => {
+    expect(capEncounter(null, 2)).toBeNull();
+    const enc = { monsters: ['a', 'b', 'c'] };
+    expect(capEncounter(enc, 0).monsters).toHaveLength(3); // no size info → verbatim
   });
 });

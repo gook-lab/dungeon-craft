@@ -23,13 +23,13 @@ import { bondKey } from '../src/systems/bonds.js';
 
 // Region scenarios: expected party level + gear tier + encounter pool / boss.
 const SCENARIOS = [
-  { name: 'wild  (L2)', level: 2, equip: {}, pool: ['goblin', 'wolf', 'spider', 'bat', 'walker', 'hornet'], min: 2, max: 3, herbs: 2 },
+  { name: 'wild  (L2)', level: 2, equip: {}, pool: ['goblin', 'wolf', 'spider', 'bat', 'walker', 'hornet'], min: 1, max: 2, herbs: 2 },
   // 어둠숲 (1막 스토리 존, wild 반 계단 위) — 맵 encounters와 동기 (min/max/pool).
-  { name: 'dkfrst(L3)', level: 3, equip: {}, pool: ['wolf', 'spider', 'hornet', 'walker'], min: 2, max: 4, herbs: 3 },
+  { name: 'dkfrst(L3)', level: 3, equip: {}, pool: ['wolf', 'spider', 'hornet', 'walker'], min: 1, max: 3, herbs: 3 },
   { name: 'dkWARDEN(L3)', level: 3, equip: { weapon: 'bronze_sword' }, boss: 'dark_warden', herbs: 3 },
-  { name: 'dungeon(L5)', level: 5, equip: { weapon: 'bronze_sword', armor: 'leather_armor' }, pool: ['imp', 'wisp', 'walker', 'spider', 'brood_mother', 'bone_archer', 'powder_skeleton', 'giant_spider', 'dark_acolyte'], min: 2, max: 5, herbs: 4 },
+  { name: 'dungeon(L5)', level: 5, equip: { weapon: 'bronze_sword', armor: 'leather_armor' }, pool: ['imp', 'wisp', 'walker', 'spider', 'brood_mother', 'bone_archer', 'powder_skeleton', 'giant_spider', 'dark_acolyte'], min: 2, max: 4, herbs: 4 },
   { name: 'dungBOSS(L7)', level: 7, equip: { weapon: 'iron_sword', armor: 'chain_armor' }, boss: 'skeleton_king', herbs: 5 },
-  { name: 'frost (L10)', level: 10, equip: { weapon: 'iron_sword', armor: 'chain_armor', accessory: 'power_ring' }, pool: ['frost_wisp', 'ice_golem', 'void_walker', 'chimera', 'frost_crow', 'yeti', 'frost_wolf', 'ice_wraith'], min: 2, max: 5, herbs: 6 },
+  { name: 'frost (L10)', level: 10, equip: { weapon: 'iron_sword', armor: 'chain_armor', accessory: 'power_ring' }, pool: ['frost_wisp', 'ice_golem', 'void_walker', 'chimera', 'frost_crow', 'yeti', 'frost_wolf', 'ice_wraith'], min: 2, max: 4, herbs: 6 },
   { name: 'frostBOSS(L12)', level: 12, equip: { weapon: 'silver_sword', armor: 'plate_armor', accessory: 'power_ring' }, boss: 'werewolf_king', herbs: 8 },
   { name: 'swamp (L15)', level: 15, equip: { weapon: 'silver_sword', armor: 'plate_armor', accessory: 'swift_boots' }, pool: ['mud_crawler', 'bog_brute', 'swamp_runner', 'giant_frog', 'medusa_head', 'bog_zombie', 'bog_leech'], min: 2, max: 5, herbs: 8 },
   { name: 'swampBOSS(L16)', level: 16, equip: { weapon: 'frost_blade', armor: 'mythril_mail', accessory: 'vitality_charm' }, boss: 'bog_witch', herbs: 9 },

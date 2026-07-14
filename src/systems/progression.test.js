@@ -25,16 +25,17 @@ describe('stats scaling', () => {
   });
 
   it('spells accumulate as levels are gained', () => {
-    expect(statsAtLevel('knight', 1).spells).toEqual(['heal']);
-    expect(statsAtLevel('knight', 3).spells).toEqual(['heal', 'smite']);
+    // smite is an L1 BASE spell (2026-07-15) — solo-leader knight starts with an attack.
+    expect(statsAtLevel('knight', 1).spells).toEqual(['heal', 'smite']);
+    expect(statsAtLevel('knight', 6).spells).toEqual(['heal', 'smite', 'shield_wall']);
     expect(statsAtLevel('huntress', 5).spells).toContain('multishot'); // huntress L4 learn
   });
 });
 
 describe('spellsLearnedBetween', () => {
   it('reports only newly crossed learn levels', () => {
-    expect(spellsLearnedBetween('knight', 1, 3)).toEqual(['smite']);
-    expect(spellsLearnedBetween('knight', 3, 4)).toEqual([]);
+    expect(spellsLearnedBetween('knight', 1, 5)).toEqual([]); // smite is base now, next learn L6
+    expect(spellsLearnedBetween('knight', 5, 6)).toEqual(['shield_wall']);
     expect(spellsLearnedBetween('huntress', 1, 5)).toEqual(['multishot']); // L4 learn
   });
 });

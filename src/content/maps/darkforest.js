@@ -62,5 +62,6 @@ export default {
     { x: 12, y: 0, to: 'wild', tx: 16, ty: 26 },
   ],
   // 황야보다 반 계단 위 — 늑대/거미/말벌 무리가 2-4마리로 몰려온다.
-  encounters: { rate: 0.11, pool: ['wolf', 'spider', 'hornet', 'walker'], min: 2, max: 4 },
+  // 초반 완화 (2026-07-15): 1막 스토리 존(L3 밴드) — 최대 4→3마리.
+  encounters: { rate: 0.11, pool: ['wolf', 'spider', 'hornet', 'walker'], min: 1, max: 3 },
 };

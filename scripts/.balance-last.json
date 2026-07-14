@@ -2,14 +2,14 @@
   "BASELINE": {
     "wild  (L2)": {
       "win": 100,
-      "rounds": 1.7,
-      "hp": 95,
+      "rounds": 1.1,
+      "hp": 98,
       "deaths": 0
     },
     "dkfrst(L3)": {
       "win": 100,
-      "rounds": 1.8,
-      "hp": 93,
+      "rounds": 1.4,
+      "hp": 97,
       "deaths": 0
     },
     "dkWARDEN(L3)": {
@@ -20,8 +20,8 @@
     },
     "dungeon(L5)": {
       "win": 100,
-      "rounds": 2.4,
-      "hp": 89,
+      "rounds": 2.2,
+      "hp": 93,
       "deaths": 0
     },
     "dungBOSS(L7)": {
@@ -32,8 +32,8 @@
     },
     "frost (L10)": {
       "win": 100,
-      "rounds": 2.9,
-      "hp": 87,
+      "rounds": 2.6,
+      "hp": 91,
       "deaths": 0
     },
     "frostBOSS(L12)": {
@@ -100,14 +100,14 @@
   "MERCY": {
     "wild  (L2)": {
       "win": 100,
-      "rounds": 2.1,
-      "hp": 92,
+      "rounds": 1.6,
+      "hp": 98,
       "deaths": 0
     },
     "dkfrst(L3)": {
       "win": 100,
-      "rounds": 2.2,
-      "hp": 91,
+      "rounds": 1.7,
+      "hp": 96,
       "deaths": 0
     },
     "dkWARDEN(L3)": {
@@ -118,8 +118,8 @@
     },
     "dungeon(L5)": {
       "win": 100,
-      "rounds": 2.6,
-      "hp": 85,
+      "rounds": 2.4,
+      "hp": 89,
       "deaths": 0
     },
     "dungBOSS(L7)": {
@@ -130,8 +130,8 @@
     },
     "frost (L10)": {
       "win": 100,
-      "rounds": 2.8,
-      "hp": 88,
+      "rounds": 2.5,
+      "hp": 91,
       "deaths": 0
     },
     "frostBOSS(L12)": {
@@ -198,14 +198,14 @@
   "RUTHLESS": {
     "wild  (L2)": {
       "win": 100,
-      "rounds": 2,
-      "hp": 91,
+      "rounds": 1.6,
+      "hp": 97,
       "deaths": 0
     },
     "dkfrst(L3)": {
       "win": 100,
-      "rounds": 2.2,
-      "hp": 90,
+      "rounds": 1.7,
+      "hp": 95,
       "deaths": 0
     },
     "dkWARDEN(L3)": {
@@ -216,8 +216,8 @@
     },
     "dungeon(L5)": {
       "win": 100,
-      "rounds": 2.6,
-      "hp": 85,
+      "rounds": 2.4,
+      "hp": 88,
       "deaths": 0
     },
     "dungBOSS(L7)": {
@@ -228,8 +228,8 @@
     },
     "frost (L10)": {
       "win": 100,
-      "rounds": 2.8,
-      "hp": 86,
+      "rounds": 2.5,
+      "hp": 90,
       "deaths": 0
     },
     "frostBOSS(L12)": {

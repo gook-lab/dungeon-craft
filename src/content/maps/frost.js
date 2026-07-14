@@ -79,5 +79,5 @@ export default {
     // East exit to the witch's swamp — gated behind the Werewolf King.
     { x: W - 1, y: 8, to: 'swamp', tx: 1, ty: 8, requires: 'frostBossDefeated', lockedTalk: 'swamp_gate' },
   ],
-  encounters: { rate: 0.13, pool: ['frost_wisp', 'ice_golem', 'void_walker', 'chimera', 'frost_crow', 'yeti', 'frost_wolf', 'ice_wraith'], min: 2, max: 5 },
+  encounters: { rate: 0.13, pool: ['frost_wisp', 'ice_golem', 'void_walker', 'chimera', 'frost_crow', 'yeti', 'frost_wolf', 'ice_wraith'], min: 2, max: 4 }, // 초반 완화 (2026-07-15): L10 밴드 최대 5→4마리
 };

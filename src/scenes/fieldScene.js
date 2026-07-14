@@ -5,7 +5,7 @@
 
 import * as PIXI from 'pixi.js';
 import { TILE, WORLD_SCALE, HERO_SCALE, PROP_SCALE, NPC_SCALE, TILESET_META, TILE_COLOR, MOVE_TIME, REPEAT_DELAY, REGION_MOOD, FOG_FADE, ELEV_STEP, FAR_BLUR, BACKDROP, TILT } from '../config.js';
-import { tryMove, objectAt, resolveTrigger, elevAt, isStair } from '../systems/field.js';
+import { tryMove, objectAt, resolveTrigger, elevAt, isStair, capEncounter } from '../systems/field.js';
 import { createRng } from '../util/rng.js';
 import { spawnRoamers, stepRoamers, roamerAt, roamerGroup } from '../systems/roamers.js';
 import { getMap } from '../content/maps/index.js';
@@ -1272,7 +1272,7 @@ export class FieldScene {
     }
     this.roamerSprites.delete(r.id);
     this.roamers = this.roamers.filter((x) => x !== r);
-    this.game.startBattle(roamerGroup(r, this.map, this.game.rng), this.map.tileset);
+    this.game.startBattle(capEncounter(roamerGroup(r, this.map, this.game.rng), this.activePartySize()), this.map.tileset);
   }
 
   // Build (or re-fit) the tilt RenderTexture + trapezoid PerspectiveMesh to the
@@ -1791,10 +1791,17 @@ export class FieldScene {
       }
     }
     // Random step-encounters only on maps without symbol (roamer) encounters.
+    // capEncounter: 랜덤 조우는 파티 수+1 마리까지 (초반 솔로/듀오 완화).
     if (res && res.encounter && !this.map.symbolEncounters) {
       this.busy = true;
-      this.game.startBattle(res.encounter, this.map.tileset);
+      this.game.startBattle(capEncounter(res.encounter, this.activePartySize()), this.map.tileset);
     }
+  }
+
+  // 출전 인원 수 (조우 규모 캡 기준) — active 라인업, 없으면 파티 전체.
+  activePartySize() {
+    const rt = this.game.runtime;
+    return (rt.active && rt.active.length) || (rt.party && rt.party.length) || 1;
   }
 
   // Apply a resolved trigger effect (the impure half of the trigger seam).

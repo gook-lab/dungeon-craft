@@ -114,5 +114,6 @@ export default {
     { x: 16, y: H - 1, to: 'darkforest', tx: 12, ty: 1 },
     { x: 17, y: H - 1, to: 'darkforest', tx: 12, ty: 1 },
   ],
-  encounters: { rate: 0.09, pool: ['goblin', 'wolf', 'spider', 'bat', 'walker', 'hornet'], min: 2, max: 3 },
+  // 초반 완화 (2026-07-15): 첫 필드 — 솔로/듀오 초반 파티 기준 1~2마리.
+  encounters: { rate: 0.09, pool: ['goblin', 'wolf', 'spider', 'bat', 'walker', 'hornet'], min: 1, max: 2 },
 };

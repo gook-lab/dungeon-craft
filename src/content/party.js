@@ -21,8 +21,10 @@ export const PARTY_MEMBERS = {
     // Growth trimmed ~20% (maxHp/atk/def) for a gentler level-up curve — spd/MP
     // kept (turn-order + magicScale tuning). Post-game bosses re-trimmed to match.
     growth: { maxHp: 4.8, maxMp: 1.5, atk: 1.6, def: 1.6, spd: 1 },
-    spells: ['heal'],
-    learn: { 3: 'smite', 6: 'shield_wall', 9: 'masheal', 11: 'cleanse', 13: 'masscleanse', 15: 'masbarrier', 17: 'holy_nova', 19: 'divinewrath', 20: 'holyblade' },
+    // 심판의 빛(smite)은 L1 기본기 (2026-07-15) — 성기사 리더 솔로 스타트에서
+    // 저렙 킷이 힐뿐이라 기본공격만 가능하던 문제. 공격 스킬 하나는 처음부터.
+    spells: ['heal', 'smite'],
+    learn: { 6: 'shield_wall', 9: 'masheal', 11: 'cleanse', 13: 'masscleanse', 15: 'masbarrier', 17: 'holy_nova', 19: 'divinewrath', 20: 'holyblade' },
   },
   warrior: {
     id: 'warrior', name: '전사', sprite: 'warrior',

@@ -98,6 +98,17 @@ export function buildEncounter(map, rng) {
   return buildGroup(map.encounters, rng);
 }
 
+// 조우 규모 완화 (2026-07-15): 랜덤 스텝 조우/로머 그룹을 파티 수+1로 캡 —
+// 혼자 시작한 리더가 첫 필드에서 2~3마리와 맞붙지 않게 하는 초반 안전벨트
+// (풀 파티 3~4인에선 캡이 min/max 위로 올라가 no-op). 스크립트 편성(트리거의
+// exact `group` 매복)은 저술된 연출이므로 호출부(fieldScene)가 캡을 건너뛴다.
+export function capEncounter(enc, partySize) {
+  if (!enc || !Array.isArray(enc.monsters) || !partySize) return enc;
+  const cap = Math.max(1, partySize + 1);
+  if (enc.monsters.length > cap) enc.monsters = enc.monsters.slice(0, cap);
+  return enc;
+}
+
 // Roll for an encounter after a step. Returns the encounter group or null.
 // Deterministic under a seeded rng.
 export function rollEncounter(map, rng) {

@@ -93,5 +93,5 @@ export default {
     { x: 0, y: 8, to: 'wild', tx: 34, ty: 8 }, // lands just inside wild's east gate (wild W=36)
     { x: W - 1, y: 8, to: 'frost', tx: 1, ty: 8, requires: 'bossDefeated', lockedTalk: 'frost_gate' },
   ],
-  encounters: { rate: 0.12, pool: ['imp', 'wisp', 'walker', 'spider', 'brood_mother', 'bone_archer', 'powder_skeleton', 'giant_spider', 'dark_acolyte'], min: 2, max: 5 },
+  encounters: { rate: 0.12, pool: ['imp', 'wisp', 'walker', 'spider', 'brood_mother', 'bone_archer', 'powder_skeleton', 'giant_spider', 'dark_acolyte'], min: 2, max: 4 }, // 초반 완화 (2026-07-15): L5 밴드 최대 5→4마리
 };
