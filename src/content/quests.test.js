@@ -8,7 +8,7 @@ describe('quest data integrity', () => {
     for (const [id, q] of Object.entries(QUESTS)) {
       expect(q.id).toBe(id);
       expect(typeof q.giver).toBe('string');
-      expect(['boss', 'mercy', 'slay', 'collect']).toContain(q.cond.type);
+      expect(['boss', 'mercy', 'slay', 'collect', 'reach', 'talk']).toContain(q.cond.type);
       expect(Array.isArray(q.offer) && q.offer.length).toBeTruthy();
       // reward item (if any) must exist; collect target item must exist
       if (q.reward && q.reward.item) expect(ITEMS[q.reward.item], `${id} reward item`).toBeTruthy();

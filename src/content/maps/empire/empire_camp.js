@@ -53,6 +53,8 @@ export default {
     // 로어 사이드퀘 기버: 봉인의 파수병(2막 존) / 핏빛 백작(옵셔널 미니보스) 지목.
     { x: 4, y: 7, kind: 'npc', ref: 'priest', dir: 'south', quest: 'q_broken_oath', label: '! 유물 학자' },
     { x: 13, y: 7, kind: 'npc', ref: 'guard', dir: 'south', quest: 'q_bloods_madness', label: '! 떠도는 검객' },
+    { x: 13, y: 9, kind: 'npc', ref: 'shopkeeper', dir: 'south', quest: 'q_hunt_wastes', label: '! 전리품 수집상' },
+    { x: 9, y: 4, kind: 'npc', ref: 'blacksmith', dir: 'south', quest: 'q_scout_bridge', label: '! 다리 목수' },
     // Late-game restock — alchemist (potions / return scrolls) in the camp.
     { x: 11, y: 9, kind: 'npc', ref: 'alchemist', dir: 'south', talk: 'shop_alchemist', label: '연금술사' },
     // Every town has a smith + jeweler. The refugees rebuilt a forge + a gem stall

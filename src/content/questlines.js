@@ -62,6 +62,22 @@ export const QUESTLINES = {
     ],
     reward: { gold: 1000, item: 'awakening' },
   },
+
+  // 사이드 퀘스트라인 「순례 · 재의 길」 (2026-07-15, 첫 non-막 라인) — `after`
+  // 없음(새 게임부터 활성). 에녹의 다중 배치 talk 패턴 재사용: 같은 순례자가
+  // 당신보다 한 걸음 앞서 세계를 걷고, 리전이 열릴 때마다 그를 다시 만난다.
+  // 진행 게이트는 리전 해금 자체(frost/lava가 보스 플래그로 잠겨 있음)라 막
+  // 진행과 자연 동기화된다.
+  ql_pilgrim: {
+    id: 'ql_pilgrim',
+    name: '순례 · 재의 길',
+    stages: [
+      { cond: { type: 'talk', npcId: 'pilgrim_town' }, desc: '마을의 순례자와 이야기한다' },
+      { cond: { type: 'talk', npcId: 'pilgrim_frost' }, desc: '서리첨탑에서 순례자를 다시 만난다' },
+      { cond: { type: 'talk', npcId: 'pilgrim_lava' }, desc: '불의 분화구, 순례의 끝에서 그와 이야기한다' },
+    ],
+    reward: { gold: 300, item: 'sage_amulet' },
+  },
 };
 
 // `after` 게이트가 열려 있는가 — 선행 퀘스트라인이 없거나 완료됐으면 true.

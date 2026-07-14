@@ -10,7 +10,8 @@
 //   mercy   { count }           → runtime.flags.mercied >= count
 //   slay    { count }           → runtime.flags.slain   >= count
 //   collect { item, count }     → runtime.inventory[item] >= count
-// (reach/visited deferred — needs a visited-map tracker; boss flags proxy it.)
+//   reach   { map }             → runtime.visitedMaps includes map
+//   talk    { npcId }           → runtime.talkedNpcs includes npcId
 //
 // reward — granted on turn-in: { gold?, item?, xp? } (xp split across party).
 
@@ -177,6 +178,64 @@ Object.assign(QUESTS, {
     offer: ['평생 강철만 두드렸지만, 용의 비늘만은 만져 본 적이 없네.', '분화구 어딘가에 용비늘 갑옷이 잠들어 있다 들었네. 한 벌만 구해다 주게 — 값은 섭섭잖게 치르지.'],
     active: ['용비늘 갑옷 한 벌일세. 분화구를 뒤져 보게. (지금 가진 것을 확인해 보게.)'],
     done: ['오오... 이것이 용의 비늘인가. 여한이 없네. 약속한 값일세 — 그리고 이 영약은 덤이야.'],
+  },
+});
+
+// --- 목표 다양화 라운드 (2026-07-15): 사냥(slay 첫 사용) · 탐사(reach) · 전언
+// (talk) — condMet은 세 타입을 이미 지원했지만 콘텐츠가 처음 쓴다. slay/mercy
+// 카운터는 게임 누적치(기존 q_mercy 관례와 동일 — 수주 전 진행분 소급 인정). ---
+
+Object.assign(QUESTS, {
+  // 사냥 의뢰 (초반) — 잔혹 성향 기버: 자비 퀘스트(q_mercy)의 거울상.
+  q_hunt_wild: {
+    id: 'q_hunt_wild', name: '황야의 사냥 의뢰', giver: '사냥길 안내인',
+    desc: '부패에 삼켜진 마수 열다섯을 처치하라.',
+    cond: { type: 'slay', count: 15 },
+    reward: { gold: 100, item: 'bronze_sword' },
+    offer: ['사제는 살려 보내라 하던가? 흥. 부패가 뼛속까지 스민 것들은 못 돌아와.', '열다섯. 그만큼은 베어야 길이 안전해지네. 의뢰를 받겠나?'],
+    active: ['아직 부족하네. 황야도 숲도, 마수는 얼마든지 있지.'],
+    done: ['확실한 솜씨군. 약속한 값과 — 내 예비 검일세. 어느 쪽 길을 걷든, 자네 몫이지.'],
+  },
+  // 사냥 의뢰 (후반) — 제국 야영지의 전리품 수집상.
+  q_hunt_wastes: {
+    id: 'q_hunt_wastes', name: '폐허의 소탕전', giver: '전리품 수집상',
+    desc: '부패의 권속 마흔을 처치하라.',
+    cond: { type: 'slay', count: 40 },
+    reward: { gold: 350, item: 'swift_boots' },
+    offer: ['폐허 장사는 목숨 장사요. 권속들이 줄어야 수레가 다니지.', '마흔. 지금까지 벤 것도 쳐 주겠소 — 장부는 정직하니까.'],
+    active: ['장부를 봤소. 아직 마흔이 안 되오. 서두르시오.'],
+    done: ['마흔... 확인했소. 값이오. 이 장화는 죽은 척후병의 것 — 산 자가 신어야지.'],
+  },
+  // 탐사 (옵셔널 존 발견성) — 심연의 다리(empire_bridge)는 안 가도 되는 맵이라
+  // 존재 자체를 모르기 쉽다. reach 퀘스트가 지도 바깥을 가리킨다.
+  q_scout_bridge: {
+    id: 'q_scout_bridge', name: '무너진 다리', giver: '다리 목수',
+    desc: '야영지 동쪽, 심연의 다리에 다녀와라.',
+    cond: { type: 'reach', map: 'empire_bridge' },
+    reward: { gold: 180, item: 'mana_drop' },
+    offer: ['제국이 무너지기 전, 내가 놓은 다리요. 심연 위에 걸린 마지막 다리지.', '아직 서 있는지... 이 눈으로는 볼 용기가 없소. 대신 가서 봐 주겠소?'],
+    active: ['다리는 야영지 동쪽이오. 부디 조심하시오 — 파수꾼이 아직 있다면, 그는 내 친구였소.'],
+    done: ['서 있단 말이지... 그 친구가 아직 지키고 있었군. 고맙소. 정말 고맙소.'],
+  },
+  // 탐사 (포스트게임) — 드레이크 둥지 정찰: q_drake(토벌)와 별개의 선행 정찰.
+  q_scout_core: {
+    id: 'q_scout_core', name: '심부 정찰', giver: '조사대 신참',
+    desc: '불의 분화구 심부에 발을 들여라.',
+    cond: { type: 'reach', map: 'lava_core' },
+    reward: { gold: 250, item: 'fp_potion' },
+    offer: ['대장은 토벌 얘기뿐이지만... 심부 지형을 아는 사람이 아무도 없어요.', '먼저 들어가서 보고만 와 주세요. 싸우지 않아도 돼요 — 돌아오기만 하면.'],
+    active: ['심부는 용암길 동쪽 끝이에요. 발판이 무너진 곳이 많대요.'],
+    done: ['살아 돌아왔네요...! 지형은 기록했어요. 이 영약은 제 몫이었지만 — 당신이 받아야죠.'],
+  },
+  // 전언 (talk 첫 사용) — 마을 여관 안주인 → 서리첨탑의 산사람 생존자.
+  q_message_frost: {
+    id: 'q_message_frost', name: '산으로 가는 전언', giver: '여관 안주인',
+    desc: '서리첨탑의 산사람 생존자에게 안부를 전하라.',
+    cond: { type: 'talk', npcId: 'frost_survivor' },
+    reward: { gold: 70, item: 'antidote' },
+    offer: ['산사람 마을에 사촌이 있어요. 첨탑에 그것이 온 뒤로 소식이 끊겼죠.', '살아만 있다면... 이 말만 전해 줘요. "여관 등불은 계속 켜 두겠다"고.'],
+    active: ['사촌은 첨탑 입구 쪽에 있을 거예요. 산사람들은 쉽게 안 죽어요.'],
+    done: ['살아 있대요?! ...고마워요. 정말. 등불 값이라 생각하고 받아 줘요.'],
   },
 });
 

@@ -73,6 +73,10 @@ export default {
     // 로어 사이드퀘 기버 (2026-07-10): 어둠숲 감시자 / 용비늘 단조.
     { x: 14, y: 8, kind: 'npc', ref: 'guard', dir: 'south', quest: 'q_warden_rest', label: '! 늙은 사냥꾼' },
     { x: 3, y: 11, kind: 'npc', ref: 'blacksmith', dir: 'south', quest: 'q_scale_forge', label: '! 노장장이' },
+    // 목표 다양화 라운드 (2026-07-15): 사냥(slay)·전언(talk) 기버 + 순례자 1스톱.
+    { x: 15, y: 10, kind: 'npc', ref: 'guard', dir: 'south', quest: 'q_hunt_wild', label: '! 사냥길 안내인' },
+    { x: 14, y: 4, kind: 'npc', ref: 'herbalist', dir: 'south', quest: 'q_message_frost', label: '! 여관 안주인' },
+    { x: 6, y: 9, kind: 'npc', ref: 'priest', npcId: 'pilgrim_town', dir: 'south', talk: 'pilgrim_town', label: '? 순례자' },
     // Specialized merchants (placeholder sprites until PixelLab art lands).
     { x: 5, y: 11, kind: 'npc', ref: 'blacksmith', dir: 'south', talk: 'shop_smith', label: '대장장이' },
     { x: 9, y: 9, kind: 'npc', ref: 'jeweler', dir: 'south', talk: 'shop_jeweler', label: '보석상' },

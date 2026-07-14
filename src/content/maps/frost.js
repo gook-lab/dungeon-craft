@@ -48,7 +48,8 @@ export default {
     // 2막 관통 캐릭터 — 방랑자 에녹 (배치별 고유 id enoch_act2; 1막은 마을의 enoch_act1).
     { x: 2, y: 10, kind: 'npc', ref: 'enoch', npcId: 'enoch_act2', dir: 'south', talk: 'enoch_act2', label: '? 방랑자' },
     // 로어 사이드퀘: 서리 여왕(옵셔널 미니보스) 지목 — 발견성.
-    { x: 1, y: 12, kind: 'npc', ref: 'herbalist', dir: 'south', quest: 'q_frozen_kin', label: '! 생존자' },
+    { x: 1, y: 12, kind: 'npc', ref: 'herbalist', npcId: 'frost_survivor', dir: 'south', quest: 'q_frozen_kin', label: '! 생존자' },
+    { x: 3, y: 12, kind: 'npc', ref: 'priest', npcId: 'pilgrim_frost', dir: 'south', talk: 'pilgrim_frost', label: '? 순례자' },
     { x: bossX, y: bossY, kind: 'boss', ref: 'werewolf_king', talk: 'frost_boss_intro', flag: 'frostBossDefeated', win: 'frost_boss_win' },
     // Optional MINIBOSS (서리 여왕) — spareable, off the main path. Engage by choice.
     { x: 2, y: 16, kind: 'boss', ref: 'frost_queen', talk: 'frost_queen_intro', flag: 'frostQueenDefeated', win: 'frost_queen_win' },

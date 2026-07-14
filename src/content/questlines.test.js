@@ -37,6 +37,8 @@ describe('condMet — delegation equivalence (regression: extraction from isQues
       mercy: (c) => rt({ flags: { mercied: c.count } }),
       slay: (c) => rt({ flags: { slain: c.count } }),
       collect: (c) => rt({ inventory: { [c.item]: c.count } }),
+      reach: (c) => rt({ visitedMaps: [c.map] }),
+      talk: (c) => rt({ talkedNpcs: [c.npcId] }),
     };
     for (const q of Object.values(QUESTS)) {
       const unmet = rt();
@@ -235,5 +237,24 @@ describe('ql_act3 (3막 게이팅 체인)', () => {
     expect(ev[0].id).toBe('ql_act3');
     expect(ev[0].status).toBe('done');
     expect(ev[0].reward).toEqual(QUESTLINES.ql_act3.reward);
+  });
+});
+
+// 사이드 퀘스트라인 「순례 · 재의 길」 (2026-07-15) — 첫 non-막 라인.
+describe('ql_pilgrim (side questline)', () => {
+  it('has no `after` gate — unlocked from a fresh game', () => {
+    expect(questlineUnlocked(rt(), QUESTLINES.ql_pilgrim)).toBe(true);
+  });
+
+  it('advances stage-by-stage on pilgrim talks and rewards on the last stop', () => {
+    const r = rt({ talkedNpcs: ['pilgrim_town'] });
+    let ev = advanceQuestlines(r).find((e) => e.id === 'ql_pilgrim');
+    expect(ev.stage).toBe(1);
+    expect(ev.status).toBe('active');
+    r.talkedNpcs.push('pilgrim_frost', 'pilgrim_lava');
+    ev = advanceQuestlines(r).find((e) => e.id === 'ql_pilgrim');
+    expect(ev.status).toBe('done');
+    expect(ev.reward).toEqual(QUESTLINES.ql_pilgrim.reward);
+    expect(ev.unlocked).toBeNull(); // 사이드라인 — 다음 막 카드 없음
   });
 });

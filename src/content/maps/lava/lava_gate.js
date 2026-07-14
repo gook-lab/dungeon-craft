@@ -50,6 +50,8 @@ export default {
     // Post-game quest givers (camped in the open entrance hollow, off the path).
     { x: 2, y: 6, kind: 'npc', ref: 'guard', dir: 'south', quest: 'q_drake', label: '! 화산 조사대장' },
     { x: 2, y: 11, kind: 'npc', ref: 'alchemist', dir: 'south', quest: 'q_lava_cache', label: '! 잿불 연금술사' },
+    { x: 2, y: 7, kind: 'npc', ref: 'guard', dir: 'south', quest: 'q_scout_core', label: '! 조사대 신참' },
+    { x: 1, y: 9, kind: 'npc', ref: 'priest', npcId: 'pilgrim_lava', dir: 'south', talk: 'pilgrim_lava', label: '? 순례자' },
     { x: 2, y: 2, kind: 'chest', loot: { gold: 400 } },
     { x: 24, y: 2, kind: 'chest', loot: { item: 'dragon_scale' } },
     // Hidden cache deep in the molten maze (off the minimap).
