@@ -65,7 +65,17 @@ export function createAudio() {
   }
 
   // --- Asset audio layer -------------------------------------------------
-  const ASSET_BGM = { battle: 'bgm_battle', boss: 'bgm_boss' };
+  // 리전 BGM (2차, 2026-07-14): `field_<region>` modes keyed by the map's
+  // `mood || tileset` (the REGION_MOOD pattern — fieldScene.loadMap sets it).
+  // Unknown/unmapped field modes fall back to the TRACKS.field chiptune.
+  const ASSET_BGM = {
+    battle: 'bgm_battle', boss: 'bgm_boss',
+    field_town: 'bgm_town', field_wild: 'bgm_wild', field_dungeon: 'bgm_dungeon',
+    field_darkforest: 'bgm_graveyard', // 어둠숲 — 옛 묘지기(감시자) 로어와 일치
+    field_frost: 'bgm_frost', field_swamp: 'bgm_forest', field_empire: 'bgm_castle',
+    field_ritual: 'bgm_ruins', field_starfall: 'bgm_ascent', field_lava: 'bgm_ascent',
+    field_void: 'bgm_dungeon',
+  };
   const JINGLES = { victory: 'jingle_victory' };
   // spells.js element → public/audio/sfx_{cast|impact}_<element>.m4a. 'heal' is a
   // pseudo-element the scene passes for heal/cure casts (MagicArsenal 'life' set).
@@ -111,7 +121,10 @@ export function createAudio() {
   function preload() {
     if (preloadedAssets) return;
     preloadedAssets = true;
-    Object.values(ASSET_BGM).forEach(loadBuffer);
+    // 상시 트랙(전투/보스)만 프리로드 — 리전 BGM은 방문 시 lazy (디코드된 PCM이
+    // 트랙당 수십 MB라 전부 상주시키면 메모리가 터진다; startAssetBgm이 evict).
+    loadBuffer(ASSET_BGM.battle);
+    loadBuffer(ASSET_BGM.boss);
     Object.values(JINGLES).forEach(loadBuffer);
     for (const el of SFX_ELEMENTS) { loadBuffer(`sfx_cast_${el}`); loadBuffer(`sfx_impact_${el}`); }
   }
@@ -137,6 +150,12 @@ export function createAudio() {
     src.connect(g); g.connect(c.destination);
     src.start(0, entry.trim[0]);
     bgmSrc = src; bgmGain = g;
+    // 리전 BGM 버퍼 evict: 지금 트랙 + 상시 트랙(전투/보스)만 남긴다. 재방문은
+    // HTTP 캐시 fetch + 재디코드(~수십 ms) — 디코드 PCM 상주 메모리와의 트레이드.
+    for (const [k, v] of buffers) {
+      if (k.startsWith('bgm_') && typeof v === 'object'
+        && k !== ASSET_BGM[mode] && k !== ASSET_BGM.battle && k !== ASSET_BGM.boss) buffers.delete(k);
+    }
     return true;
   }
 
@@ -215,7 +234,8 @@ export function createAudio() {
       loadBuffer(ASSET_BGM[mode]);
       if (enabled && startAssetBgm(mode)) return;
     }
-    const t = TRACKS[mode];
+    // field_<region> without an asset (or pre-decode) → the field chiptune.
+    const t = TRACKS[mode] || (String(mode).startsWith('field') ? TRACKS.field : null);
     if (!t) return;
     playNote(t);
     musicTimer = setInterval(() => playNote(t), t.beat);

@@ -13,9 +13,14 @@ See also: [CLAUDE.md](CLAUDE.md) (shipped architecture) · [DESIGN.md](DESIGN.md
   **모든 경로가 ZzFX 폴백**(파일 없음/미디코드/비활성 → 기존과 동일). AAC 인코더
   딜레이 ~45ms는 디코드 시 무음 트림(trimRange → loopStart/End + start offset)으로
   해결 — 임팩트 펀치 유지 + BGM 루프 무단절. unlock()에서 전 버퍼 프리로드.
-- **2차 (⬜)**: 리전 BGM 11곡(`Resources/Bgm` town/wild/forest/frost/dungeon/ruins/
-  castle/graveyard/meadow/ascent) — 웹 리전과 이름 거의 1:1. ASSET_BGM에 모드 추가
-  + main.js setMusic('field')를 리전별 모드로 분기하면 됨. 곡당 m4a ~1.5MB.
+- **2차 리전 BGM — ✅ DONE (2026-07-14)**: 9곡 변환(bgm_town/wild/dungeon/graveyard/
+  frost/forest/castle/ruins/ascent, 총 public/audio 16MB). `field_<mood||tileset>`
+  모드(REGION_MOOD와 같은 조회 키) — fieldScene.loadMap이 `game.fieldMusic` 기록 +
+  setMusic, enterField/endBattle이 복원. 매핑: darkforest→graveyard(묘지기 로어) /
+  swamp→forest / empire→castle / ritual→ruins / starfall·lava→ascent / void→dungeon
+  재사용. **메모리 설계**: 리전 BGM은 방문 시 lazy 디코드(디코드 PCM ~40MB/트랙) +
+  startAssetBgm이 현재 트랙·전투/보스 외 bgm 버퍼 evict(재방문 = HTTP캐시 재디코드).
+  미디코드 구간·미매핑 리전은 필드 칩튠 폴백.
 - **유의**: 에셋스토어 팩 → 유니티 외 사용은 라이선스 회색지대 (로컬 토이라 수용).
 
 

@@ -432,6 +432,11 @@ export class FieldScene {
     // 내내 밝은 맵이었다가 대화가 끝나는 순간 어두운 시야로 '뚝' 바뀌는 불일치가
     // 있었다. 여기서 켜 두면 오버레이 아래에서도 처음부터 일관된 화면.
     this.updateSpotlight();
+    // 리전 BGM: `field_<mood||tileset>` 모드 (REGION_MOOD와 같은 조회 키). asset이
+    // 없는 리전/미디코드 구간은 audio.setMusic이 필드 칩튠으로 폴백. 전투 복귀용으로
+    // game.fieldMusic에 기억해 둔다 (main.enterField/endBattle이 이걸 복원).
+    this.game.fieldMusic = `field_${this.map.mood || this.map.tileset || ''}`;
+    this.game.audio?.setMusic(this.game.fieldMusic);
     // reach 트래커: 방문 기록(영구, 최초 1회 — 재진입 no-op) + 퀘스트라인 tick.
     // 전진이 있으면 main이 진행 토스트 다이얼로그를 띄운다(맵 진입 = 도착 비트).
     recordVisit(this.game.runtime, mapId);

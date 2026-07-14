@@ -122,7 +122,7 @@ async function main() {
   game.enterField = () => {
     game.field = new FieldScene(game);
     scenes.push(game.field, { mapId: game.runtime.mapId, x: game.runtime.pos.x, y: game.runtime.pos.y });
-    game.audio.setMusic('field');
+    game.audio.setMusic(game.fieldMusic || 'field'); // loadMap이 리전 모드를 기록
     game.saveNow();
     // Opening prologue — shown once per save (gated by flags.intro). Sets the
     // shared-universe premise + the mercy theme before the player takes a step.
@@ -412,7 +412,7 @@ async function main() {
 
   game.endBattle = (outcome, state, opts = {}) => {
     scenes.pop(); // remove battle scene
-    game.audio?.setMusic('field'); // back to overworld music
+    game.audio?.setMusic(game.fieldMusic || 'field'); // back to the region's overworld music
     const heroUnits = state.units.filter((u) => u.side === 'hero');
     // 도감(Bestiary): record every monster faced this battle as 'seen'.
     if (!Array.isArray(game.runtime.seen)) game.runtime.seen = [];
