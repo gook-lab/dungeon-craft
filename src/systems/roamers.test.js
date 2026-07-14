@@ -56,9 +56,10 @@ describe('roamerGroup + roamerAt', () => {
 
 // 로머 밀도 (2026-07-15) — 면적 비례 + 맵별 오버라이드.
 describe('roamerCount', () => {
-  it('scales with map area, clamped to 7..12', () => {
-    expect(roamerCount({ w: 36, h: 28, encounters: {} })).toBe(11); // 1008/90
-    expect(roamerCount({ w: 10, h: 10, encounters: {} })).toBe(7);  // small map floor
+  it('scales with map area, clamped to 5..12', () => {
+    expect(roamerCount({ w: 36, h: 28, encounters: {} })).toBe(12); // 1008/80 → ceiling
+    expect(roamerCount({ w: 34, h: 26, encounters: {} })).toBe(11); // 884/80
+    expect(roamerCount({ w: 18, h: 14, encounters: {} })).toBe(5);  // 소형 보스방 floor
     expect(roamerCount({ w: 60, h: 60, encounters: {} })).toBe(12); // ceiling
   });
 
