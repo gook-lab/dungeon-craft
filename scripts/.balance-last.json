@@ -25,10 +25,10 @@
       "deaths": 0
     },
     "dungBOSS(L7)": {
-      "win": 93,
-      "rounds": 5.1,
-      "hp": 53,
-      "deaths": 0.89
+      "win": 84,
+      "rounds": 5.6,
+      "hp": 42,
+      "deaths": 1.29
     },
     "frost (L10)": {
       "win": 100,
@@ -37,10 +37,10 @@
       "deaths": 0
     },
     "frostBOSS(L12)": {
-      "win": 88,
-      "rounds": 5.3,
-      "hp": 45,
-      "deaths": 1.16
+      "win": 81,
+      "rounds": 5.5,
+      "hp": 38,
+      "deaths": 1.46
     },
     "swamp (L15)": {
       "win": 100,
@@ -49,10 +49,10 @@
       "deaths": 0
     },
     "swampBOSS(L16)": {
-      "win": 93,
-      "rounds": 11.5,
-      "hp": 53,
-      "deaths": 0.42
+      "win": 72,
+      "rounds": 12.8,
+      "hp": 35,
+      "deaths": 1.26
     },
     "ruins (L16)": {
       "win": 100,
@@ -67,10 +67,10 @@
       "deaths": 0
     },
     "EMPEROR(L18)": {
-      "win": 99,
-      "rounds": 5.2,
-      "hp": 73,
-      "deaths": 0.49
+      "win": 94,
+      "rounds": 5.5,
+      "hp": 61,
+      "deaths": 1.1
     },
     "starfl(L21)": {
       "win": 100,
@@ -79,10 +79,10 @@
       "deaths": 0
     },
     "FSTAR(L21)": {
-      "win": 100,
-      "rounds": 5.7,
-      "hp": 56,
-      "deaths": 0.68
+      "win": 92,
+      "rounds": 6.6,
+      "hp": 40,
+      "deaths": 1.47
     },
     "DRAKE(L25)": {
       "win": 75,
@@ -91,10 +91,10 @@
       "deaths": 2.12
     },
     "VOIDLORD(L35)": {
-      "win": 88,
-      "rounds": 11.3,
-      "hp": 39,
-      "deaths": 1.5
+      "win": 80,
+      "rounds": 11.7,
+      "hp": 33,
+      "deaths": 1.83
     }
   },
   "MERCY": {
@@ -124,9 +124,9 @@
     },
     "dungBOSS(L7)": {
       "win": 100,
-      "rounds": 3.9,
-      "hp": 76,
-      "deaths": 0.25
+      "rounds": 4.1,
+      "hp": 74,
+      "deaths": 0.34
     },
     "frost (L10)": {
       "win": 100,
@@ -137,8 +137,8 @@
     "frostBOSS(L12)": {
       "win": 100,
       "rounds": 4.1,
-      "hp": 78,
-      "deaths": 0.19
+      "hp": 74,
+      "deaths": 0.32
     },
     "swamp (L15)": {
       "win": 100,
@@ -147,10 +147,10 @@
       "deaths": 0
     },
     "swampBOSS(L16)": {
-      "win": 100,
-      "rounds": 8.7,
-      "hp": 68,
-      "deaths": 0.08
+      "win": 98,
+      "rounds": 9.3,
+      "hp": 60,
+      "deaths": 0.26
     },
     "ruins (L16)": {
       "win": 100,
@@ -165,10 +165,10 @@
       "deaths": 0
     },
     "EMPEROR(L18)": {
-      "win": 100,
-      "rounds": 4.7,
-      "hp": 79,
-      "deaths": 0.27
+      "win": 98,
+      "rounds": 5,
+      "hp": 72,
+      "deaths": 0.64
     },
     "starfl(L21)": {
       "win": 100,
@@ -178,9 +178,9 @@
     },
     "FSTAR(L21)": {
       "win": 100,
-      "rounds": 5,
-      "hp": 68,
-      "deaths": 0.29
+      "rounds": 5.3,
+      "hp": 56,
+      "deaths": 0.71
     },
     "DRAKE(L25)": {
       "win": 99,
@@ -189,10 +189,10 @@
       "deaths": 0.73
     },
     "VOIDLORD(L35)": {
-      "win": 98,
-      "rounds": 9.9,
-      "hp": 56,
-      "deaths": 0.79
+      "win": 96,
+      "rounds": 10.2,
+      "hp": 51,
+      "deaths": 1.02
     }
   },
   "RUTHLESS": {
@@ -222,9 +222,9 @@
     },
     "dungBOSS(L7)": {
       "win": 100,
-      "rounds": 3,
-      "hp": 87,
-      "deaths": 0.04
+      "rounds": 3.1,
+      "hp": 79,
+      "deaths": 0.2
     },
     "frost (L10)": {
       "win": 100,
@@ -235,8 +235,8 @@
     "frostBOSS(L12)": {
       "win": 100,
       "rounds": 3,
-      "hp": 85,
-      "deaths": 0.09
+      "hp": 84,
+      "deaths": 0.12
     },
     "swamp (L15)": {
       "win": 100,
@@ -245,10 +245,10 @@
       "deaths": 0
     },
     "swampBOSS(L16)": {
-      "win": 100,
-      "rounds": 7.5,
-      "hp": 67,
-      "deaths": 0.15
+      "win": 98,
+      "rounds": 8.3,
+      "hp": 57,
+      "deaths": 0.36
     },
     "ruins (L16)": {
       "win": 100,
@@ -263,10 +263,10 @@
       "deaths": 0
     },
     "EMPEROR(L18)": {
-      "win": 100,
-      "rounds": 4.4,
-      "hp": 81,
-      "deaths": 0.25
+      "win": 97,
+      "rounds": 4.8,
+      "hp": 70,
+      "deaths": 0.81
     },
     "starfl(L21)": {
       "win": 100,
@@ -275,10 +275,10 @@
       "deaths": 0
     },
     "FSTAR(L21)": {
-      "win": 100,
-      "rounds": 4.3,
-      "hp": 73,
-      "deaths": 0.26
+      "win": 99,
+      "rounds": 4.7,
+      "hp": 58,
+      "deaths": 0.72
     },
     "DRAKE(L25)": {
       "win": 98,
@@ -287,10 +287,10 @@
       "deaths": 0.89
     },
     "VOIDLORD(L35)": {
-      "win": 99,
-      "rounds": 8.1,
-      "hp": 55,
-      "deaths": 0.81
+      "win": 98,
+      "rounds": 8.2,
+      "hp": 51,
+      "deaths": 1.02
     }
   }
 }

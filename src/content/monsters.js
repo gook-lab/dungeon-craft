@@ -25,7 +25,7 @@ export const MONSTERS = {
   dark_acolyte: { id: 'dark_acolyte', name: '정예 흑마도사', maxHp: 42, atk: 16, def: 5, spd: 12, xp: 18, gold: 14, ai: 'attack', sprite: 'necromancer', spriteScale: 1.1, tint: 0xc9a0ff, family: 'undead', skills: [{ id: 'warcry', chance: 0.4, cd: 3, max: 2 }, { id: 'monshock', chance: 0.3, cd: 2 }], joinSkill: 'darkmist', recruitLine: '정예 흑마도사가 후드를 내리고 너의 술법서가 되기로 한다.' },
 
   skeleton_king: {
-    id: 'skeleton_king', name: '해골 왕', maxHp: 320, atk: 26, def: 10, spd: 6,
+    id: 'skeleton_king', name: '해골 왕', maxHp: 330, atk: 28, def: 10, spd: 6,
     xp: 80, gold: 100, ai: 'boss', sprite: 'boss_skeleton_king', boss: true, family: 'undead',
     // P1: a heavy bone-smash that cleaves armor. P2(격노): 광폭화 + 더 잦은 강타.
     skills: [{ id: 'monslam', chance: 0.35, cd: 2 }],
@@ -55,7 +55,7 @@ export const MONSTERS = {
     phase2: { at: 0.5, atkMult: 1.5, spdBonus: 5, heal: 0.15, cry: '서리 여왕이 분노한다! 폭설이 휘몰아친다!', skills: [{ id: 'frenzy', chance: 0.7, cd: 0, max: 1 }, { id: 'frostbreath', chance: 0.5, cd: 2 }] } },
 
   werewolf_king: {
-    id: 'werewolf_king', name: '늑대인간 왕', maxHp: 440, atk: 42, def: 13, spd: 11,
+    id: 'werewolf_king', name: '늑대인간 왕', maxHp: 440, atk: 45, def: 13, spd: 11,
     xp: 220, gold: 320, ai: 'boss', sprite: 'boss_werewolf_king', boss: true,
     // P1: 갈퀴 강타(방어 관통). P2(격노): 광폭화로 빠른 연타 + 강타 유지.
     skills: [{ id: 'monslam', chance: 0.4, cd: 2 }],
@@ -78,7 +78,7 @@ export const MONSTERS = {
   bog_leech:   { id: 'bog_leech',   name: '늪 거머리', maxHp: 50, atk: 21, def: 4, spd: 14, xp: 30, gold: 15, ai: 'attack', sprite: 'carnivore_plant', spriteScale: 0.82, tint: 0x8a3b3b, inflict: { status: 'poison', chance: 0.4, turns: 3 }, skills: [{ id: 'lifedrain', chance: 0.4, cd: 2 }], joinSkill: 'venom_shot', recruitLine: '늪 거머리가 흡혈을 멈추고 네 피붙이가 된다.' },
 
   bog_witch: {
-    id: 'bog_witch', name: '늪의 마녀', maxHp: 790, atk: 46, def: 16, spd: 13, // 660→790 (2026-07-14: L16 3인 magicScale 화력에 swampBOSS 100%/64%HP 무저항 — deaths 0.4-0.8 밴드 복원)
+    id: 'bog_witch', name: '늪의 마녀', maxHp: 790, atk: 56, def: 16, spd: 13, // 660→790 (2026-07-14: L16 3인 magicScale 화력에 swampBOSS 100%/64%HP 무저항 — deaths 0.4-0.8 밴드 복원)
     xp: 520, gold: 720, ai: 'boss', sprite: 'boss_bog_witch', boss: true,
     inflict: { status: 'poison', chance: 0.5, turns: 4 },
     // P1: 독 + 저주 압박. P2(격노): 재생으로 장기전 + 저주/독 유지.
@@ -126,7 +126,7 @@ export const MONSTERS = {
   // 떨어진 별 (별무덤 리전 보스) — 균열의 밤에 떨어져 부패에 붙들린 별의 잔해.
   // NOT boss:true → 자비로 '해방'(스페어)·영입 가능. frost_wisp 금빛 스왑 대형.
   fallen_star: {
-    id: 'fallen_star', name: '떨어진 별', maxHp: 1050, atk: 78, def: 15, spd: 30,
+    id: 'fallen_star', name: '떨어진 별', maxHp: 1050, atk: 100, def: 15, spd: 30,
     xp: 900, gold: 800, ai: 'boss', sprite: 'frost_wisp', tint: 0xffd77a, spriteScale: 1.7,
     family: 'void', mercyThreshold: 0.35,
     skills: [{ id: 'voidblast', chance: 0.35, cd: 2 }, { id: 'monshock', chance: 0.3, cd: 3 }],
@@ -169,13 +169,13 @@ export const MONSTERS = {
   // Final boss — the toughest in the game (> bog_witch). final:true lives on
   // the map boss OBJECT (empire_throne), not here; this just defines stats.
   fallen_emperor: {
-    id: 'fallen_emperor', name: '타락한 황제', maxHp: 1400, atk: 74, def: 18, spd: 14, // 980→1400 (2026-07-14: 4인 파티 EMPEROR 100%/89%HP 3.7R 무저항 — atk는 frenzy×enrage 절벽이라 HP만; P2 체류 연장)
+    id: 'fallen_emperor', name: '타락한 황제', maxHp: 1400, atk: 97, def: 18, spd: 14, // 980→1400 (2026-07-14: 4인 파티 EMPEROR 100%/89%HP 3.7R 무저항 — atk는 frenzy×enrage 절벽이라 HP만; P2 체류 연장)
     xp: 900, gold: 1200, ai: 'boss', sprite: 'fallen_emperor', boss: true, family: 'undead',
     // P1: 제국의 위압(전체 약화 저주) + 제왕의 일격(관통). P2(격노): 광폭화 +
     // 영혼 흡수(자가 회복)로 처형 페이즈 — 최종전다운 2페이즈 압박.
     skills: [{ id: 'curse', chance: 0.35, cd: 3 }, { id: 'monslam', chance: 0.4, cd: 2 }],
     phase2: {
-      at: 0.5, atkMult: 1.6, spdBonus: 6, heal: 0.18, cry: '타락한 황제가 옥좌에서 일어선다! 제국의 원한이 끓는다!',
+      at: 0.5, atkMult: 1.6, spdBonus: 8, heal: 0.18, cry: '타락한 황제가 옥좌에서 일어선다! 제국의 원한이 끓는다!',
       skills: [{ id: 'frenzy', chance: 0.7, cd: 0, max: 1 }, { id: 'lifedrain', chance: 0.45, cd: 2 }, { id: 'curse', chance: 0.4, cd: 3 }],
     },
   },
@@ -233,7 +233,7 @@ export const MONSTERS = {
 
   // Deepest superboss — toughest in the game (NOT final; no map `final` flag).
   void_lord: {
-    id: 'void_lord', name: '심연의 군주', maxHp: 1740, atk: 91, def: 24, spd: 16,
+    id: 'void_lord', name: '심연의 군주', maxHp: 1740, atk: 95, def: 24, spd: 16,
     xp: 2500, gold: 3000, ai: 'boss', sprite: 'boss_demon', spriteScale: 0.8, boss: true, family: 'void',
     inflict: { status: 'weaken', chance: 0.5, turns: 3 },
     // P1: 영혼 흡수(자가 회복) + 저주. P2(격노): 광폭화로 처형 페이즈.
