@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { spawnRoamers, roamerAt, stepRoamers, roamerGroup } from './roamers.js';
+import { spawnRoamers, roamerAt, stepRoamers, roamerGroup , roamerCount} from './roamers.js';
 import { createRng } from '../util/rng.js';
 
 const map = {
@@ -51,5 +51,18 @@ describe('roamerGroup + roamerAt', () => {
     const rs = [{ id: 'r0', ref: 'bat', x: 2, y: 3 }];
     expect(roamerAt(rs, 2, 3)).toBe(rs[0]);
     expect(roamerAt(rs, 0, 0)).toBe(null);
+  });
+});
+
+// 로머 밀도 (2026-07-15) — 면적 비례 + 맵별 오버라이드.
+describe('roamerCount', () => {
+  it('scales with map area, clamped to 7..12', () => {
+    expect(roamerCount({ w: 36, h: 28, encounters: {} })).toBe(11); // 1008/90
+    expect(roamerCount({ w: 10, h: 10, encounters: {} })).toBe(7);  // small map floor
+    expect(roamerCount({ w: 60, h: 60, encounters: {} })).toBe(12); // ceiling
+  });
+
+  it('map override wins (wild starter field stays moderate)', () => {
+    expect(roamerCount({ w: 36, h: 28, encounters: { roamers: 8 } })).toBe(8);
   });
 });

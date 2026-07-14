@@ -7,7 +7,7 @@ import * as PIXI from 'pixi.js';
 import { TILE, WORLD_SCALE, HERO_SCALE, PROP_SCALE, NPC_SCALE, TILESET_META, TILE_COLOR, MOVE_TIME, REPEAT_DELAY, REGION_MOOD, FOG_FADE, ELEV_STEP, FAR_BLUR, BACKDROP, TILT } from '../config.js';
 import { tryMove, objectAt, resolveTrigger, elevAt, isStair, capEncounter } from '../systems/field.js';
 import { createRng } from '../util/rng.js';
-import { spawnRoamers, stepRoamers, roamerAt, roamerGroup } from '../systems/roamers.js';
+import { spawnRoamers, stepRoamers, roamerAt, roamerGroup, roamerCount } from '../systems/roamers.js';
 import { getMap } from '../content/maps/index.js';
 import { getMonster } from '../content/monsters.js';
 import { heroUrl, heroWalkUrl, npcUrl, structureUrl, enemyUrl, pickupUrl } from '../util/assets.js';
@@ -413,7 +413,9 @@ export class FieldScene {
     this.buildWalls();
     this.buildObjects();
     this.buildLights();
-    this.roamers = this.map.symbolEncounters ? spawnRoamers(this.map, this.game.rng, 6) : [];
+    // 로머 밀도는 맵 면적 비례(roamerCount) — loadMap마다 재스폰이라 맵을
+    // 나갔다 오면 쓰러뜨린 로머도 돌아온다 (보스 오브젝트는 플래그 게이트 별개).
+    this.roamers = this.map.symbolEncounters ? spawnRoamers(this.map, this.game.rng, roamerCount(this.map)) : [];
     this.roamerT = 0;
     this.buildPlayer();
     this.buildRoamers();

@@ -5,6 +5,16 @@
 
 import { canStep } from './field.js';
 
+// 로머 밀도 (2026-07-15): 고정 6마리 → 맵 면적 비례 (약 90타일당 1마리, 7~12
+// 클램프). `map.encounters.roamers`로 맵별 오버라이드 가능. 로머는 loadMap마다
+// 새로 스폰되므로 맵을 나갔다 오면 리스폰된다 (보스는 로머가 아니라 플래그
+// 게이트 오브젝트 — 자연 제외). 심볼 조우라 피해 다닐 수 있어 밀도를 올려도
+// 강제 전투량이 늘진 않는다.
+export function roamerCount(map) {
+  if (map.encounters && map.encounters.roamers) return map.encounters.roamers;
+  return Math.max(7, Math.min(12, Math.round((map.w * map.h) / 90)));
+}
+
 export function spawnRoamers(map, rng, count) {
   if (!map.encounters || !map.encounters.pool || !map.encounters.pool.length) return [];
   const out = [];
