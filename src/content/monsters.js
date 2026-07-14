@@ -78,7 +78,7 @@ export const MONSTERS = {
   bog_leech:   { id: 'bog_leech',   name: '늪 거머리', maxHp: 50, atk: 21, def: 4, spd: 14, xp: 30, gold: 15, ai: 'attack', sprite: 'carnivore_plant', spriteScale: 0.82, tint: 0x8a3b3b, inflict: { status: 'poison', chance: 0.4, turns: 3 }, skills: [{ id: 'lifedrain', chance: 0.4, cd: 2 }], joinSkill: 'venom_shot', recruitLine: '늪 거머리가 흡혈을 멈추고 네 피붙이가 된다.' },
 
   bog_witch: {
-    id: 'bog_witch', name: '늪의 마녀', maxHp: 660, atk: 46, def: 16, spd: 13,
+    id: 'bog_witch', name: '늪의 마녀', maxHp: 790, atk: 46, def: 16, spd: 13, // 660→790 (2026-07-14: L16 3인 magicScale 화력에 swampBOSS 100%/64%HP 무저항 — deaths 0.4-0.8 밴드 복원)
     xp: 520, gold: 720, ai: 'boss', sprite: 'boss_bog_witch', boss: true,
     inflict: { status: 'poison', chance: 0.5, turns: 4 },
     // P1: 독 + 저주 압박. P2(격노): 재생으로 장기전 + 저주/독 유지.
@@ -169,7 +169,7 @@ export const MONSTERS = {
   // Final boss — the toughest in the game (> bog_witch). final:true lives on
   // the map boss OBJECT (empire_throne), not here; this just defines stats.
   fallen_emperor: {
-    id: 'fallen_emperor', name: '타락한 황제', maxHp: 980, atk: 74, def: 18, spd: 14,
+    id: 'fallen_emperor', name: '타락한 황제', maxHp: 1400, atk: 74, def: 18, spd: 14, // 980→1400 (2026-07-14: 4인 파티 EMPEROR 100%/89%HP 3.7R 무저항 — atk는 frenzy×enrage 절벽이라 HP만; P2 체류 연장)
     xp: 900, gold: 1200, ai: 'boss', sprite: 'fallen_emperor', boss: true, family: 'undead',
     // P1: 제국의 위압(전체 약화 저주) + 제왕의 일격(관통). P2(격노): 광폭화 +
     // 영혼 흡수(자가 회복)로 처형 페이즈 — 최종전다운 2페이즈 압박.

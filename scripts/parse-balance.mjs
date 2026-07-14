@@ -52,12 +52,15 @@ function flagsFor(section, name, r) {
   // Post-game boss scenarios (EMPEROR/DRAKE/VOIDLORD) carry no "BOSS" suffix but
   // are bosses, not trash — classify them so the 70-95% band + attrition rules
   // apply (else a genuinely-hard superboss falsely flags as an over-hard encounter).
-  const boss = /BOSS|EMPEROR|DRAKE|VOIDLORD/i.test(name);
+  const boss = /BOSS|EMPEROR|DRAKE|VOIDLORD|FSTAR/i.test(name); // FSTAR = 별무덤 리전 보스 (2026-07-14)
   const baseline = /BASELINE/i.test(section);
   const out = [];
   if (boss) {
     if (r.win < 70) out.push(`승률 ${r.win}% — 보스 과함(<70%)`);
-    else if (baseline && r.win > 95) out.push(`승률 ${r.win}% — 보스 무름(천장 95% 초과)`);
+    // win 천장은 deaths와 결합해서만 플래그: 4인+rally 클러치 하에선 win%가 포화해도
+    // (하니스 지침: deaths/rounds를 읽어라) 파티원이 반 명꼴로 죽는 싸움이면 이빨이
+    // 있는 것 — EMPEROR 99%/0.49가 그 케이스 (2026-07-14 판정 정교화).
+    else if (baseline && r.win > 95 && r.deaths < 0.3) out.push(`승률 ${r.win}%·사망 ${r.deaths} — 보스 무름(무저항 천장)`);
     if (baseline && r.hp > 60 && r.deaths < 0.2) out.push(`HP잔량 ${r.hp}%·사망 ${r.deaths} — 소모 부족`);
   } else if (r.win < 95) {
     out.push(`승률 ${r.win}% — 일반전 과함(<95%)`);
