@@ -115,6 +115,6 @@ export default {
     { x: 17, y: H - 1, to: 'darkforest', tx: 12, ty: 1 },
   ],
   // 초반 완화 (2026-07-15): 첫 필드 — 솔로/듀오 초반 파티 기준 1~2마리.
-  // roamers 8: 면적 공식(≈11)보다 낮춘 스타터 필드 밀도 오버라이드.
-  encounters: { rate: 0.09, pool: ['goblin', 'wolf', 'spider', 'bat', 'walker', 'hornet'], min: 1, max: 2, roamers: 8 },
+  // roamers 10: 면적 공식(18)보다 낮춘 스타터 필드 밀도 오버라이드.
+  encounters: { rate: 0.09, pool: ['goblin', 'wolf', 'spider', 'bat', 'walker', 'hornet'], min: 1, max: 2, roamers: 10 },
 };

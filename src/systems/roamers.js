@@ -12,10 +12,10 @@ import { canStep } from './field.js';
 // 강제 전투량이 늘진 않는다.
 export function roamerCount(map) {
   if (map.encounters && map.encounters.roamers) return map.encounters.roamers;
-  // 면적/80, 5~12 클램프 — 대형 필드(884~1008칸)는 11~12로 활기, 중형(~572칸)은 7,
-  // 소형 보스방(252칸 — 옥좌/용암·공허 심부)은 5로 오히려 비운다(보스 앞 긴장감;
-  // 이전 최소 7은 소형에서 1마리당 36칸 과밀이었다).
-  return Math.max(5, Math.min(12, Math.round((map.w * map.h) / 80)));
+  // 면적/55, 5~18 클램프 (2026-07-15 상향) — 미로 벽을 빼면 보행 칸이 절반쯤이라
+  // 체감 밀도는 수치의 2배로 잡는다: 대형 필드(884~1008칸) 16~18, 중형(~572칸) 10,
+  // 소형 보스방(252칸 — 옥좌/용암·공허 심부)은 5로 비운다(보스 앞 긴장감).
+  return Math.max(5, Math.min(18, Math.round((map.w * map.h) / 55)));
 }
 
 export function spawnRoamers(map, rng, count) {
