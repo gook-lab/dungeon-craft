@@ -426,6 +426,12 @@ export class FieldScene {
     this.placeHint();
     this.centerCamera();
     this.persistPos();
+    // 스포트라이트(원형 시야 페이드)를 로드 시점에 즉시 1회 갱신. update(dt)는 TOP
+    // 씬만 받으므로, 필드 위에 곧바로 오버레이가 얹히는 경로(새 게임 프롤로그 등)에선
+    // 첫 update가 오기 전까지 constructor 초기값(visible=false)이 유지돼 — 프롤로그
+    // 내내 밝은 맵이었다가 대화가 끝나는 순간 어두운 시야로 '뚝' 바뀌는 불일치가
+    // 있었다. 여기서 켜 두면 오버레이 아래에서도 처음부터 일관된 화면.
+    this.updateSpotlight();
     // reach 트래커: 방문 기록(영구, 최초 1회 — 재진입 no-op) + 퀘스트라인 tick.
     // 전진이 있으면 main이 진행 토스트 다이얼로그를 띄운다(맵 진입 = 도착 비트).
     recordVisit(this.game.runtime, mapId);
