@@ -1140,6 +1140,13 @@ export class BattleScene {
       t.x = colX[i % this.cmdCols]; t.y = top + Math.floor(i / this.cmdCols) * itemH;
       this.menuLayer.addChild(t);
       this.cmdTexts.push(t);
+      // 자비 비활성 사유 인라인 — 회색 자비 옆에 조건 한 줄 (왜 못 쓰는지 즉답).
+      if (this.menuOptions[i] === 'mercy' && disabled) {
+        const why = label('— 적을 약하게', FS.caption, HEX.textOff, { font: FONT.ui });
+        why.anchor = { x: 0, y: 0.5 };
+        why.x = t.x + t.width + 8; why.y = t.y;
+        this.menuLayer.addChild(why);
+      }
     });
     this.cmdCursor = new PIXI.Graphics();
     this.menuLayer.addChild(this.cmdCursor);

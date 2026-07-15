@@ -34,6 +34,8 @@ export function freshSave() {
     mapId: 'town',
     pos: { x: 7, y: 9 },
     openedChests: [],
+    // 누적 플레이타임 (초) — 메인 루프가 runtime에 적산, 타이틀 슬롯 카드가 표시.
+    playtime: 0,
     // 도감(Bestiary): refIds of every monster the party has faced in battle.
     seen: [],
     // Quest log: { questId: 'active' | 'done' } (see content/quests.js).
@@ -150,6 +152,7 @@ export function validateSave(raw) {
     mapId: typeof d.mapId === 'string' ? d.mapId : fresh.mapId,
     pos: d.pos && Number.isFinite(d.pos.x) && Number.isFinite(d.pos.y) ? { x: d.pos.x, y: d.pos.y } : { ...fresh.pos },
     openedChests: Array.isArray(d.openedChests) ? d.openedChests.filter((c) => typeof c === 'string') : [],
+    playtime: Number.isFinite(d.playtime) && d.playtime >= 0 ? Math.round(d.playtime) : 0,
     // 도감 seen-monster ids (string refIds, deduped).
     seen: Array.isArray(d.seen) ? [...new Set(d.seen.filter((s) => typeof s === 'string'))] : [],
     // Quest log: keep only string keys whose state is 'active' | 'done'.
@@ -247,6 +250,7 @@ export function toRuntime(save) {
     mapId: save.mapId,
     pos: { ...save.pos },
     openedChests: [...(save.openedChests || [])],
+    playtime: save.playtime || 0,
     seen: [...(save.seen || [])],
     quests: { ...(save.quests || {}) },
     questlines: Object.fromEntries(Object.entries(save.questlines || {}).map(([k, v]) => [k, { ...v }])),
@@ -273,6 +277,7 @@ export function runtimeToSave(runtime) {
     mapId: runtime.mapId,
     pos: { ...runtime.pos },
     openedChests: [...(runtime.openedChests || [])],
+    playtime: Math.round(runtime.playtime || 0),
     seen: [...(runtime.seen || [])],
     quests: { ...(runtime.quests || {}) },
     questlines: Object.fromEntries(Object.entries(runtime.questlines || {}).map(([k, v]) => [k, { ...v }])),
@@ -341,9 +346,11 @@ export function slotSummary(storage = defaultStorage(), slot = 1) {
     const d = validateSave(JSON.parse(raw));
     return {
       party: d.party.map((p) => p.id),
+      members: d.party.map((p) => ({ id: p.id, level: p.level || 1 })),
       level: d.party.reduce((m, p) => Math.max(m, p.level || 1), 1),
       mapId: d.mapId,
       gold: d.gold,
+      playtime: d.playtime || 0,
     };
   } catch { return null; }
 }

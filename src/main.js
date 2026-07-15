@@ -613,6 +613,8 @@ async function main() {
   // Main loop.
   renderer.app.ticker.add((ticker) => {
     const dt = Math.min(0.05, ticker.deltaMS / 1000);
+    // 플레이타임 적산 (런 진행 중에만 — 타이틀/캐릭터 선택은 runtime 없음).
+    if (game.runtime) game.runtime.playtime = (game.runtime.playtime || 0) + dt;
     input.tick(dt);
     scenes.update(dt);
     input.endFrame();
