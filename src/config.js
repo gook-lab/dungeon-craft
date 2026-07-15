@@ -39,7 +39,7 @@ export const TILESET_META = {
 // Solid-color ground fallback per semantic tile id.
 // 9 = molten lava pool (v3 리디자인 — 용암 리전의 비통행 웅덩이; Wang 시트 없음,
 // 밝은 단색 폴백으로 렌더. 통행 차단은 collision이 담당).
-export const TILE_COLOR = { 0: 0x3a6d34, 1: 0x8a6a3a, 2: 0x4a4652, 3: 0x2a4a8a, 4: 0xcdd9e6, 5: 0x4a5638, 6: 0x6b241a, 7: 0x241640, 8: 0x352a3a, 9: 0xd8501a };
+export const TILE_COLOR = { 0: 0x3a6d34, 1: 0x8a6a3a, 2: 0x4a4652, 3: 0x3f66c4, 4: 0xcdd9e6, 5: 0x4a5638, 6: 0x6b241a, 7: 0x241640, 8: 0x352a3a, 9: 0xd8501a }; // 3 물은 보드 프리뷰 톤으로 상향 (2026-07-16)
 
 // HD-2D atmosphere tokens per region (the "공기" layer — fieldScene.buildAtmosphere
 // composites ambient tint + a vertical depth-fog + a radial vignette over the world,

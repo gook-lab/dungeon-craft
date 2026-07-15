@@ -418,6 +418,8 @@ export class FieldScene {
     this.buildGround();
     this.buildDecor();
     this.buildElevation();
+    this.buildStairSteps();
+    this.buildWaterCrossings();
     this.buildAtmosphere();
     this.buildEdgeFade();
     this.buildBackdrop();
@@ -490,11 +492,19 @@ export class FieldScene {
     // Fog of war: only EXPLORED tiles are drawn — the map fills in as you walk it.
     const exp = this._explored;
     const seen = (i) => !exp || exp.has(i);
-    // Tile colors: wall (dark) vs floor (muted blue-gray)
+    // Tile colors: wall (dark) vs floor = ground 시맨틱 색 (보드 프리뷰처럼 개울/길/
+    // 호수가 미니맵에서도 읽히게). TILE_COLOR를 잉크 쪽으로 35% 눌러 HUD 톤 유지.
+    const mixInk = (c) => {
+      const t = 0.35, ink = 0x10142a;
+      return ((Math.round(((c >> 16) & 255) * (1 - t) + ((ink >> 16) & 255) * t) << 16)
+        | (Math.round(((c >> 8) & 255) * (1 - t) + ((ink >> 8) & 255) * t) << 8)
+        | Math.round((c & 255) * (1 - t) + (ink & 255) * t));
+    };
     for (let i = 0; i < struct.length; i++) {
       if (!seen(i)) continue;
       const cx = (i % w) * cell, cy = Math.floor(i / w) * cell;
-      g.rect(cx, cy, cell, cell).fill({ color: struct[i] === 1 ? NUM.ink900 : NUM.ink600 });
+      const col = struct[i] === 1 ? NUM.ink900 : mixInk(TILE_COLOR[this.map.ground[i]] ?? NUM.ink600);
+      g.rect(cx, cy, cell, cell).fill({ color: col });
     }
     // Portals (info/cyan), gated portals slightly dimmer.
     for (const p of this.map.portals || []) {
@@ -655,6 +665,56 @@ export class FieldScene {
     this.weather.setKind(kind);
     this.game.currentWeather = kind; // 전투 배경이 승계 (battleScene)
     this.weatherT = WEATHER_CYCLE_MIN + Math.random() * (WEATHER_CYCLE_MAX - WEATHER_CYCLE_MIN);
+  }
+
+  // 계단 시각화 — stairs 셀에 돌계단 트레드를 그린다 (걷기 규칙만 있고 보이지
+  // 않던 계단에 에셋 대응). 4단 트레드 + 좌우 난간 라인, elevation 레이어에 얹음.
+  buildStairSteps() {
+    if (!this.map || !this.map.stairs || !this.map.stairs.length) return;
+    const g = new PIXI.Graphics();
+    for (const st of this.map.stairs) {
+      const eo = elevAt(this.map, st.x, st.y) * ELEV_STEP;
+      const px = st.x * TILE, py = st.y * TILE - eo;
+      // 바닥판
+      g.rect(px + 1, py + 1, TILE - 2, TILE - 2).fill({ color: 0x6a6a78 });
+      // 4단 트레드 (위로 갈수록 밝게 — 올라가는 느낌)
+      const STEPS = 4, sh = (TILE - 6) / STEPS;
+      for (let i = 0; i < STEPS; i++) {
+        const ty = py + 3 + i * sh;
+        const shade = [0x9a9aa8, 0x8a8a98, 0x7a7a88, 0x6f6f7d][i];
+        g.rect(px + 3, ty, TILE - 6, sh - 1).fill({ color: shade });
+        g.rect(px + 3, ty + sh - 1, TILE - 6, 1).fill({ color: 0x4a4a56 }); // 단 그림자
+      }
+      // 좌우 난간
+      g.rect(px + 1, py + 1, 2, TILE - 2).fill({ color: 0x55555f });
+      g.rect(px + TILE - 3, py + 1, 2, TILE - 2).fill({ color: 0x55555f });
+    }
+    this.elevation.addChild(g);
+  }
+
+  // 징검다리 — 통행 가능한 물 셀(ground 3 + 구조 collision 0)에 디딤돌을 그린다.
+  // 보드 시안의 개울 건널목이 게임에서 '물 위를 걷는' 것처럼 보이던 것에 대응.
+  buildWaterCrossings() {
+    if (!this.map) return;
+    const { w, h, ground } = this.map;
+    const struct = this.structCollision || this.map.collision;
+    const g = new PIXI.Graphics();
+    let n = 0;
+    for (let i = 0; i < ground.length; i++) {
+      if (ground[i] !== 3 || struct[i] === 1) continue;
+      const x = i % w, y = Math.floor(i / w);
+      const eo = elevAt(this.map, x, y) * ELEV_STEP;
+      const px = x * TILE, py = y * TILE - eo;
+      // 디딤돌 3개 (지그재그) — 밝은 상판 + 어두운 밑둥.
+      const stones = [[0.28, 0.3, 7], [0.66, 0.5, 8], [0.36, 0.72, 6]];
+      for (const [fx, fy, r] of stones) {
+        g.ellipse(px + TILE * fx, py + TILE * fy + 1.5, r, r * 0.7).fill({ color: 0x3c4250 });
+        g.ellipse(px + TILE * fx, py + TILE * fy, r, r * 0.7).fill({ color: 0x8e94a4 });
+        g.ellipse(px + TILE * fx - r * 0.25, py + TILE * fy - r * 0.2, r * 0.45, r * 0.3).fill({ color: 0xb8bec9, alpha: 0.8 });
+      }
+      n++;
+    }
+    if (n) this.decor.addChild(g);
   }
 
   // 화면 가장자리 어둠 그라데이션 (TILT 전용) — 위는 깊게, 좌우는 얕게.
@@ -977,7 +1037,7 @@ export class FieldScene {
     for (const [x, y] of this._waterCells) {
       const eo = elevAt(this.map, x, y) * ELEV_STEP;
       const px = x * TILE, py = y * TILE - eo;
-      g.rect(px, py, TILE, TILE).fill({ color: 0x21407a }); // richer water base
+      g.rect(px, py, TILE, TILE).fill({ color: 0x3a5fb4 }); // 밝은 강물 — 보드 프리뷰 톤
       // two drifting highlight bands (phase by world-x → a continuous wave)
       for (let b = 0; b < 2; b++) {
         const yy = py + TILE * (0.34 + 0.36 * b) + Math.sin(x * 0.85 + t * 1.6 + b * 2.1) * 3;
