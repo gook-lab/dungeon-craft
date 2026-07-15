@@ -121,7 +121,9 @@ export const TILT = {
   // ~this radius and the billboard actors beyond it are CULLED (fully hidden, not
   // just dimmed), fading over the last `viewFade` tiles → a tight, focused diorama
   // where things outside your sightline disappear. Lower = tighter.
-  viewRadius: 3.5, viewFade: 1.2,
+  // 2026-07-15 확장: 3.5/1.2 → 5.5/2.0 — v3 광활 맵에서 시야가 답답하다는 피드백.
+  // 밝은 원이 넓어지고 가장자리 페이드도 완만해진다 (마을 openMap은 아예 제외).
+  viewRadius: 5.5, viewFade: 2.0,
 };
 
 export const MOVE_TIME = 0.12; // seconds per grid step (tween) — snappier walk
