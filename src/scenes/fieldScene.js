@@ -623,7 +623,22 @@ export class FieldScene {
   // Rebuilt per loadMap + resume; sized to the current screen.
   // 바이옴 날씨 풀에서 하나 뽑아 적용 + 다음 롤 타이머 장전. 코스메틱 전용이라
   // 시드 rng가 아닌 Math.random을 쓴다 (인카운터 롤 결정성 비오염).
+  // 맵 스키마 `weather` 오버라이드 (지역 정체성 — 풀 로테이션보다 우선):
+  //   null            → 무날씨 고정 (실내: waterway/ruins_below/void_*)
+  //   'fog'|'snow'|…  → 해당 킨드 고정
+  //   { kind, chance }→ 입장 시 chance 확률로 발생, 아니면 맑음 (재진입마다 재롤)
   rollWeather(initial = false) {
+    const mw = this.map ? this.map.weather : undefined;
+    if (mw !== undefined) {
+      let kind = 'clear';
+      if (typeof mw === 'string') kind = mw;
+      else if (mw && mw.kind) kind = Math.random() < (mw.chance ?? 1) ? mw.kind : 'clear';
+      this.weatherKind = kind;
+      this.weather.setKind(kind);
+      this.game.currentWeather = kind; // 전투 배경이 승계 (battleScene)
+      this.weatherT = undefined;       // 고정 — 로테이션 없음
+      return;
+    }
     const pool = BIOME_WEATHER[this.map?.tileset || 'town'] || ['clear'];
     let kind = pool[Math.floor(Math.random() * pool.length)];
     if (!initial && pool.length > 1 && kind === this.weatherKind) {
@@ -631,6 +646,7 @@ export class FieldScene {
     }
     this.weatherKind = kind;
     this.weather.setKind(kind);
+    this.game.currentWeather = kind; // 전투 배경이 승계 (battleScene)
     this.weatherT = WEATHER_CYCLE_MIN + Math.random() * (WEATHER_CYCLE_MAX - WEATHER_CYCLE_MIN);
   }
 

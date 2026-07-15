@@ -73,6 +73,7 @@ export default {
   name: "지하 수로",
   w: W, h: H,
   tileset: 'dungeon',
+  weather: null, // 지역 정체성 날씨 (맵 오버라이드 — 풀 로테이션 대신 고정/확률)
   ground,
   collision,
   elev,

@@ -26,14 +26,16 @@ export function createWeather({ width = 800, height = 600 } = {}) {
   const stormOverlay = new PIXI.Graphics();
   const snowGraphics = new PIXI.Graphics();
   const embersGraphics = new PIXI.Graphics();
+  const fogGraphics = new PIXI.Graphics();
 
   // Hide initially
   rainGraphics.visible = false;
   stormOverlay.visible = false;
   snowGraphics.visible = false;
   embersGraphics.visible = false;
+  fogGraphics.visible = false;
 
-  container.addChild(rainGraphics, stormOverlay, snowGraphics, embersGraphics);
+  container.addChild(rainGraphics, stormOverlay, snowGraphics, embersGraphics, fogGraphics);
 
   // --- Initialization ---
   function seedParticles(newKind) {
@@ -76,6 +78,21 @@ export function createWeather({ width = 800, height = 600 } = {}) {
           drift: Math.random() * 1.4 - 0.7,
           ph: Math.random() * 6,
           life: Math.random(), // 0..1, decays as it rises
+        });
+      }
+    } else if (newKind === 'fog') {
+      // 느리게 흐르는 반투명 안개 덩어리 (늪 등) — 큰 타원 소수.
+      count = Math.ceil(w / 160) + 4;
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * w,
+          y: h * (0.15 + Math.random() * 0.75),
+          rx: 90 + Math.random() * 120,
+          ry: 22 + Math.random() * 30,
+          sp: 6 + Math.random() * 14,
+          drift: Math.random() < 0.5 ? -1 : 1,
+          ph: Math.random() * 6,
+          a: 0.05 + Math.random() * 0.05,
         });
       }
     }
@@ -244,6 +261,19 @@ export function createWeather({ width = 800, height = 600 } = {}) {
           p.r
         ).fill({ color: (r << 16) | (g << 8) | b, alpha: a });
       }
+    } else if (kind === 'fog') {
+      fogGraphics.clear();
+      for (const p of particles) {
+        p.x += p.sp * p.drift * dt;
+        const yy = p.y + Math.sin(t * 0.4 + p.ph) * 6;
+        // Wrap x (타원 폭만큼 여유)
+        if (p.x < -p.rx) p.x = w + p.rx;
+        else if (p.x > w + p.rx) p.x = -p.rx;
+        const breathe = 0.8 + 0.2 * Math.sin(t * 0.6 + p.ph);
+        // 두 겹(넓고 옅게 + 좁고 살짝 진하게)으로 부드러운 뭉게 느낌.
+        fogGraphics.ellipse(p.x, yy, p.rx, p.ry).fill({ color: 0xdfe8e0, alpha: p.a * breathe });
+        fogGraphics.ellipse(p.x, yy, p.rx * 0.55, p.ry * 0.6).fill({ color: 0xeef4ee, alpha: p.a * 0.8 * breathe });
+      }
     }
   }
 
@@ -267,6 +297,8 @@ export function createWeather({ width = 800, height = 600 } = {}) {
       snowGraphics.visible = true;
     } else if (newKind === 'embers') {
       embersGraphics.visible = true;
+    } else if (newKind === 'fog') {
+      fogGraphics.visible = true;
     }
   }
 
@@ -286,6 +318,7 @@ export function createWeather({ width = 800, height = 600 } = {}) {
     stormOverlay.destroy();
     snowGraphics.destroy();
     embersGraphics.destroy();
+    fogGraphics.destroy();
   }
 
   return {

@@ -161,9 +161,11 @@ export class BattleScene {
     this.layout();
 
     // Initialize weather layer: insert after backdrop, before fieldLayer units.
+    // 필드의 현재 날씨(game.currentWeather — 맵 오버라이드/로테이션 결과)를 그대로
+    // 승계한다; 필드 정보가 없을 때만 바이옴 기본값으로 폴백.
     const { w, h } = this.game.renderer.screen;
     this.weather = createWeather({ width: w, height: h });
-    let weatherKind = BIOME_WEATHER[this.biome] || 'clear';
+    let weatherKind = this.game.currentWeather ?? (BIOME_WEATHER[this.biome] || 'clear');
     if (this.isBoss && weatherKind === 'rain') weatherKind = 'storm'; // boss battles in swamp → storm
     this.weather.setKind(weatherKind);
     const backdropIndex = this.container.children.indexOf(this.backdrop);
