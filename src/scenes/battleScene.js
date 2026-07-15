@@ -1140,12 +1140,30 @@ export class BattleScene {
       t.x = colX[i % this.cmdCols]; t.y = top + Math.floor(i / this.cmdCols) * itemH;
       this.menuLayer.addChild(t);
       this.cmdTexts.push(t);
-      // 자비 비활성 사유 인라인 — 회색 자비 옆에 조건 한 줄 (왜 못 쓰는지 즉답).
-      if (this.menuOptions[i] === 'mercy' && disabled) {
-        const why = label('— 적을 약하게', FS.caption, HEX.textOff, { font: FONT.ui });
-        why.anchor = { x: 0, y: 0.5 };
-        why.x = t.x + t.width + 8; why.y = t.y;
-        this.menuLayer.addChild(why);
+      if (this.menuOptions[i] === 'mercy') {
+        this.mercyCmdIdx = i;
+        if (disabled) {
+          // 비활성 사유 인라인 — 왜 못 쓰는지 즉답. 남은 적이 전부 보스면 아예 불가.
+          const foes = living(this.state, 'enemy');
+          const allBoss = foes.length > 0 && foes.every((u) => u.boss);
+          const why = label(allBoss ? '— 통하지 않는다' : '— 적을 약하게', FS.caption, HEX.textOff, { font: FONT.ui });
+          why.anchor = { x: 0, y: 0.5 };
+          why.x = t.x + t.width + 8; why.y = t.y;
+          this.menuLayer.addChild(why);
+        } else {
+          // 시그니처 승격 — 조건 충족 시 자비 라벨은 골드 상시 (highlightCommand가 유지).
+          t.style.fill = HEX.gold;
+          // 영입까지 가능한 적이 있으면 배지.
+          if (living(this.state, 'enemy').some(canRecruit)) {
+            const bt = label('영입 가능', FS.caption, HEX.goldDeep, { font: FONT.ui });
+            bt.anchor = { x: 0, y: 0.5 };
+            bt.x = t.x + t.width + 14; bt.y = t.y;
+            const bb = new PIXI.Graphics();
+            bb.roundRect(bt.x - 5, bt.y - bt.height / 2 - 1, bt.width + 10, bt.height + 2, 3)
+              .stroke({ color: NUM.goldDeep, width: 1, alpha: 0.9 });
+            this.menuLayer.addChild(bb, bt);
+          }
+        }
       }
     });
     this.cmdCursor = new PIXI.Graphics();
@@ -1158,7 +1176,9 @@ export class BattleScene {
   highlightCommand() {
     this.cmdTexts.forEach((t, i) => {
       const disabled = this.cmdDisabled && this.cmdDisabled[i];
-      t.style.fill = disabled ? HEX.textOff : (i === this.menuIndex ? HEX.gold : HEX.text);
+      // 자비 충족 상태는 커서와 무관하게 골드 상시 (시그니처 승격 연출).
+      const mercyGold = i === this.mercyCmdIdx && !disabled;
+      t.style.fill = disabled ? HEX.textOff : (i === this.menuIndex || mercyGold ? HEX.gold : HEX.text);
       t.scale.set(i === this.menuIndex && !disabled ? 1.12 : 1);
     });
     const t = this.cmdTexts[this.menuIndex];
