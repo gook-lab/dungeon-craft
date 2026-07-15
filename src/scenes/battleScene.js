@@ -1511,7 +1511,7 @@ export class BattleScene {
 
   // Render the skill-info tooltip (속성·형식·소모·예상 피해·효과·상성) for the cursored
   // spell into this.skillInfo. spellId null (the 뒤로 row) clears it.
-  renderSkillInfo(spellId) {
+  renderSkillInfo(spellId, target = null) {
     const c = this.skillInfo;
     if (!c) return;
     c.removeChildren();
@@ -1522,7 +1522,8 @@ export class BattleScene {
     const box = frame(bw, bh, 'bevel'); box.x = bx; box.y = by;
     c.addChild(box);
     const actor = this.actor;
-    const enemy = living(this.state, 'enemy')[0];
+    // 대상 지정 중이면 커서의 대상 기준으로 계산 (예상 피해·상성이 대상을 따라간다).
+    const enemy = target || living(this.state, 'enemy')[0];
     const lx = bx + 16;
     let yy = by + 12;
     const line = (txt, col, sz) => {
@@ -1555,11 +1556,34 @@ export class BattleScene {
     if (spell.inflict && statusDesc(spell.inflict)) line(`└ ${STATUS_KR[spell.inflict] || spell.inflict}: ${statusDesc(spell.inflict)}`, HEX.textMute);
     // Usage condition (그림자 일격류는 은신 필요) — green if met, red if not.
     if (spell.requiresStealth) line('조건: 은신 상태 필요', actor && actor.stealth ? HEX.hpHigh : HEX.hpLow);
-    if (spell.element && spell.element !== 'physical' && enemy && enemy.family) {
-      const k = affinityKind(spell.element, enemy.family);
-      const info = k === 'strong' ? ['▲ 약점 — 피해 증가', HEX.hpHigh]
-        : k === 'resist' ? ['▼ 반감 — 피해 감소', HEX.hpLow] : ['● 보통', HEX.textMute];
-      line('상성: ' + info[0], info[1]);
+    if (spell.element && spell.element !== 'physical') {
+      // 도감 연동 — 조우 기록(save.seen)이 있는 몬스터만 상성 공개, 미조우는 ???.
+      const seen = this.game.runtime.seen || [];
+      const known = (u) => u && u.refId && seen.includes(u.refId);
+      if (spell.target === 'all' && !target) {
+        // 전체기: 대상별 상성 요약 (약점 N체 · 반감 M체 · 미확인 K).
+        const foes = living(this.state, 'enemy');
+        let weak = 0, res = 0, unk = 0;
+        for (const f of foes) {
+          if (!known(f)) { unk++; continue; }
+          const k = affinityKind(spell.element, f.family);
+          if (k === 'strong') weak++; else if (k === 'resist') res++;
+        }
+        const parts = [];
+        if (weak) parts.push(`약점 ${weak}체`);
+        if (res) parts.push(`반감 ${res}체`);
+        if (unk) parts.push(`미확인 ${unk}`);
+        line('상성: ' + (parts.length ? parts.join(' · ') : '● 보통'), weak ? HEX.goldGlow : HEX.textMute);
+      } else if (enemy && enemy.side === 'enemy') {
+        if (!known(enemy)) {
+          line('상성: ??? (미조우)', HEX.textOff);
+        } else if (enemy.family) {
+          const k = affinityKind(spell.element, enemy.family);
+          const info = k === 'strong' ? ['▲ 약점 — 피해 증가', HEX.goldGlow]
+            : k === 'resist' ? ['▼ 반감 — 피해 감소', HEX.textMute] : ['● 보통', HEX.textMute];
+          line('상성: ' + info[0], info[1]);
+        }
+      }
     }
   }
 
@@ -1592,7 +1616,13 @@ export class BattleScene {
     this.targetIndex = 0;
     this.phase = 'target';
     const names = this.targetList.map((id) => findUnit(this.state, id).name);
-    this.menu = this.panelMenu(names);
+    // 주문 대상 지정: 스킬 툴팁을 옆에 유지 (panelMenu가 menuLayer를 비우므로 재생성).
+    const spellTip = forAction.type === 'spell';
+    this.menu = this.panelMenu(names, spellTip ? { cx: 0.26 } : {});
+    if (spellTip) {
+      this.skillInfo = new PIXI.Container();
+      this.menuLayer.addChild(this.skillInfo);
+    }
     this.menu.setIndex(0);
     this.refreshTargetGlow();
   }
@@ -1607,6 +1637,10 @@ export class BattleScene {
       v.root.scale.set(1);
     }
     this.showTargetPreview(); // damage band + kill skull on the hovered target
+    // 주문 대상 지정 중엔 스킬 툴팁도 커서 대상 기준으로 갱신 (예상 피해·상성 동기).
+    if (this.targetForAction && this.targetForAction.type === 'spell' && this.targetGlowId) {
+      this.renderSkillInfo(this.targetForAction.spellId, findUnit(this.state, this.targetGlowId));
+    }
   }
 
   clearTargetGlow() {
