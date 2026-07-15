@@ -116,7 +116,10 @@ export const BACKDROP = {
 // later phase. `inset` = how far each top corner pulls in (fraction of width),
 // `topY`/`botY` = top/bottom edge screen-y fractions (botY<1 lifts the horizon).
 export const TILT = {
-  enabled: true, inset: 0.16, topY: 0.18, botY: 1.0, grid: 12,
+  // OFF (2026-07-16, 사용자 결정): 사다리꼴 기울기가 가장자리 빈 공간·시작 화면
+  // 이상을 만들고 이질감이 커서 평면 풀스크린으로 회귀. 원형 시야 스포트라이트·
+  // 빌보드·엣지 포그는 TILT 게이트라 함께 잠든다 (되돌리려면 이 플래그 하나).
+  enabled: false, inset: 0.16, topY: 0.06, botY: 1.0, grid: 12,
   // View range (tiles from the player): the spotlight overlay lights a circle of
   // ~this radius and the billboard actors beyond it are CULLED (fully hidden, not
   // just dimmed), fading over the last `viewFade` tiles → a tight, focused diorama

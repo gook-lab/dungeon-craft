@@ -319,6 +319,12 @@ export class FieldScene {
     this.atmosphere = new PIXI.Container();
     this.container.addChild(this.atmosphere);
 
+    // 엣지 포그 — TILT 사다리꼴이 못 덮는 화면 가장자리(상단/좌우 쐐기)를 어둠
+    // 그라데이션으로 녹인다. 하드 엣지가 어떤 화면비에서도 안 보이게 하는 스크린
+    // 스페이스 오버레이 (HUD 아래). buildEdgeFade가 loadMap/resize에서 재구축.
+    this.edgeFade = new PIXI.Container();
+    this.container.addChild(this.edgeFade);
+
     this.hud = new PIXI.Container();
     this.banner = label('', FS.label, HEX.gold);
     this.banner.x = 16; this.banner.y = 12;
@@ -413,6 +419,7 @@ export class FieldScene {
     this.buildDecor();
     this.buildElevation();
     this.buildAtmosphere();
+    this.buildEdgeFade();
     this.buildBackdrop();
     this.buildWalls();
     this.buildObjects();
@@ -648,6 +655,30 @@ export class FieldScene {
     this.weather.setKind(kind);
     this.game.currentWeather = kind; // 전투 배경이 승계 (battleScene)
     this.weatherT = WEATHER_CYCLE_MIN + Math.random() * (WEATHER_CYCLE_MAX - WEATHER_CYCLE_MIN);
+  }
+
+  // 화면 가장자리 어둠 그라데이션 (TILT 전용) — 위는 깊게, 좌우는 얕게.
+  buildEdgeFade() {
+    this.edgeFade.removeChildren();
+    if (!TILT.enabled) return;
+    const { w, h } = this.game.renderer.screen;
+    const g = new PIXI.Graphics();
+    const BLACK = 0x05060f;
+    // 상단 밴드 — 사다리꼴 topY 위 + 접합부를 부드럽게 (알파 0.95 → 0).
+    const TOPB = 12, topH = h * 0.20;
+    for (let i = 0; i < TOPB; i++) {
+      const t = i / (TOPB - 1);
+      g.rect(0, (topH * i) / TOPB, w, topH / TOPB + 1).fill({ color: BLACK, alpha: 0.95 * (1 - t) });
+    }
+    // 좌/우 쐐기 — inset이 만드는 세로 빈 공간을 얕은 그라데이션으로.
+    const SIDEB = 8, sideW = w * 0.09;
+    for (let i = 0; i < SIDEB; i++) {
+      const t = i / (SIDEB - 1);
+      const a = 0.85 * (1 - t);
+      g.rect((sideW * i) / SIDEB, 0, sideW / SIDEB + 1, h).fill({ color: BLACK, alpha: a });
+      g.rect(w - (sideW * (i + 1)) / SIDEB, 0, sideW / SIDEB + 1, h).fill({ color: BLACK, alpha: a });
+    }
+    this.edgeFade.addChild(g);
   }
 
   buildAtmosphere() {
@@ -2005,6 +2036,7 @@ export class FieldScene {
     const { w, h } = this.game.renderer.screen;
     this.weather?.resize(w, h);
     if (this.map) this.buildBackdrop(); // re-fit sky/mountains + world mask to the new screen
+    this.buildEdgeFade(); // 엣지 포그도 새 화면 크기에 재구축
     this.centerCamera();
     if (this.map) this.buildMinimap();
     this.placeHint();
