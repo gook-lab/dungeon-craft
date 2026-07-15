@@ -16,12 +16,18 @@ import { getMap } from '../content/maps/index.js';
 // recall) is available; each region's gate unlocks when its boss falls.
 export const WARP_POINTS = [
   { map: 'town', name: '크립트 마을', requires: null },               // home recall, always
-  { map: 'lake_town', name: '호숫가 마을', requires: null },          // 황야 서편 안전 허브 (길이 상시 개방이라 무게이트)
+  { map: 'lake_town', name: '호숫가 마을', requires: null },          // 황야 동편 안전 허브 (길이 상시 개방이라 무게이트)
+  { map: 'wild_cave', name: '황야 동굴', requires: null },            // 황야 서측 포켓 (상시 개방 진입로)
   { map: 'dungeon', name: '뼈의 지하묘', requires: 'bossDefeated' },
+  { map: 'waterway', name: '지하 수로', requires: 'bossDefeated' },   // 금고 뒤 비밀 사이드 (지하묘 클리어 후 편의)
   { map: 'frost', name: '서리 첨탑', requires: 'frostBossDefeated' },
+  { map: 'switchback', name: '협곡 스위치백', requires: 'frostBossDefeated' },
   { map: 'swamp', name: '마녀의 늪', requires: 'swampBossDefeated' },
+  { map: 'overworld', name: '몰락 평원', requires: 'swampBossDefeated' },
   { map: 'empire_gate', name: '무너진 제국', requires: 'empireBossDefeated' },
   { map: 'port_city', name: '운하 항구', requires: 'swampBossDefeated' }, // 야영지 남측 안전 허브 (진입로와 같은 게이트)
+  { map: 'grand_citadel', name: '대성채', requires: 'empireBossDefeated' },
+  { map: 'lava_keep', name: '용암 요새', requires: 'empireBossDefeated' },
   // Post-game optional regions — open after their gate boss falls (warp-only).
   { map: 'starfall', name: '별무덤', requires: 'empireBossDefeated' }, // 3막 잿빛 들판 (L20 밴드)
   { map: 'lava_gate', name: '불의 분화구', requires: 'empireBossDefeated' },

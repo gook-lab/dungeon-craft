@@ -209,6 +209,11 @@ async function main() {
       spared: { dialog: 'moral_soul_spared', items: { sage_amulet: 1 } },
       slain: { dialog: 'moral_soul_slain', gold: 200, items: { elixir: 1 } },
     },
+    // port_city — a smuggler feeding refugees from the lord's warehouse.
+    port_smuggler: {
+      spared: { dialog: 'moral_smuggler_spared', items: { antidote: 1, herb: 2 } },
+      slain: { dialog: 'moral_smuggler_slain', gold: 220 },
+    },
   };
   game.resolveMoral = (obj, pick) => {
     game.runtime.flags[obj.flag] = true;

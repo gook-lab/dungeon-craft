@@ -96,8 +96,10 @@ export default {
     { x: 11, y: 17, kind: "prop", ref: "prop_oak_tree", tiles: 2.3 },
     { x: 19, y: 6, kind: "prop", ref: "prop_oak_tree", tiles: 2.3 },
     { x: 6, y: 3, kind: "prop", ref: "prop_wild_bush", tiles: 1.3, walkable: true },
-    { x: 6, y: 7, kind: "npc", ref: "shopkeeper", dir: "south", talk: "inn", label: "호반 여관" },
-    { x: 23, y: 7, kind: "npc", ref: "shopkeeper", dir: "south", talk: "shop", label: "잡화점" },
+    { x: 6, y: 7, kind: "npc", ref: "shopkeeper", dir: "south", talk: "lake_inn", label: "호반 여관" },
+    { x: 23, y: 7, kind: "npc", ref: "shopkeeper", dir: "south", talk: "lake_shop", label: "잡화점" },
+    // 부두의 낚시꾼 — 톤 반응 대사 + 사이드퀘 q_lake_missing 기버.
+    { x: 20, y: 13, kind: "npc", ref: "herbalist", dir: "south", talk: "lake_fisher", quest: "q_lake_missing", label: "! 낚시꾼" },
     { x: 6, y: 16, kind: "npc", ref: "blacksmith", dir: "south", talk: "shop_smith", label: "대장장이" },
     { x: 5, y: 7, kind: "prop", ref: "prop_cottage", tiles: 2.8 },
     { x: 22, y: 7, kind: "prop", ref: "prop_cottage", tiles: 2.8 },

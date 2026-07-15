@@ -112,6 +112,8 @@ export default {
   stairs: [{"x":36,"y":10}],
   spawn: {"x":2,"y":15},
   objects: [
+    // q_lake_missing의 목표 — 숲 깊은 곳의 조난자 (talkedNpcs: lost_fisher).
+    { x: 30, y: 22, kind: "npc", ref: "guard", npcId: "lost_fisher", dir: "south", talk: "lost_fisher", label: "? 조난자" },
     { x: 34, y: 4, kind: "prop", ref: "prop_broken_brazier", tiles: 1.6 },
     { x: 40, y: 4, kind: "prop", ref: "prop_broken_brazier", tiles: 1.6 },
     { x: 25, y: 28, kind: "prop", ref: "prop_dead_tree_hd", tiles: 2.2 },

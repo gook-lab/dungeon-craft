@@ -84,6 +84,8 @@ export default {
   stairs: [{"x":14,"y":13},{"x":15,"y":13},{"x":14,"y":8},{"x":15,"y":8}],
   spawn: {"x":3,"y":10},
   objects: [
+    // 옵션 미니보스 — 화염 파수장 (포스트게임, spareable).
+    { x: 14, y: 7, kind: "boss", ref: "flame_warden", talk: "flamewarden_intro", flag: "flameWardenDefeated", win: "flamewarden_win" },
     { x: 12, y: 6, kind: "prop", ref: "prop_fire_altar", tiles: 1.6 },
     { x: 17, y: 6, kind: "prop", ref: "prop_fire_altar", tiles: 1.6 },
     { x: 9, y: 10, kind: "prop", ref: "prop_gargoyle_hd", tiles: 1.8 },

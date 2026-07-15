@@ -171,6 +171,8 @@ export default {
   ],
   spawn: {"x":13,"y":26},
   objects: [
+    // 역참 폐허의 모닥불 — 늪↔관문 대여정의 중간 쉼터 (여관 동작 재사용).
+    { x: 10, y: 19, kind: "npc", ref: "elder", dir: "south", talk: "waystation_fire", label: "역참지기" },
     // 대형맵 볼거리 보강 (2026-07-15 밀도 패스)
     {x: 40, y: 12, kind: "chest", loot: {item: "antidote"}},
     {x: 42, y: 14, kind: "prop", ref: "prop_mossy_boulder", tiles: 1.5, walkable: true},

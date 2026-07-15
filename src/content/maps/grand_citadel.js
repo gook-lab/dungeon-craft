@@ -130,6 +130,8 @@ export default {
   stairs: [{"x":23,"y":18},{"x":24,"y":18},{"x":23,"y":9},{"x":24,"y":9}],
   spawn: {"x":23,"y":29},
   objects: [
+    // 옵션 미니보스 — 성채 집사 (spareable, NOT boss:true).
+    { x: 24, y: 5, kind: "boss", ref: "citadel_seneschal", talk: "seneschal_intro", flag: "citadelSeneschalDefeated", win: "seneschal_win" },
     { x: 20, y: 4, kind: "prop", ref: "prop_broken_brazier", tiles: 1.6 },
     { x: 27, y: 4, kind: "prop", ref: "prop_broken_brazier", tiles: 1.6 },
     { x: 23, y: 12, kind: "prop", ref: "prop_gargoyle_hd", tiles: 1.8 },

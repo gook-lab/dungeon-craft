@@ -46,6 +46,8 @@ const SCENARIOS = [
   { name: 'sealGRD(L16)', level: 16, equip: { weapon: 'frost_blade', armor: 'mythril_mail', accessory: 'vitality_charm' }, boss: 'seal_guardian', herbs: 9 },
   // 대성채 (v3 신규 옵션 던전, 수도 북측 황제 전 밴드) — 맵 encounters와 동기.
   { name: 'citadel(L17)', level: 17, equip: { weapon: 'frost_blade', armor: 'mythril_mail', accessory: 'vitality_charm' }, pool: ['imperial_guard', 'spirit_guard', 'rune_guardian', 'wraith_sentinel'], min: 2, max: 4, herbs: 9 },
+  // 성채 집사 (대성채 옵션 미니보스, 황제 전 밴드).
+  { name: 'SENESCHAL(L17)', level: 17, equip: { weapon: 'frost_blade', armor: 'mythril_mail', accessory: 'vitality_charm' }, boss: 'citadel_seneschal', herbs: 9 },
   // --- POST-GAME bosses: fought by the 4-hero party (incl. mage) at higher
   // levels. Story final (emperor) + two optional superbosses (drake, void lord).
   // Healthy target: 70-95% win with real attrition (deaths 0.3-1.5, not a wipe).
@@ -56,6 +58,8 @@ const SCENARIOS = [
   { name: 'DRAKE(L25)', level: 25, party: ['knight', 'warrior', 'huntress', 'mage'], equip: { weapon: 'flame_brand', armor: 'dragon_scale', accessory: 'power_ring' }, boss: 'magma_drake', herbs: 12 },
   // 용암 요새 (v3 신규 포스트게임 옵션 존, 드레이크 이후 밴드) — 맵 encounters와 동기.
   { name: 'lvkeep(L26)', level: 26, party: ['knight', 'warrior', 'huntress', 'mage'], equip: { weapon: 'flame_brand', armor: 'dragon_scale', accessory: 'power_ring' }, pool: ['magma_golem', 'fire_bat', 'ember_hound', 'lava_slug'], min: 2, max: 4, herbs: 12 },
+  // 화염 파수장 (용암 요새 옵션 미니보스, 드레이크 아래 체급).
+  { name: 'FWARDEN(L26)', level: 26, party: ['knight', 'warrior', 'huntress', 'mage'], equip: { weapon: 'flame_brand', armor: 'dragon_scale', accessory: 'power_ring' }, boss: 'flame_warden', herbs: 12 },
   { name: 'VOIDLORD(L35)', level: 35, party: ['knight', 'warrior', 'huntress', 'mage'], equip: { weapon: 'flame_brand', armor: 'dragon_scale', accessory: 'sage_amulet' }, boss: 'void_lord', herbs: 15 },
 ];
 

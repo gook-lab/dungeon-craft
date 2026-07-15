@@ -65,6 +65,8 @@ export function freshSave() {
       magmaDrakeDefeated: false, voidLordDefeated: false,
       // Optional minibosses (서리 여왕 / 핏빛 백작 / 망령 리치 / 다리 파수꾼 / 어둠숲 감시자) — spareable field bosses.
       frostQueenDefeated: false, bloodCountDefeated: false, wraithLichDefeated: false, bridgeWardenDefeated: false, darkWardenDefeated: false, sealGuardianDefeated: false, fallenStarDefeated: false,
+      // v3 옵션 던전 미니보스 (성채 집사 / 화염 파수장).
+      citadelSeneschalDefeated: false, flameWardenDefeated: false,
       // joinedKnight: the chosen leader's join flag is preset at new-game so their
       // town recruit NPC stays hidden (you can't re-recruit your own leader).
       joinedKnight: false, joinedWarrior: false, joinedHuntress: false, joinedMage: false, joinedDuelist: false,
@@ -72,6 +74,8 @@ export function freshSave() {
       freedHound: false,
       // Moral-choice rooms (탈영병/얼음 사냥꾼/늪 영혼) — one-time; pick fed mercied/slain.
       deserterJudged: false, frozenHunterJudged: false, mireSoulJudged: false,
+      // 항구 밀수 창고 도덕 선택 (신고/눈감기 — mercied/slain 연동).
+      portSmugglerJudged: false,
       // Dungeon trigger-kit key items (chest loot.flag → requires-door). Each
       // door-gating key needs an entry here + in validateSave or it dies on reload.
       crypt_key: false, bog_key: false,
@@ -200,6 +204,8 @@ export function validateSave(raw) {
       darkWardenDefeated: d.flags ? d.flags.darkWardenDefeated === true : false,
       sealGuardianDefeated: d.flags ? d.flags.sealGuardianDefeated === true : false,
       fallenStarDefeated: d.flags ? d.flags.fallenStarDefeated === true : false,
+      citadelSeneschalDefeated: d.flags ? d.flags.citadelSeneschalDefeated === true : false,
+      flameWardenDefeated: d.flags ? d.flags.flameWardenDefeated === true : false,
       // Town companion recruits — persist so the NPC stays gone + isn't re-recruitable.
       joinedKnight: d.flags ? d.flags.joinedKnight === true : false,
       joinedWarrior: d.flags ? d.flags.joinedWarrior === true : false,
@@ -213,6 +219,7 @@ export function validateSave(raw) {
       deserterJudged: d.flags ? d.flags.deserterJudged === true : false,
       frozenHunterJudged: d.flags ? d.flags.frozenHunterJudged === true : false,
       mireSoulJudged: d.flags ? d.flags.mireSoulJudged === true : false,
+      portSmugglerJudged: d.flags ? d.flags.portSmugglerJudged === true : false,
       // Dungeon trigger-kit key items (chest loot.flag → requires-door).
       crypt_key: d.flags ? d.flags.crypt_key === true : false,
       bog_key: d.flags ? d.flags.bog_key === true : false,

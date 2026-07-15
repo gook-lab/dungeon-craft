@@ -243,6 +243,28 @@ export const MONSTERS = {
       skills: [{ id: 'frenzy', chance: 0.7, cd: 0, max: 1 }, { id: 'lifedrain', chance: 0.45, cd: 2 }, { id: 'curse', chance: 0.4, cd: 3 }, { id: 'voidblast', chance: 0.3, cd: 3 }],
     },
   },
+
+  // ─── v3 신규 옵션 던전 미니보스 2종 (2026-07-15) — spareable 패턴 ───
+  // 성채 집사 — 대성채(황제 전 밴드) 옵션 미니보스. 제국 근위 금빛 스왑 대형.
+  // NOT boss:true → 자비 가능; 근위대 지휘관답게 감전·연속타 + 격노 시 가속.
+  citadel_seneschal: {
+    id: 'citadel_seneschal', name: '성채 집사', maxHp: 600, atk: 60, def: 16, spd: 20,
+    xp: 340, gold: 320, ai: 'boss', sprite: 'rusty_soldier', tint: 0xe8d090, spriteScale: 1.5,
+    family: 'undead', mercyThreshold: 0.35, skills: [{ id: 'flurry', chance: 0.4, cd: 2 }, { id: 'monshock', chance: 0.3, cd: 3 }],
+    joinSkill: 'crushblow', recruitLine: '집사가 녹슨 열쇠 꾸러미를 내려놓는다 — "새 주인을... 모시겠습니다."',
+    phase2: { at: 0.5, atkMult: 1.35, spdBonus: 3, cry: '집사의 금빛 갑주가 갈라진다 — "성채의 격식은... 지켜져야 한다!"' },
+  },
+  // 화염 파수장 — 용암 요새(포스트게임 밴드) 옵션 미니보스. 마그마 골렘 작열 스왑 대형.
+  // 드레이크 아래 체급: 브레스 AoE + 석화 방벽 자기강화, 격노 시 분출 해금.
+  flame_warden: {
+    id: 'flame_warden', name: '화염 파수장', maxHp: 1250, atk: 90, def: 20, spd: 16,
+    xp: 1300, gold: 1400, ai: 'boss', sprite: 'magma_golem', tint: 0xff8a3a, spriteScale: 1.6,
+    family: 'fire', recruitable: false, mercyThreshold: 0.3,
+    inflict: { status: 'burn', chance: 0.4, turns: 3 },
+    skills: [{ id: 'firebreath', chance: 0.3, cd: 3 }, { id: 'stoneskin', chance: 0.3, cd: 5, max: 1 }],
+    phase2: { at: 0.5, atkMult: 1.25, spdBonus: 3, cry: '파수장의 심장이 백열한다 — 요새 전체가 끓어오른다!',
+      skills: [{ id: 'eruption', chance: 0.25, cd: 4 }, { id: 'firebreath', chance: 0.3, cd: 3 }] },
+  },
 };
 
 export function getMonster(id) {

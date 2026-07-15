@@ -237,6 +237,27 @@ Object.assign(QUESTS, {
     active: ['사촌은 첨탑 입구 쪽에 있을 거예요. 산사람들은 쉽게 안 죽어요.'],
     done: ['살아 있대요?! ...고마워요. 정말. 등불 값이라 생각하고 받아 줘요.'],
   },
+  // ─── v3 신규 맵 사이드퀘 2종 (2026-07-15) ───
+  // 호수 실종자 — 어둠숲에 쓰러진 동생 낚시꾼을 찾아 말을 건다 (talk cond).
+  q_lake_missing: {
+    id: 'q_lake_missing', name: '호수의 실종자', giver: '호숫가 낚시꾼',
+    desc: '어둠숲에서 실종된 동생 낚시꾼을 찾아라.',
+    cond: { type: 'talk', npcId: 'lost_fisher' },
+    reward: { gold: 120, item: 'lucky_charm' },
+    offer: ['동생 놈이 사흘 전 서쪽 숲으로 갔다우. 좋은 낚시터가 있다나 뭐라나...', '어둠숲은 밤이 되면 길을 삼키는 곳이오. 부디, 찾아만 봐 주시오.'],
+    active: ['숲 깊은 곳까지 봐 주었소? 그 녀석, 겁은 많아도 다리는 빨라서 멀리 갔을 거요.'],
+    done: ['살아 있었단 말이오?! 아이고, 이 못난 놈아...! 이건 우리 집안 대대로 내려오는 부적이오 — 은인께 드리리다.'],
+  },
+  // 항구 밀수꾼 — 창고를 조사하고 도덕 선택 (신고/눈감기, mercied/slain 연동).
+  q_port_smuggler: {
+    id: 'q_port_smuggler', name: '창고의 그림자', giver: '부두장',
+    desc: '운하 항구 창고의 물목 도둑을 밝혀내라.',
+    cond: { type: 'boss', flag: 'portSmugglerJudged' },
+    reward: { gold: 200, item: 'swift_boots' },
+    offer: ['창고 물목이 자꾸 어긋나오. 장부는 거짓말을 안 하는데 말이지.', '남쪽 부두 창고를 조사해 주시오. 쥐든 사람이든 — 결말을 지어야겠소.'],
+    active: ['창고는 남쪽 부두 쪽이오. 상자 뒤 그늘을 잘 살펴보시오.'],
+    done: ['결말을 지었구려. 어느 쪽이었든... 항구는 답을 얻었소. 약속한 보수요.'],
+  },
 });
 
 export function getQuest(id) { return QUESTS[id] || null; }
