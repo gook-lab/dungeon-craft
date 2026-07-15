@@ -78,6 +78,18 @@ const CLIFF = {
   default: { face: 0x40404a, overhang: 0x5a5a52 },
 };
 
+// 지면 틴트 — 타일셋 시트(특히 meadow의 형광 녹색)를 전투 배경 톤에 맞춰 눌러
+// 준다. this.ground 컨테이너 tint에 곱해지며, 물(this.water)·프롭은 별 레이어라
+// 영향 없음. mood 오버라이드 우선, 없으면 tileset, 없으면 무틴트(0xffffff).
+const GROUND_TINT = {
+  town:  0xb8c49c, wild: 0xb8c49c,
+  frost: 0xe0ecff, ice: 0xe0ecff,
+  swamp: 0xbcccaa,
+  dungeon: 0xc4c4d0, empire: 0xcfc0c4,
+  lava:  0xe8c0a0, void: 0xd0c0e8,
+  darkforest: 0x9ab088, // 어둠숲 — 초록 그늘
+};
+
 // Tiny deterministic string hash → seed (for stable per-map decal layout).
 function hashStr(s) {
   let h = 0x811c9dc5;
@@ -676,12 +688,12 @@ export class FieldScene {
       const eo = elevAt(this.map, st.x, st.y) * ELEV_STEP;
       const px = st.x * TILE, py = st.y * TILE - eo;
       // 바닥판
-      g.rect(px + 1, py + 1, TILE - 2, TILE - 2).fill({ color: 0x6a6a78 });
+      g.rect(px + 1, py + 1, TILE - 2, TILE - 2).fill({ color: 0x585864 });
       // 4단 트레드 (위로 갈수록 밝게 — 올라가는 느낌)
       const STEPS = 4, sh = (TILE - 6) / STEPS;
       for (let i = 0; i < STEPS; i++) {
         const ty = py + 3 + i * sh;
-        const shade = [0x9a9aa8, 0x8a8a98, 0x7a7a88, 0x6f6f7d][i];
+        const shade = [0x8a8a96, 0x7c7c88, 0x6e6e7a, 0x62626e][i];
         g.rect(px + 3, ty, TILE - 6, sh - 1).fill({ color: shade });
         g.rect(px + 3, ty + sh - 1, TILE - 6, 1).fill({ color: 0x4a4a56 }); // 단 그림자
       }
@@ -1051,6 +1063,8 @@ export class FieldScene {
 
   buildGround() {
     this.ground.removeChildren();
+    // 지면 틴트 — 형광 잔디를 전투 배경 톤으로 눌러 통일 (프롭·물은 별 레이어라 무관).
+    this.ground.tint = GROUND_TINT[this.map.mood] ?? GROUND_TINT[this.map.tileset] ?? 0xffffff;
     const { w, h, ground } = this.map;
     const meta = TILESET_META[this.map.tileset];
     const cellRect = (id, x, y) => {
