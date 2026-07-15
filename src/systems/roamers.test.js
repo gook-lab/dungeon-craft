@@ -54,16 +54,17 @@ describe('roamerGroup + roamerAt', () => {
   });
 });
 
-// 로머 밀도 (2026-07-15) — 면적 비례 + 맵별 오버라이드.
+// 로머 밀도 (2026-07-15 v3 재산정) — 칸수/100 (구 wild 1008칸=10의 밀도를 기준으로
+// 고정), 8~45 클램프 + 맵별 오버라이드.
 describe('roamerCount', () => {
-  it('scales with map area, clamped to 5..18', () => {
-    expect(roamerCount({ w: 36, h: 28, encounters: {} })).toBe(18); // 1008/55
-    expect(roamerCount({ w: 34, h: 26, encounters: {} })).toBe(16); // 884/55
-    expect(roamerCount({ w: 18, h: 14, encounters: {} })).toBe(5);  // 소형 보스방 floor
-    expect(roamerCount({ w: 60, h: 60, encounters: {} })).toBe(18); // ceiling
+  it('scales with map area at the legacy-wild density (cells/100), clamped 8..45', () => {
+    expect(roamerCount({ w: 36, h: 28, encounters: {} })).toBe(10);  // 구 wild 튜닝값 재현
+    expect(roamerCount({ w: 80, h: 52, encounters: {} })).toBe(42);  // v3 wild — 밀도 유지
+    expect(roamerCount({ w: 18, h: 14, encounters: {} })).toBe(8);   // 소형 포켓 floor
+    expect(roamerCount({ w: 90, h: 60, encounters: {} })).toBe(45);  // ceiling
   });
 
-  it('map override wins (wild starter field stays moderate)', () => {
-    expect(roamerCount({ w: 36, h: 28, encounters: { roamers: 10 } })).toBe(10);
+  it('map override wins', () => {
+    expect(roamerCount({ w: 80, h: 52, encounters: { roamers: 12 } })).toBe(12);
   });
 });

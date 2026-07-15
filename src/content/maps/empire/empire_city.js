@@ -190,6 +190,11 @@ export default {
   toggleWalls: {"hound_cage":[{"x":71,"y":46}]},
   spawn: {"x":2,"y":26},
   objects: [
+    // 대형맵 볼거리 보강 (2026-07-15 밀도 패스)
+    {x: 10, y: 46, kind: "chest", loot: {gold: 300}},
+    {x: 68, y: 12, kind: "chest", loot: {item: "power_ring"}, hidden: true},
+    {x: 40, y: 46, kind: "trigger", effect: "encounter", once: true, pool: ["imperial_guard", "rusty_soldier", "wraith_sentinel"], min: 3, max: 4, fireMsg: "폐블록의 어둠에서 근위대 망령이 쏟아진다!"},
+    {x: 12, y: 44, kind: "prop", ref: "prop_crypt_rubble", tiles: 1.5, walkable: true},
     // 보드 장식 프롭 병합 (v3 원본 좌표, 2026-07-15)
     {x: 5, y: 8, kind: "prop", ref: "prop_mossy_boulder", tiles: 1.5},
     {x: 9, y: 4, kind: "prop", ref: "prop_bone_pile_hd", tiles: 1.4, walkable: true},

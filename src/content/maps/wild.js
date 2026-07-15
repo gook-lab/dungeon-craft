@@ -179,6 +179,12 @@ export default {
   drops: [{"x":27,"y":16},{"x":27,"y":17},{"x":27,"y":18},{"x":27,"y":19},{"x":27,"y":20}],
   spawn: {"x":40,"y":49},
   objects: [
+    // 대형맵 볼거리 보강 (2026-07-15 밀도 패스)
+    {x: 12, y: 44, kind: "chest", loot: {gold: 60}},
+    {x: 10, y: 46, kind: "prop", ref: "prop_mossy_boulder", tiles: 1.6, walkable: true},
+    {x: 66, y: 10, kind: "chest", loot: {item: "herb"}, hidden: true},
+    {x: 64, y: 12, kind: "prop", ref: "prop_wild_bush", tiles: 1.3, walkable: true},
+    {x: 55, y: 30, kind: "trigger", effect: "encounter", once: true, pool: ["wolf", "hornet", "goblin"], min: 2, max: 3, fireMsg: "풀숲이 흔들린다 — 매복이다!"},
     { x: 11, y: 4, kind: "prop", ref: "prop_mossy_shrine", tiles: 1.6 },
     { x: 12, y: 4, kind: "prop", ref: "prop_tombstone_hd", tiles: 1.4 },
     { x: 55, y: 46, kind: "prop", ref: "prop_wild_bush", tiles: 1.3, walkable: true },
@@ -287,5 +293,5 @@ export default {
     {x: 78, y: 26, to: "lake_town", tx: 2, ty: 10},
     {x: 12, y: 30, to: "wild_cave", tx: 5, ty: 3},
   ],
-  encounters: {rate: 0.09,pool: ["goblin","wolf","spider","bat","walker","hornet"],min: 1,max: 2,roamers: 10},
+  encounters: {rate: 0.09,pool: ["goblin","wolf","spider","bat","walker","hornet"],min: 1,max: 2}, // 로머 수는 면적 공식(칸수/100)로 일원화
 };

@@ -177,6 +177,9 @@ export default {
   ],
   spawn: {"x":1,"y":23},
   objects: [
+    // 대형맵 볼거리 보강 (2026-07-15 밀도 패스)
+    {x: 59, y: 41, kind: "chest", loot: {gold: 220}, hidden: true},
+    {x: 55, y: 41, kind: "prop", ref: "prop_swamp_reeds", tiles: 1.4, walkable: true},
     // 보드 장식 프롭 병합 (v3 원본 좌표, 2026-07-15)
     {x: 35, y: 37, kind: "prop", ref: "prop_broken_brazier", tiles: 1.6},
     {x: 42, y: 37, kind: "prop", ref: "prop_broken_brazier", tiles: 1.6},

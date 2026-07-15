@@ -12,10 +12,11 @@ import { canStep } from './field.js';
 // 강제 전투량이 늘진 않는다.
 export function roamerCount(map) {
   if (map.encounters && map.encounters.roamers) return map.encounters.roamers;
-  // 면적/55, 5~18 클램프 (2026-07-15 상향) — 미로 벽을 빼면 보행 칸이 절반쯤이라
-  // 체감 밀도는 수치의 2배로 잡는다: 대형 필드(884~1008칸) 16~18, 중형(~572칸) 10,
-  // 소형 보스방(252칸 — 옥좌/용암·공허 심부)은 5로 비운다(보스 앞 긴장감).
-  return Math.max(5, Math.min(18, Math.round((map.w * map.h) / 55)));
+  // v3 광활 스케일 재산정 (2026-07-15): 구 wild(36×28=1008칸)의 튜닝값 roamers 10
+  // ≈ 칸수/100 을 밀도 기준으로 고정 — 맵이 2~8배 커져도 체감 밀도가 유지된다.
+  // (wild 80×52=4160칸 → 42, empire_city 4480 → 45 클램프, 소형 포켓 → 하한 8.)
+  // rate는 이 공식과 무관 — 로머는 심볼 조우라 밀도를 올려도 강제 전투량은 불변.
+  return Math.max(8, Math.min(45, Math.round((map.w * map.h) / 100)));
 }
 
 export function spawnRoamers(map, rng, count) {

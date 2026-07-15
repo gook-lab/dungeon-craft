@@ -171,6 +171,9 @@ export default {
   ],
   spawn: {"x":13,"y":26},
   objects: [
+    // 대형맵 볼거리 보강 (2026-07-15 밀도 패스)
+    {x: 40, y: 12, kind: "chest", loot: {item: "antidote"}},
+    {x: 42, y: 14, kind: "prop", ref: "prop_mossy_boulder", tiles: 1.5, walkable: true},
     // 보드 장식 프롭 병합 (v3 원본 좌표, 2026-07-15)
     {x: 32, y: 30, kind: "prop", ref: "prop_mossy_boulder", tiles: 1.5},
     {x: 36, y: 32, kind: "prop", ref: "prop_mossy_boulder", tiles: 1.5},

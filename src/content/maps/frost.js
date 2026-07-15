@@ -166,6 +166,11 @@ export default {
   stairs: [{"x":28,"y":12},{"x":47,"y":12},{"x":37,"y":7},{"x":38,"y":7}],
   spawn: {"x":37,"y":45},
   objects: [
+    // 대형맵 볼거리 보강 (2026-07-15 밀도 패스)
+    {x: 38, y: 26, kind: "chest", loot: {item: "elixir"}},
+    {x: 36, y: 28, kind: "prop", ref: "prop_ice_cluster", tiles: 1.3, walkable: true},
+    {x: 13, y: 7, kind: "chest", loot: {gold: 200}, hidden: true},
+    {x: 38, y: 20, kind: "trigger", effect: "encounter", once: true, pool: ["frost_wolf", "ice_wraith", "frost_crow"], min: 2, max: 3, fireMsg: "빙호가 쩍 갈라진다 — 냉기 속 매복!"},
     { x: 33, y: 3, kind: "prop", ref: "prop_broken_brazier", tiles: 1.6 },
     { x: 42, y: 3, kind: "prop", ref: "prop_broken_brazier", tiles: 1.6 },
     { x: 4, y: 42, kind: "prop", ref: "prop_dead_tree_hd", tiles: 2.2 },
