@@ -227,7 +227,9 @@ export class EquipScene {
     const hov = this.hoveredItem();
     let next = cur;
     if (hov) {
-      const trial = { ...(hero.equip || {}), [this.cat]: hov };
+      // 이미 장착 중인 항목에 커서 → "해제 시" 비교 (− 방향 프리뷰); 그 외엔 교체 비교.
+      const wearing = (hero.equip || {})[this.cat] === hov;
+      const trial = { ...(hero.equip || {}), [this.cat]: wearing ? null : hov };
       next = this.totals(trial);
     }
 
