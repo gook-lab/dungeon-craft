@@ -89,10 +89,10 @@ export const FAR_BLUR = { enabled: true, bandFrac: 0.32, strength: 6 };
 // Per region: `sky` = [topColor, bottomColor] vertical gradient; `hills` = far→near
 // silhouette band colours; or `off:true` for indoor maps (dungeon/ice cave).
 export const BACKDROP = {
-  // 재활성화 (2026-07-15): WebGL 헤디드 브라우저에서 신·구 게임 플로우 모두 정상
-  // 검증 완료 (하늘/구름/능선 + 무대 틴트가 TILT 사다리꼴 "잘림"을 덮는다).
-  // ※ 편집 직후 화면이 단색으로 깨지면 HMR 스테일 — 하드 리로드(Cmd+R)로 해소.
-  enabled: true,
+  // OFF (2026-07-16, 사용자 결정): 필드 백그라운드(하늘/능선/무대 틴트) 제거.
+  // 울트라와이드/리사이즈 시 백드롭 지오메트리가 스테일해져 화면이 어긋나는
+  // 문제도 함께 소거. 재실험은 localStorage.dbg_backdrop='1' 게이트로.
+  enabled: false,
   band: 0.24,
   regions: {
     town:    { sky: [0x9fc0e8, 0xdce8f4], hills: [0x6f93b8, 0x53708f] },
