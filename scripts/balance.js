@@ -27,15 +27,25 @@ const SCENARIOS = [
   // 어둠숲 (1막 스토리 존, wild 반 계단 위) — 맵 encounters와 동기 (min/max/pool).
   { name: 'dkfrst(L3)', level: 3, equip: {}, pool: ['wolf', 'spider', 'hornet', 'walker'], min: 1, max: 3, herbs: 3 },
   { name: 'dkWARDEN(L3)', level: 3, equip: { weapon: 'bronze_sword' }, boss: 'dark_warden', herbs: 3 },
+  // 황야 동굴 (v3 신규 옵션 포켓, wild 밴드) — 맵 encounters와 동기.
+  { name: 'wldcave(L3)', level: 3, equip: {}, pool: ['spider', 'bat', 'walker', 'imp'], min: 2, max: 3, herbs: 3 },
   { name: 'dungeon(L5)', level: 5, equip: { weapon: 'bronze_sword', armor: 'leather_armor' }, pool: ['imp', 'wisp', 'walker', 'spider', 'brood_mother', 'bone_archer', 'powder_skeleton', 'giant_spider', 'dark_acolyte'], min: 2, max: 4, herbs: 4 },
   { name: 'dungBOSS(L7)', level: 7, equip: { weapon: 'iron_sword', armor: 'chain_armor' }, boss: 'skeleton_king', herbs: 5 },
+  // 지하 수로 (v3 신규 비밀 사이드, dungeon 금고 뒤 L6 밴드) — 맵 encounters와 동기.
+  { name: 'watrwy(L6)', level: 6, equip: { weapon: 'bronze_sword', armor: 'leather_armor' }, pool: ['imp', 'wisp', 'walker', 'spider'], min: 2, max: 3, herbs: 4 },
   { name: 'frost (L10)', level: 10, equip: { weapon: 'iron_sword', armor: 'chain_armor', accessory: 'power_ring' }, pool: ['frost_wisp', 'ice_golem', 'void_walker', 'chimera', 'frost_crow', 'yeti', 'frost_wolf', 'ice_wraith'], min: 2, max: 4, herbs: 6 },
   { name: 'frostBOSS(L12)', level: 12, equip: { weapon: 'silver_sword', armor: 'plate_armor', accessory: 'power_ring' }, boss: 'werewolf_king', herbs: 8 },
+  // 협곡 스위치백 (v3 신규 등반 사이드, frost 밴드) — 맵 encounters와 동기.
+  { name: 'swchbk(L11)', level: 11, equip: { weapon: 'iron_sword', armor: 'chain_armor', accessory: 'power_ring' }, pool: ['frost_wisp', 'frost_crow', 'yeti', 'frost_wolf'], min: 2, max: 3, herbs: 6 },
   { name: 'swamp (L15)', level: 15, equip: { weapon: 'silver_sword', armor: 'plate_armor', accessory: 'swift_boots' }, pool: ['mud_crawler', 'bog_brute', 'swamp_runner', 'giant_frog', 'medusa_head', 'bog_zombie', 'bog_leech'], min: 2, max: 5, herbs: 8 },
   { name: 'swampBOSS(L16)', level: 16, equip: { weapon: 'frost_blade', armor: 'mythril_mail', accessory: 'vitality_charm' }, boss: 'bog_witch', herbs: 9 },
+  // 몰락 평원 (v3 대여정 삽입, 늪 클리어 직후 2막 진입 밴드) — 맵 encounters와 동기.
+  { name: 'ovrwld(L16)', level: 16, equip: { weapon: 'frost_blade', armor: 'mythril_mail', accessory: 'vitality_charm' }, pool: ['wolf', 'hornet', 'rusty_soldier', 'spirit_guard', 'stone_gargoyle'], min: 2, max: 4, herbs: 9 },
   // 지하 의식장 (2막 스토리 존, swamp 이후·황제 전 밴드) — 맵 encounters와 동기.
   { name: 'ruins (L16)', level: 16, equip: { weapon: 'frost_blade', armor: 'mythril_mail', accessory: 'vitality_charm' }, pool: ['rusty_soldier', 'spirit_guard', 'wraith_sentinel', 'stone_gargoyle'], min: 2, max: 4, herbs: 9 },
   { name: 'sealGRD(L16)', level: 16, equip: { weapon: 'frost_blade', armor: 'mythril_mail', accessory: 'vitality_charm' }, boss: 'seal_guardian', herbs: 9 },
+  // 대성채 (v3 신규 옵션 던전, 수도 북측 황제 전 밴드) — 맵 encounters와 동기.
+  { name: 'citadel(L17)', level: 17, equip: { weapon: 'frost_blade', armor: 'mythril_mail', accessory: 'vitality_charm' }, pool: ['imperial_guard', 'spirit_guard', 'rune_guardian', 'wraith_sentinel'], min: 2, max: 4, herbs: 9 },
   // --- POST-GAME bosses: fought by the 4-hero party (incl. mage) at higher
   // levels. Story final (emperor) + two optional superbosses (drake, void lord).
   // Healthy target: 70-95% win with real attrition (deaths 0.3-1.5, not a wipe).
@@ -44,6 +54,8 @@ const SCENARIOS = [
   { name: 'starfl(L21)', level: 21, party: ['knight', 'warrior', 'huntress', 'mage'], equip: { weapon: 'flame_brand', armor: 'mythril_mail', accessory: 'power_ring' }, pool: ['star_husk', 'star_moth', 'revenant', 'reaper'], min: 2, max: 4, herbs: 10 },
   { name: 'FSTAR(L21)', level: 21, party: ['knight', 'warrior', 'huntress', 'mage'], equip: { weapon: 'flame_brand', armor: 'mythril_mail', accessory: 'power_ring' }, boss: 'fallen_star', herbs: 11 },
   { name: 'DRAKE(L25)', level: 25, party: ['knight', 'warrior', 'huntress', 'mage'], equip: { weapon: 'flame_brand', armor: 'dragon_scale', accessory: 'power_ring' }, boss: 'magma_drake', herbs: 12 },
+  // 용암 요새 (v3 신규 포스트게임 옵션 존, 드레이크 이후 밴드) — 맵 encounters와 동기.
+  { name: 'lvkeep(L26)', level: 26, party: ['knight', 'warrior', 'huntress', 'mage'], equip: { weapon: 'flame_brand', armor: 'dragon_scale', accessory: 'power_ring' }, pool: ['magma_golem', 'fire_bat', 'ember_hound', 'lava_slug'], min: 2, max: 4, herbs: 12 },
   { name: 'VOIDLORD(L35)', level: 35, party: ['knight', 'warrior', 'huntress', 'mage'], equip: { weapon: 'flame_brand', armor: 'dragon_scale', accessory: 'sage_amulet' }, boss: 'void_lord', herbs: 15 },
 ];
 

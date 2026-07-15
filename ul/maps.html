@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>맵 카탈로그 & 디자이너 — 던전크래프트</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/board.css">
+<link rel="stylesheet" href="css/ui.css">
+<style>
+  body { font-family: var(--f-ui); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 40px 80px; }
+  .top { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 8px; }
+  .back { font-size: 17px; color: var(--c-text-soft); text-decoration: none; border: 1px solid var(--c-frame-shadow); border-radius: 6px; padding: 6px 14px; }
+  .back:hover { color: var(--c-gold); border-color: var(--c-gold-deep); }
+  a { color: var(--c-info); } a:hover { color: var(--c-gold); }
+  /* 카탈로그 */
+  .cat-act { font-family: var(--f-display); font-size: 22px; color: var(--c-gold); margin: 30px 0 12px; }
+  .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+  .cat-card { background: rgba(27,32,70,.4); border: 1px solid var(--c-frame-shadow); border-radius: 8px; padding: 14px 16px; cursor: pointer; }
+  .cat-card:hover { border-color: var(--c-frame-dim); }
+  .cat-prev { margin-top: 10px; cursor: default; }
+  .cat-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .cat-name { font-family: var(--f-display); font-size: 19px; color: var(--c-text); }
+  .cat-type { font-family: var(--f-small); font-size: 13px; color: var(--c-gold-deep); border: 1px solid var(--c-gold-deep); border-radius: 3px; padding: 1px 6px; white-space: nowrap; }
+  .cat-id { font-family: var(--f-mono); font-size: 13px; color: var(--c-text-mute); margin-top: 4px; }
+  .cat-ts { color: var(--c-mp); }
+  .cat-note { font-size: 15px; color: var(--c-text-soft); margin-top: 8px; line-height: 1.6; }
+  /* 디자이너 */
+  .designer { margin-top: 20px; }
+  .stage-frame { border: 4px solid var(--c-ink-800); border-top-color: #3a4170; border-left-color: #3a4170;
+    border-right-color: #05060f; border-bottom-color: #05060f;
+    box-shadow: inset 0 0 0 2px var(--c-frame), inset 0 0 0 4px var(--c-frame-shadow); background: #0a0b16;
+    display: inline-block; line-height: 0; }
+  #mapCanvas { width: 100%; max-width: 100%; image-rendering: pixelated; cursor: crosshair; }
+  .designer-row { display: grid; grid-template-columns: 1fr 300px; gap: 22px; align-items: start; }
+  @media (max-width: 900px) { .designer-row { grid-template-columns: 1fr; } }
+  .side-panel { display: flex; flex-direction: column; gap: 10px; }
+  .side-panel label { font-size: 15px; color: var(--c-text-soft); display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+  .side-panel input, .side-panel select { font-family: var(--f-mono); font-size: 15px; color: var(--c-text);
+    background: var(--c-ink-700); border: 1px solid var(--c-frame-shadow); border-radius: 5px; padding: 5px 8px; width: 160px; }
+  #toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 10px; }
+  #exportOut { display: none; width: 100%; height: 260px; margin-top: 14px; font-family: var(--f-mono); font-size: 13px;
+    color: var(--c-text); background: var(--c-ink-900); border: 1px solid var(--c-frame-shadow); border-radius: 8px; padding: 12px; white-space: pre; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">MAP CATALOG · DESIGNER</div>
+      <h1 class="title" style="font-size:36px">맵 카탈로그 & 디자이너</h1>
+    </div>
+    <a class="back" href="terrain.html">← 지형지물 리디자인</a>
+  </div>
+  <p class="lede">전 <strong>25개 맵</strong>(기존 18 + 신규 편성 7)을 권역별로 정리하고, 아래 디자이너에서 게임과 같은 시맨틱(잔디·길·바닥·<strong>물·용암</strong>·벽·고도·계단·포탈)으로
+    새 맵을 그려 <strong>content/maps/ 에 그대로 넣을 수 있는 JS 모듈</strong>로 내보냅니다.</p>
+
+  <div id="catalog"></div>
+
+  <h2 class="title" style="font-size:26px;margin-top:52px">샘플 맵 디자인 — 클래식 탑다운 패턴</h2>
+  <p class="note">2D 탑다운 명작들의 공간 문법을 참조한 7종 — 소형 4종 + <b>대형(오버월드·대성채·항구도시)</b> 3종. <b>불러오기</b>를 누르면 아래 에디터에 로드되고,
+    그대로 수정 후 JS로 내보낼 수 있습니다. <b>이 7종은 위 카탈로그에도 정식 맵으로 편성되어 기존 맵들과 포탈로 연결됩니다.</b></p>
+  <div id="samples" class="cat-grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))"></div>
+
+  <h2 class="title" style="font-size:26px;margin-top:52px">맵 디자이너</h2>
+  <p class="note">클릭/드래그로 페인트. <b>고도 ±</b>는 누를 때마다 0→1→2 순환, 계단·포탈·스폰은 타일 클릭으로 배치.
+    작업은 자동 저장됩니다.</p>
+  <div id="toolbar"></div>
+  <div class="designer-row">
+    <div class="stage-frame"><canvas id="mapCanvas"></canvas></div>
+    <div class="side-panel">
+      <label>맵 ID <input id="mapId" value="custom_map"></label>
+      <label>이름 <input id="mapName" value="새 맵"></label>
+      <label>타일셋 <select id="mapTileset">
+        <option>dungeon</option><option>dungeon_stone</option><option>town</option><option>meadow</option>
+        <option>forest</option><option>frost_ice</option><option>swamp</option><option>empire_marble</option>
+        <option>lava</option><option>void</option><option>crypt_a2</option>
+      </select></label>
+      <label>크기 W×H <span style="display:flex;gap:4px"><input id="mapW" value="16" style="width:52px"><input id="mapH" value="13" style="width:52px"></span></label>
+      <p class="note" style="font-size:13px;margin:0">최대 128×96 — 큰 맵은 타일이 자동으로 축소됩니다.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="applySize">새 캔버스</button>
+        <button class="btn" id="resetMap">리셋</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+        <button class="btn on" id="exportBtn">JS로 내보내기</button>
+        <button class="btn" id="downloadBtn">↓ .js 다운로드</button>
+      </div>
+      <p class="note" style="font-size:14px">내보낸 파일을 <b>src/content/maps/</b>에 넣고 <b>maps/index.js</b>의 MAPS에 등록하면
+        바로 로드됩니다. objects(NPC·상자·보스)와 encounters는 파일에서 채우세요. <b>용암(4)</b>은 신규 제안 id —
+        fieldScene 타일 변환에 케이스 추가가 필요합니다(물(3)과 같은 패턴).</p>
+    </div>
+  </div>
+  <textarea id="exportOut" spellcheck="false"></textarea>
+</div>
+
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<rect width="100" height="100" fill="#12152e"/>
+<rect x="14" y="14" width="34" height="34" fill="#3d4a2e"/>
+<rect x="52" y="14" width="34" height="34" fill="#274a78"/>
+<rect x="14" y="52" width="34" height="34" fill="#d84a20"/>
+<rect x="52" y="52" width="34" height="34" fill="#33344a"/>
+</svg>
+</template>
+
+<script src="js/mapmaker.js"></script>
+</body>
+</html>

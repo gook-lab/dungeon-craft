@@ -1,76 +1,136 @@
-// Volcanic Crater — approach (불의 분화구 입구). POST-GAME optional region,
-// reached via the town rune-gate once the emperor falls (warp point gated on
-// empireBossDefeated). A magma maze of obsidian pillars and lava cracks; the
-// drake's lair (lava_core) lies east. West portal recalls to town on foot.
-// Lava tileset (ground id 6); molten monsters roam.
+// 불의 분화구 — v3 리디자인 (지형: maps-export 원본 재생성 36×24)
+// 북문(용암 요새 진입로)은 성채 접근 단상(elev 1)에 맞춰 승격
 
-import { fillGrid, pillarHall, borderWall, raiseRect } from '../_builder.js';
-
-const W = 26, H = 22;
-const ground = fillGrid(W, H, 6); // magma rock floor (lava tileset)
-const collision = fillGrid(W, H, 0);
-borderWall(collision, W, H);
-
-// A field of OBSIDIAN PILLARS (pillarHall) rising from the magma — the dark wall
-// sprite reads as black obsidian on the molten floor. Bounded to cols 4-20 so the
-// entrance hollow (npcs/chests/warp, cols 1-3) + east margin stay open.
-pillarHall(collision, W, H, 4, 3, 20, 18, { spacing: 4, size: 2 });
-
-for (let y = 7; y <= 9; y++) { collision[y * W] = 0; collision[y * W + (W - 1)] = 0; } // 3-wide arches
-// South pass down to the 별무덤 (3막 스토리 리전 — 재의 들판으로 내려가는 잿길).
-collision[(H - 1) * W + 12] = 0;
-
-// HD-2D: a raised obsidian shelf at the east gateway to the drake's lair — climb a
-// stair to the exit, so the threshold reads as an ascent into deeper danger.
-const elev = fillGrid(W, H, 0);
-raiseRect(elev, collision, W, 21, 6, 24, 10, 1);
-for (let y = 6; y <= 10; y++) if (collision[y * W + (W - 1)] === 0) elev[y * W + (W - 1)] = 1; // whole east arch rides the shelf
-const stairs = [{ x: 21, y: 8 }];
+const W = 36, H = 24;
+const ground = [
+  6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+  6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+  6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+  6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+  6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+  6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+  6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,6,6,6,6,6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,
+  6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,6,6,6,6,6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,
+  6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,6,6,6,6,6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,
+  6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,6,6,6,6,6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,
+  6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,6,6,6,6,6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,
+  6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,6,6,6,6,6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,
+  6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,6,6,6,6,6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,
+  6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,6,6,6,6,6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,
+  6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,6,6,6,6,6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,
+  6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,6,6,6,6,6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,
+  6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,6,6,6,6,6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,
+  6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,6,6,6,6,6,6,9,9,9,9,9,9,9,9,9,9,9,9,6,6,
+  6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+  6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+  6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+  6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+  6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+  6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+];
+const collision = [
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+];
+const elev = [
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+];
 
 export default {
   id: 'lava_gate',
-  name: '불의 분화구',
+  name: "불의 분화구",
   w: W, h: H,
   tileset: 'lava',
-  walls: true,
   symbolEncounters: true,
+  walls: true,
   ground,
   collision,
   elev,
-  stairs,
-  spawn: { x: 1, y: 8 },
+  stairs: [{"x":17,"y":8},{"x":18,"y":8},{"x":22,"y":3}],
+  spawn: {"x":17,"y":21},
   objects: [
-    { x: 2, y: 5, kind: 'prop', ref: 'prop_obsidian_pillar_hd' },
-    { x: 24, y: 5, kind: 'prop', ref: 'prop_magma_vent' },
-    { x: 22, y: 14, kind: 'prop', ref: 'prop_lava_crack_hd' },
-    { x: 24, y: 11, kind: 'prop', ref: 'prop_fire_altar' },
-    { x: 1, y: 9, kind: 'sign', talk: 'lava_sign' },
-    // 3막 관통 캐릭터 — 방랑자 에녹 (배치별 고유 id enoch_act3; 최후의 등반 허브).
-    { x: 1, y: 5, kind: 'npc', ref: 'enoch', npcId: 'enoch_act3', dir: 'south', talk: 'enoch_act3', label: '? 방랑자' },
-    // Post-game quest givers (camped in the open entrance hollow, off the path).
-    { x: 2, y: 6, kind: 'npc', ref: 'guard', dir: 'south', quest: 'q_drake', label: '! 화산 조사대장' },
-    { x: 2, y: 11, kind: 'npc', ref: 'alchemist', dir: 'south', quest: 'q_lava_cache', label: '! 잿불 연금술사' },
-    { x: 2, y: 7, kind: 'npc', ref: 'guard', dir: 'south', quest: 'q_scout_core', label: '! 조사대 신참' },
-    { x: 1, y: 9, kind: 'npc', ref: 'priest', npcId: 'pilgrim_lava', dir: 'south', talk: 'pilgrim_lava', label: '? 순례자' },
-    { x: 2, y: 2, kind: 'chest', loot: { gold: 400 } },
-    { x: 24, y: 2, kind: 'chest', loot: { item: 'dragon_scale' } },
-    // Hidden cache deep in the molten maze (off the minimap).
-    { x: 2, y: 20, kind: 'chest', loot: { item: 'power_ring' }, hidden: true },
-    // WARP pad pair: twin magma rifts shortcut across the obsidian maze. A
-    // teleporter fits this molten rift's fiction (unlike the grounded crypt).
-    { x: 2, y: 18, kind: 'trigger', effect: 'warp', tx: 24, ty: 18, fireMsg: '용암 균열이 타오르며 몸이 건너편으로 빨려든다…' },
-    { x: 24, y: 18, kind: 'trigger', effect: 'warp', tx: 2, ty: 18, fireMsg: '용암 균열이 타오르며 몸이 건너편으로 빨려든다…' },
-    // 별무덤 잿길 입구 (12,21) — 흑요석 기둥 두 개가 남쪽 통로를 액자처럼 감싸고
-    // 표지판이 알린다 (맨 구멍이던 입구에 시각 표지).
-    { x: 11, y: 20, kind: 'prop', ref: 'prop_obsidian_pillar_hd', tiles: 2.2 },
-    { x: 13, y: 20, kind: 'prop', ref: 'prop_obsidian_pillar_hd', tiles: 2.2 },
-    { x: 11, y: 19, kind: 'sign', talk: 'ashpath_sign' },
+    // 보드 장식 프롭 병합 (v3 원본 좌표, 2026-07-15)
+    {x: 15, y: 3, kind: "prop", ref: "prop_fire_altar", tiles: 1.6},
+    {x: 20, y: 3, kind: "prop", ref: "prop_fire_altar", tiles: 1.6},
+    {x: 24, y: 3, kind: "prop", ref: "prop_bone_pile_hd", tiles: 1.4, walkable: true},
+    {x: 25, y: 22, kind: "prop", ref: "prop_mossy_boulder", tiles: 1.5},
+    {x: 13, y: 19, kind: "prop", ref: "prop_mossy_boulder", tiles: 1.5},
+    {x: 21, y: 22, kind: "prop", ref: "prop_bone_pile_hd", tiles: 1.4, walkable: true},
+    {x: 22, y: 4, kind: "prop", ref: "prop_bone_pile_hd", tiles: 1.4, walkable: true},
+    {x: 31, y: 22, kind: "prop", ref: "prop_mossy_boulder", tiles: 1.5},
+    {x: 9, y: 20, kind: "prop", ref: "prop_mossy_boulder", tiles: 1.5},
+    {x: 23, y: 19, kind: "prop", ref: "prop_bone_pile_hd", tiles: 1.4, walkable: true},
+    { x: 3, y: 5, kind: "prop", ref: "prop_obsidian_pillar_hd" },
+    { x: 32, y: 5, kind: "prop", ref: "prop_magma_vent" },
+    { x: 34, y: 10, kind: "prop", ref: "prop_lava_crack_hd" },
+    { x: 34, y: 11, kind: "prop", ref: "prop_fire_altar" },
+    { x: 5, y: 4, kind: "sign", talk: "lava_sign" },
+    { x: 2, y: 4, kind: "npc", ref: "enoch", npcId: "enoch_act3", dir: "south", talk: "enoch_act3", label: "? 방랑자" },
+    { x: 4, y: 5, kind: "npc", ref: "guard", dir: "south", quest: "q_drake", label: "! 화산 조사대장" },
+    { x: 6, y: 3, kind: "npc", ref: "alchemist", dir: "south", quest: "q_lava_cache", label: "! 잿불 연금술사" },
+    { x: 2, y: 5, kind: "npc", ref: "guard", dir: "south", quest: "q_scout_core", label: "! 조사대 신참" },
+    { x: 8, y: 3, kind: "npc", ref: "priest", npcId: "pilgrim_lava", dir: "south", talk: "pilgrim_lava", label: "? 순례자" },
+    { x: 4, y: 2, kind: "chest", loot: { gold: 400 } },
+    { x: 33, y: 19, kind: "chest", loot: { item: "dragon_scale" } },
+    { x: 4, y: 20, kind: "chest", loot: { item: "power_ring" }, hidden: true },
+    { x: 4, y: 18, kind: "trigger", effect: "warp", tx: 32, ty: 18, fireMsg: "용암 균열이 타오르며 몸이 건너편으로 빨려든다…" },
+    { x: 32, y: 18, kind: "trigger", effect: "warp", tx: 4, ty: 18, fireMsg: "용암 균열이 타오르며 몸이 건너편으로 빨려든다…" },
+    { x: 16, y: 20, kind: "prop", ref: "prop_obsidian_pillar_hd", tiles: 2.2 },
+    { x: 18, y: 20, kind: "prop", ref: "prop_obsidian_pillar_hd", tiles: 2.2 },
+    { x: 16, y: 19, kind: "sign", talk: "ashpath_sign" },
   ],
   portals: [
-    { x: 0, y: 8, to: 'town', tx: 7, ty: 9 },            // recall home on foot
-    { x: 25, y: 8, to: 'lava_core', tx: 1, ty: 7 },      // into the drake's lair
-    // 남쪽 잿길 — 별무덤 (3막 퀘스트라인 목적지, L20 밴드 리전).
-    { x: 12, y: 21, to: 'starfall', tx: 15, ty: 1 },
+    {x: 0, y: 12, to: "town", tx: 7, ty: 9},
+    {x: 35, y: 12, to: "lava_core", tx: 1, ty: 16},
+    {x: 17, y: 23, to: "starfall", tx: 36, ty: 1},
+    {x: 18, y: 23, to: "starfall", tx: 36, ty: 1},
+    {x: 17, y: 0, to: "lava_keep", tx: 12, ty: 18},
+    {x: 18, y: 0, to: "lava_keep", tx: 12, ty: 18},
   ],
-  encounters: { rate: 0.16, pool: ['magma_golem', 'fire_bat', 'ember_hound', 'lava_slug'], min: 2, max: 4 },
+  encounters: {rate: 0.16,pool: ["magma_golem","fire_bat","ember_hound","lava_slug"],min: 2,max: 4},
 };

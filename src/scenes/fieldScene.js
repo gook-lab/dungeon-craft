@@ -28,15 +28,21 @@ const SWAY_KINDS = new Set(['grass', 'reed']);
 // Dark/underground regions where the player carries a torch glow (buildLights).
 const DARK_TILESETS = new Set(['dungeon', 'ice', 'lava', 'void']);
 
-// Biome to weather kind mapping
+// Biome to weather POOL — 맵 체류 중에도 주기적으로 풀에서 랜덤 로테이션한다
+// (rollWeather). 중복 엔트리 = 가중치 (예: frost는 snow가 2/3 확률).
 const BIOME_WEATHER = {
-  swamp: 'rain',
-  frost: 'snow',
-  dungeon: 'embers',
-  empire: 'embers', // the fallen empire smoulders
-  wild: 'clear',
-  town: 'clear',
+  swamp: ['rain', 'rain', 'storm', 'clear'],
+  frost: ['snow', 'snow', 'clear'],
+  ice: ['snow', 'clear'],
+  dungeon: ['embers', 'clear'],
+  empire: ['embers', 'embers', 'clear', 'storm'], // the fallen empire smoulders
+  wild: ['clear', 'clear', 'rain', 'storm'],
+  town: ['clear', 'clear', 'clear', 'rain'],
+  lava: ['embers'],
+  void: ['embers', 'clear'],
 };
+// 날씨 로테이션 주기 (초) — 매 롤마다 이 범위에서 랜덤.
+const WEATHER_CYCLE_MIN = 22, WEATHER_CYCLE_MAX = 45;
 
 // Ground-decal scatter config per region — fills the bare Wang-tile floor with
 // small code-drawn flora/debris so a map reads as a place, not a grid. `kinds`
@@ -400,10 +406,8 @@ export class FieldScene {
     this.moving = null; this.pending = null;
     this.banner.text = this.map.name;
 
-    // Set weather based on map's tileset biome
-    const biome = this.map.tileset || 'town';
-    const weatherKind = BIOME_WEATHER[biome] || 'clear';
-    this.weather.setKind(weatherKind);
+    // Weather: biome 풀에서 랜덤 시작 + 체류 중 주기 로테이션 (update가 굴린다).
+    this.rollWeather(true);
 
     this.buildGround();
     this.buildDecor();
@@ -422,6 +426,11 @@ export class FieldScene {
     // Fog of war: point at this map's explored set + light up the spawn area first,
     // then draw the minimap (revealMinimap(false) skips the redundant rebuild).
     this._explored = (this._exploredByMap || (this._exploredByMap = {}))[mapId] || (this._exploredByMap[mapId] = new Set());
+    // 안전 허브(마을)는 미니맵 전체 공개 — map.openMap 플래그가 안개를 건너뛴다.
+    if (this.map.openMap) {
+      const n = this.map.w * this.map.h;
+      if (this._explored.size < n) for (let i = 0; i < n; i++) this._explored.add(i);
+    }
     this.revealMinimap(false);
     this.buildMinimap();
     this.buildFieldHud();
@@ -612,8 +621,23 @@ export class FieldScene {
   //              crisp pixel sprites are never softened.
   //   vignette — radial dark edges (cached canvas texture, one sprite)
   // Rebuilt per loadMap + resume; sized to the current screen.
+  // 바이옴 날씨 풀에서 하나 뽑아 적용 + 다음 롤 타이머 장전. 코스메틱 전용이라
+  // 시드 rng가 아닌 Math.random을 쓴다 (인카운터 롤 결정성 비오염).
+  rollWeather(initial = false) {
+    const pool = BIOME_WEATHER[this.map?.tileset || 'town'] || ['clear'];
+    let kind = pool[Math.floor(Math.random() * pool.length)];
+    if (!initial && pool.length > 1 && kind === this.weatherKind) {
+      kind = pool[(pool.indexOf(kind) + 1) % pool.length]; // 같은 날씨 반복 방지
+    }
+    this.weatherKind = kind;
+    this.weather.setKind(kind);
+    this.weatherT = WEATHER_CYCLE_MIN + Math.random() * (WEATHER_CYCLE_MAX - WEATHER_CYCLE_MIN);
+  }
+
   buildAtmosphere() {
     this.atmosphere.removeChildren();
+    // 안전 허브(마을)는 무드 쉐이드(틴트/안개/비네트) 제외 — 밝고 안전하게.
+    if (this.map?.openMap) return;
     const mood = REGION_MOOD[this.map?.mood || this.map?.tileset] || REGION_MOOD.default;
     const { w, h } = this.game.renderer.screen;
 
@@ -1124,7 +1148,8 @@ export class FieldScene {
       // are HIDDEN (not just darkened by the spotlight), fading over the last tiles.
       const tx = sp._ax / TILE - 0.5, ty = sp._ay / TILE - 0.9;
       const dist = Math.hypot(tx - this.player.px, ty - this.player.py);
-      const va = Math.max(0, Math.min(1, (TILT.viewRadius + TILT.viewFade - dist) / TILT.viewFade));
+      // 안전 허브(마을)는 시야 컬링 제외 — 쉐이드 오프와 짝: NPC/프롭이 항상 보인다.
+      const va = this.map?.openMap ? 1 : Math.max(0, Math.min(1, (TILT.viewRadius + TILT.viewFade - dist) / TILT.viewFade));
       sp.alpha = (sp._baseAlpha ?? 1) * va;
       sp.visible = va > 0.02;
       if (sp._shadow && !sp._shadow.destroyed) { sp._shadow.alpha = va; sp._shadow.visible = va > 0.02; }
@@ -1139,7 +1164,8 @@ export class FieldScene {
   // lets the sprite grow big enough to cover the screen while the circle stays tight.
   updateSpotlight() {
     if (!this.spotlight) return;
-    if (!TILT.enabled) { this.spotlight.visible = false; return; }
+    // 안전 허브(마을)는 원형 시야 쉐이드도 제외 — 맵 전체가 밝게 보인다.
+    if (!TILT.enabled || this.map?.openMap) { this.spotlight.visible = false; return; }
     const sp = this.player.sprite;
     if (!sp) { this.spotlight.visible = false; return; }
     this.spotlight.visible = true;
@@ -1164,6 +1190,30 @@ export class FieldScene {
     for (const sp of this.actorLayer.children) {
       if (sp === this.player.sprite) continue;
       this.layoutActor(sp);
+    }
+    this.buildPortalMarkers();
+  }
+
+  // 포탈 마커 — 출구 타일 위 은은히 맥동하는 발광 룬 패드 (코드 드로잉, 코스메틱).
+  // 게이트 잠금 상태(requires 미충족)는 어두운 자수정 톤으로 구분. buildObjects가
+  // props를 비울 때마다 함께 재생성되므로 잠금 해제 후 재진입/리줌 시 색이 갱신된다.
+  buildPortalMarkers() {
+    this.portalMarks = [];
+    const { w } = this.map;
+    for (const p of this.map.portals || []) {
+      const locked = p.requires && !this.game.runtime.flags[p.requires];
+      const eo = (this.map.elev ? this.map.elev[p.y * w + p.x] : 0) * ELEV_STEP;
+      const color = locked ? 0x9a5a8a : 0x59d8ff;
+      const g = new PIXI.Graphics();
+      g.ellipse(0, 0, TILE * 0.36, TILE * 0.18).stroke({ color, width: 2, alpha: 0.85 });
+      g.ellipse(0, 0, TILE * 0.22, TILE * 0.11).stroke({ color, width: 1, alpha: 0.5 });
+      g.moveTo(0, -TILE * 0.11).lineTo(TILE * 0.09, 0).lineTo(0, TILE * 0.11).lineTo(-TILE * 0.09, 0)
+        .closePath().fill({ color, alpha: 0.55 });
+      g.x = (p.x + 0.5) * TILE;
+      g.y = (p.y + 0.6) * TILE - eo;
+      g.zIndex = p.y - 0.45; // 그림자(−0.5) 위, 그 타일의 액터 아래
+      this.props.addChild(g);
+      this.portalMarks.push({ g, t: Math.random() * Math.PI * 2, locked });
     }
   }
 
@@ -1395,12 +1445,26 @@ export class FieldScene {
     this._clouds = null;
     const cfg = (this.map && (BACKDROP.regions[this.map.tileset] || BACKDROP.regions.default)) || null;
     // Off globally, no map, or an indoor region (dungeon/ice cave) → full-screen map.
-    this.backdropOn = !!(BACKDROP.enabled && this.map && cfg && !cfg.off);
+    // 디버그 게이트: localStorage.dbg_backdrop='1'로 세션 한정 강제 활성 (QA 재현용).
+    const bdEnabled = BACKDROP.enabled || (typeof localStorage !== 'undefined' && localStorage.getItem('dbg_backdrop') === '1');
+    this.backdropOn = !!(bdEnabled && this.map && cfg && !cfg.off);
     this.ensureWorldMask();
     if (!this.backdropOn) return;
     const { w, h } = this.game.renderer.screen;
     const band = h * BACKDROP.band;
     const W = w * 1.5, OX = -w * 0.25; // oversized so horizontal parallax never reveals an edge
+
+    // STAGE TINT: a full-screen wash behind everything, in the region's sky tone
+    // darkened almost to black. TILT의 사다리꼴 측면/하단 쐐기가 맨 어둠 대신 리전
+    // 톤의 무대 어둠으로 읽힌다 (디오라마가 "잘려" 보이지 않게).
+    const stage = new PIXI.Graphics();
+    const stageTop = lerpColor(cfg.sky[0], 0x000000, 0.78);
+    const stageBot = lerpColor(cfg.sky[0], 0x000000, 0.90);
+    const SB = 10;
+    for (let i = 0; i < SB; i++) {
+      stage.rect(0, (h * i) / SB, w, h / SB + 1).fill({ color: lerpColor(stageTop, stageBot, i / (SB - 1)) });
+    }
+    this.backdrop.addChild(stage);
 
     // Sky: vertical gradient (stacked bands) covering the reserved strip + a touch
     // of overscan past the seam so the haze can melt it into the playfield.
@@ -1606,8 +1670,16 @@ export class FieldScene {
     const input = this.game.input;
     if (this.moving && this.prompt) this.prompt.visible = false;
 
-    // Tick weather animation
+    // Tick weather animation + 주기 랜덤 로테이션.
     this.weather?.update(dt);
+    if (this.weatherT !== undefined && (this.weatherT -= dt) <= 0) this.rollWeather();
+    // 포탈 룬 패드 맥동 (잠긴 게이트는 더 낮은 밝기로 숨쉰다).
+    for (const m of this.portalMarks || []) {
+      m.t += dt * 2.4;
+      const s = 1 + Math.sin(m.t) * 0.08;
+      m.g.scale.set(s);
+      m.g.alpha = (m.locked ? 0.45 : 0.8) + Math.sin(m.t) * 0.15;
+    }
 
     // Eased camera follow (before far-blur so the RT captures the new position).
     this.followCamera(dt);

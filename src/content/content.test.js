@@ -139,7 +139,7 @@ describe('map connectivity (completable playthrough)', () => {
         }
       }
     }
-    for (const id of ['town', 'wild', 'dungeon', 'frost', 'swamp',
+    for (const id of ['town', 'wild', 'dungeon', 'frost', 'swamp', 'overworld',
       'empire_gate', 'empire_camp', 'empire_city', 'empire_throne']) {
       expect(reachable.has(id), `${id} unreachable`).toBe(true);
     }

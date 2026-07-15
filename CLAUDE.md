@@ -36,7 +36,7 @@ src/
   scenes/    title, field, battle (opaque), dialog (overlay), menu, shop, equip, warp
   fx/        spellFx.js — code-drawn pixel spell-FX engine (~76 choreographies)
   ui/        uikit.js — windowBox / menuList / label (the only UI primitives)
-  util/      rng (seeded), audio (ZzFX + music), assets (hero/enemy/structure URL bridges)
+  util/      rng (seeded), audio (ZzFX + asset SFX/BGM layer — see §11), assets (hero/enemy/structure URL bridges)
   data/      save.js (localStorage, defensive `??` validation)
 main.js      bootstrap — wires engine + scenes + runtime; owns save fold,
              prologue gating, recruit persistence, mercy-counter fold, ending tone
@@ -114,6 +114,17 @@ applies the outcome AND feeds the mercy ratio (`flags.mercied++`/`slain++`) so a
 non-combat choice shifts `toneFromFlags` → NPC tone + ending, same as battle mercy.
 Reference: empire_camp `포로` (탈영병) → `moral_deserter` (살려보낸다/처형한다). The
 choice mechanic is generic — reuse for yes/no prompts, branch picks, etc.
+
+**Grim variants (bond-polarity layer, 2026-07-14)**: dialogue can ALSO branch on the
+party's bond colour, independent of the mercy tone. `bondPolarity(bonds)` (systems/
+bonds.js, PURE) → `'dark'|'light'|'none'` by negative/positive pole majority. When
+dark, `main.openDialog` swaps to `${id}_grim` **with priority over the tone variant**;
+`endBattle` applies the same rule to boss `win` dialogs (opt-in per authored id).
+Authored: enoch_act1/act2/act3_grim (에녹 reads the party's dark undercurrent — quest
+directions unchanged) + 4 boss wins (boss_win_grim 해골왕 / frost_ 늑대왕 / empire_
+황제 / void_ 공허). The emperor grim keeps **D7**: the 5-line death monologue is
+IDENTICAL — only the reaction + tagline lines differ. Grim is a dialogue layer only —
+ending-scene tone/titles are untouched. New grim beat = just add a `${id}_grim` entry.
 
 ### 4.5 다단계 퀘스트라인 (content/questlines.js, 2026-07-10 — 서사 고도화 1막)
 Unity 스토리 바이블 역이식(자비 렌즈)의 스파인. `QUESTLINES` = 스테이지 배열
@@ -193,6 +204,16 @@ The mercy theme's mechanical payoff, split in two:
 - Bonds view: field menu (X) → 유대 (negative poles marked `†`, dual 자비/잔혹
   legend). Per-hero flaws (knight 맹세/warrior 분노/huntress 통찰) live in
   `battleScene.checkFlawFP`, not party.js.
+- **Bond strikes (인연공격, content/bondSkills.js)** — FP-cost duo skills, once per
+  battle (`state.bondStrikeUsed`). Hero pairs need an emotion on the pair's bond;
+  **recruited allies need none** (recruiting IS the bond) — deployed ally + FP suffices.
+  `availableBondStrikes()` looks up `ALLY_COMBOS[ally.refId]` first (species-specific
+  duo — 5 story-setpiece allies: dark_warden 숲의 사냥 3연격+출혈 / bridge_warden
+  파수꾼의 낙추 강타+방어약화 / seal_guardian 서약의 뇌창 관통 뇌전+감전 / fallen_star
+  별빛 낙하 전체 성속 2연 / ember_hound 잿불 질주 2연 화상), falling back to the
+  generic `ALLY_COMBO` (공생 연격) for ordinary recruits. Pure data + spellFx DEFS —
+  the resolver's existing `base.inflict/pierce/hits` paths do the work (resolver/scene
+  untouched). New species combo = one `ALLY_COMBOS` entry + a `DEFS[id]` choreography.
 
 ### 7. Field movement (fieldScene)
 - **Tile-chaining**: a finished tile FALLS THROUGH (no `return`) so a held key
@@ -204,6 +225,15 @@ The mercy theme's mechanical payoff, split in two:
   direction (= `player.dir` on input); `heroUrl`/`heroWalkUrl` resolve by `DIRS`. Up/down
   movement plays its own vertical walk cycle. (Attack frames stay east/west only — the
   battle is side-view.) `loadMap` syncs `facing = dir` so the spawn sprite faces entry.
+- **Roamer density + respawn (2026-07-15)**: `roamerCount(map)` (systems/roamers.js,
+  PURE) sizes the symbol-encounter population per map: `map.encounters.roamers` override,
+  else `max(5, min(18, round(w*h/55)))`. The divisor assumes maze walls eat ~half the
+  raw area, so **perceived density ≈ 2× the tiles-per-roamer number** (large fields
+  884-1008 tiles → 16-18, mid ~572 → 10, small boss rooms 252 → 5, deliberately sparse
+  for pre-boss tension). **Respawn contract**: roamers are runtime-only — `spawnRoamers`
+  runs on every `loadMap`, so map re-entry always respawns them (bosses are flag-gated
+  map objects, never roamers — naturally excluded). Roamers are avoidable symbols, so
+  raising density adds optional encounters, not forced grind.
 - **Ground shadows (2026-05-30)**: a soft elliptical drop-shadow under characters +
   enemies so nothing floats. `renderer.shadowTexture()` (a baked radial-ellipse canvas
   texture, reused) is the shared primitive. FIELD: `fieldScene.makeFieldShadow(mult)`
@@ -328,6 +358,26 @@ markers when more is above/below); reusable row slots re-text on each `setIndex`
 still spans every option. Two-line status cards in `menuScene` similarly clip if
 text wraps — the equipment line is ONE line auto-shrunk via `eq.scale.x`, and the
 whole status column scales to fit screen height (`statusLayer.scale`).
+
+### 11. Audio asset layer (util/audio.js, 2026-07-14)
+SFX/BGM transcoded from the Unity sibling's packs (MagicArsenal + 25 RPG Game Tracks +
+Resources/Bgm) via **afconvert** (macOS builtin, no ffmpeg) → m4a in `public/audio/`
+(32 files, ~16MB). The layer sits on the shared zzfx `AudioContext`; **every path falls
+back to ZzFX** (file missing / not-yet-decoded / disabled → identical to pre-port
+behavior), so headless/test runs are unaffected. Maps: `ASSET_BGM` (mode → basename;
+field modes are `field_<region>` keyed by `map.mood || map.tileset`, same lookup as
+`REGION_MOOD`; fieldScene.loadMap sets `game.fieldMusic` so battle-return resumes the
+region track), `JINGLES` (victory — handleEnd stops BGM then `playJingle`), and 10
+element cast/impact SFX pairs (`playElement('cast'|'impact', element)` driven from
+battleScene's castStart/impact events; heal/cure map to the 'heal' pair). **AAC encoder
+delay (~45ms lead silence)** is trimmed at decode time — scan decoded PCM for first/last
+non-silent samples (`trimRange`) → `loopStart/loopEnd` + start offset — keeping SFX
+punchy and BGM loops gapless without lossless files. **Memory**: decoded PCM ≈ 40MB/
+track, so `preload()` decodes only battle/boss + jingles + SFX; region BGMs lazy-decode
+on entry and `startAssetBgm` **evicts** non-current `bgm_` buffers (revisit = HTTP-cache
+re-decode). New track: afconvert the wav (SFX 64k / region BGM 96k / battle 128k AAC) →
+drop in `public/audio/` → add the basename to the right map. License caveat: Unity
+asset-store packs used outside Unity — accepted for this local toy (see TODOS.md).
 
 ## Content Extension Checklists
 
@@ -479,6 +529,15 @@ OPTIMAL play (perfect AoE/heal/herb), so trash showing ~90-96% HP-remaining + 0 
 there is the FLOOR — real (suboptimal) players take more; read avgRounds (now ~2.5-3 vs
 old ~1.5) and the rising per-region attrition, not the optimal-AI HP%. Don't "fix" trash
 back to 1-round kills. balance.js SCENARIOS mirror the per-map min/max — keep them in sync.
+
+**Early-game party-size cap (capEncounter, 2026-07-15)**: random encounters (step rolls
+AND roamer groups) are trimmed to **partySize+1** enemies via the PURE
+`capEncounter(enc, partySize)` (field.js), applied in fieldScene at battle start with
+`activePartySize()` — a solo-leader start faces ≤2 mobs, a full party the map's normal
+max. Scripted trigger formations (`group:[refIds]`) bypass the cap (authored ambushes
+stay as designed). The balance harness models the 3-hero ladder WITHOUT this cap
+(full-size encounters), so the cap is a pure player-side softening — no re-run needed
+when touching it.
 
 **Quest** (`content/quests.js`, PURE — no Pixi/save write): a quest is
 `{id,name,giver,desc,cond,reward,offer/active/done dialogue}`. PURE `isQuestComplete(quest,

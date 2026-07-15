@@ -16,24 +16,30 @@ export const NPC_SCALE = (TILE * 1.3) / 68;
 export const TILESET_META = {
   // town_ground sheet packing order: full-grass = idx 12, full-dirt = idx 6
   // (derived from the PixelLab Wang metadata corner map).
-  town: { url: TILESETS.town, tilePx: 32, index: { 0: 12, 1: 6 } },   // 0 grass, 1 dirt path
-  wild: { url: TILESETS.wild, tilePx: 32, index: { 0: 12, 1: 6 } },
+  // accent id 2 = flagstone plaza/ruin floor (dungeon stone sheet, within-map variety
+  // — v3 리디자인 맵의 광장/폐허 바닥. swamp_bog 악센트와 같은 메커니즘).
+  town: { url: TILESETS.town, tilePx: 32, index: { 0: 12, 1: 6 }, accents: { 2: { url: TILESETS.dungeon, idx: 12 } } },   // 0 grass, 1 dirt path
+  wild: { url: TILESETS.wild, tilePx: 32, index: { 0: 12, 1: 6 }, accents: { 2: { url: TILESETS.dungeon, idx: 12 } } },
   // dungeon_stone: PixelLab Wang sheet, same packing as town (full-upper=12).
-  dungeon: { url: TILESETS.dungeon, tilePx: 32, index: { 2: 12 } },    // 2 flagstone floor
-  frost: { url: TILESETS.frost, tilePx: 32, index: { 4: 12 } },        // 4 snow floor
+  // accent id 1 = 흙길/통행로 (town 시트의 full-dirt) — v3 리디자인 맵들이 전 리전에
+  // 길(1)을 깔았는데 리전 시트엔 dirt가 없어 단색 폴백이던 것을 텍스처로 연결.
+  dungeon: { url: TILESETS.dungeon, tilePx: 32, index: { 2: 12 }, accents: { 1: { url: TILESETS.town, idx: 6 } } },    // 2 flagstone floor
+  frost: { url: TILESETS.frost, tilePx: 32, index: { 4: 12 }, accents: { 1: { url: TILESETS.town, idx: 6 } } },        // 4 snow floor
   // 5 mud floor; accent id 3 = bog-water pools (separate sheet, within-map variety).
-  swamp: { url: TILESETS.swamp, tilePx: 32, index: { 5: 12 }, accents: { 3: { url: TILESETS.swamp_bog, idx: 12 } } },
+  swamp: { url: TILESETS.swamp, tilePx: 32, index: { 5: 12 }, accents: { 3: { url: TILESETS.swamp_bog, idx: 12 }, 1: { url: TILESETS.town, idx: 6 } } },
   // Ported biomes for upcoming regions (verify Wang `index` on first render; the
   // TILE_COLOR fallback below covers it if the sub-tile is off). New semantic
   // ground ids: 6 lava, 7 void. `ice` is an alt-frost (reuses snow floor id 4).
   lava: { url: TILESETS.lava, tilePx: 32, index: { 6: 12 } },          // 6 magma rock floor
   void: { url: TILESETS.void, tilePx: 32, index: { 7: 12 } },          // 7 void floor
   ice: { url: TILESETS.ice, tilePx: 32, index: { 4: 12 } },            // 4 ice floor (alt frost)
-  empire: { url: TILESETS.empire, tilePx: 32, index: { 8: 6 } },       // 8 corrupted obsidian floor (idx 6 = full-lower; 12=marble was too lava-like)
+  empire: { url: TILESETS.empire, tilePx: 32, index: { 8: 6 }, accents: { 1: { url: TILESETS.town, idx: 6 } } },       // 8 corrupted obsidian floor (idx 6 = full-lower; 12=marble was too lava-like); accent 1 = 흙길
 };
 
 // Solid-color ground fallback per semantic tile id.
-export const TILE_COLOR = { 0: 0x3a6d34, 1: 0x8a6a3a, 2: 0x4a4652, 3: 0x2a4a8a, 4: 0xcdd9e6, 5: 0x4a5638, 6: 0x6b241a, 7: 0x241640, 8: 0x352a3a };
+// 9 = molten lava pool (v3 리디자인 — 용암 리전의 비통행 웅덩이; Wang 시트 없음,
+// 밝은 단색 폴백으로 렌더. 통행 차단은 collision이 담당).
+export const TILE_COLOR = { 0: 0x3a6d34, 1: 0x8a6a3a, 2: 0x4a4652, 3: 0x2a4a8a, 4: 0xcdd9e6, 5: 0x4a5638, 6: 0x6b241a, 7: 0x241640, 8: 0x352a3a, 9: 0xd8501a };
 
 // HD-2D atmosphere tokens per region (the "공기" layer — fieldScene.buildAtmosphere
 // composites ambient tint + a vertical depth-fog + a radial vignette over the world,
@@ -83,7 +89,10 @@ export const FAR_BLUR = { enabled: true, bandFrac: 0.32, strength: 6 };
 // Per region: `sky` = [topColor, bottomColor] vertical gradient; `hills` = far→near
 // silhouette band colours; or `off:true` for indoor maps (dungeon/ice cave).
 export const BACKDROP = {
-  enabled: false, // deferred — felt out of place; revisit after billboard lands. Tilt stays.
+  // 재활성화 (2026-07-15): WebGL 헤디드 브라우저에서 신·구 게임 플로우 모두 정상
+  // 검증 완료 (하늘/구름/능선 + 무대 틴트가 TILT 사다리꼴 "잘림"을 덮는다).
+  // ※ 편집 직후 화면이 단색으로 깨지면 HMR 스테일 — 하드 리로드(Cmd+R)로 해소.
+  enabled: true,
   band: 0.24,
   regions: {
     town:    { sky: [0x9fc0e8, 0xdce8f4], hills: [0x6f93b8, 0x53708f] },

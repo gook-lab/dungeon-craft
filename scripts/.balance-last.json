@@ -18,6 +18,12 @@
       "hp": 80,
       "deaths": 0.07
     },
+    "wldcave(L3)": {
+      "win": 100,
+      "rounds": 1.6,
+      "hp": 96,
+      "deaths": 0
+    },
     "dungeon(L5)": {
       "win": 100,
       "rounds": 2.2,
@@ -29,6 +35,12 @@
       "rounds": 5.6,
       "hp": 42,
       "deaths": 1.29
+    },
+    "watrwy(L6)": {
+      "win": 100,
+      "rounds": 1.5,
+      "hp": 98,
+      "deaths": 0
     },
     "frost (L10)": {
       "win": 100,
@@ -42,6 +54,12 @@
       "hp": 38,
       "deaths": 1.46
     },
+    "swchbk(L11)": {
+      "win": 100,
+      "rounds": 2.1,
+      "hp": 93,
+      "deaths": 0
+    },
     "swamp (L15)": {
       "win": 100,
       "rounds": 2.8,
@@ -54,6 +72,12 @@
       "hp": 35,
       "deaths": 1.26
     },
+    "ovrwld(L16)": {
+      "win": 100,
+      "rounds": 2.6,
+      "hp": 91,
+      "deaths": 0
+    },
     "ruins (L16)": {
       "win": 100,
       "rounds": 3,
@@ -64,6 +88,12 @@
       "win": 100,
       "rounds": 3.2,
       "hp": 84,
+      "deaths": 0
+    },
+    "citadel(L17)": {
+      "win": 100,
+      "rounds": 3.1,
+      "hp": 87,
       "deaths": 0
     },
     "EMPEROR(L18)": {
@@ -89,6 +119,12 @@
       "rounds": 9.5,
       "hp": 21,
       "deaths": 2.12
+    },
+    "lvkeep(L26)": {
+      "win": 100,
+      "rounds": 2,
+      "hp": 96,
+      "deaths": 0
     },
     "VOIDLORD(L35)": {
       "win": 80,
@@ -116,6 +152,12 @@
       "hp": 91,
       "deaths": 0
     },
+    "wldcave(L3)": {
+      "win": 100,
+      "rounds": 2.1,
+      "hp": 93,
+      "deaths": 0
+    },
     "dungeon(L5)": {
       "win": 100,
       "rounds": 2.4,
@@ -127,6 +169,12 @@
       "rounds": 4.1,
       "hp": 74,
       "deaths": 0.34
+    },
+    "watrwy(L6)": {
+      "win": 100,
+      "rounds": 2,
+      "hp": 96,
+      "deaths": 0
     },
     "frost (L10)": {
       "win": 100,
@@ -140,6 +188,12 @@
       "hp": 74,
       "deaths": 0.32
     },
+    "swchbk(L11)": {
+      "win": 100,
+      "rounds": 2.1,
+      "hp": 92,
+      "deaths": 0
+    },
     "swamp (L15)": {
       "win": 100,
       "rounds": 3.1,
@@ -152,6 +206,12 @@
       "hp": 60,
       "deaths": 0.26
     },
+    "ovrwld(L16)": {
+      "win": 100,
+      "rounds": 2.9,
+      "hp": 91,
+      "deaths": 0
+    },
     "ruins (L16)": {
       "win": 100,
       "rounds": 3.2,
@@ -162,6 +222,12 @@
       "win": 100,
       "rounds": 3,
       "hp": 94,
+      "deaths": 0
+    },
+    "citadel(L17)": {
+      "win": 100,
+      "rounds": 3.7,
+      "hp": 85,
       "deaths": 0
     },
     "EMPEROR(L18)": {
@@ -187,6 +253,12 @@
       "rounds": 7.5,
       "hp": 45,
       "deaths": 0.73
+    },
+    "lvkeep(L26)": {
+      "win": 100,
+      "rounds": 2,
+      "hp": 96,
+      "deaths": 0
     },
     "VOIDLORD(L35)": {
       "win": 96,
@@ -214,6 +286,12 @@
       "hp": 92,
       "deaths": 0
     },
+    "wldcave(L3)": {
+      "win": 100,
+      "rounds": 2.1,
+      "hp": 92,
+      "deaths": 0
+    },
     "dungeon(L5)": {
       "win": 100,
       "rounds": 2.4,
@@ -225,6 +303,12 @@
       "rounds": 3.1,
       "hp": 79,
       "deaths": 0.2
+    },
+    "watrwy(L6)": {
+      "win": 100,
+      "rounds": 2,
+      "hp": 96,
+      "deaths": 0
     },
     "frost (L10)": {
       "win": 100,
@@ -238,6 +322,12 @@
       "hp": 84,
       "deaths": 0.12
     },
+    "swchbk(L11)": {
+      "win": 100,
+      "rounds": 2.1,
+      "hp": 91,
+      "deaths": 0
+    },
     "swamp (L15)": {
       "win": 100,
       "rounds": 3,
@@ -250,6 +340,12 @@
       "hp": 57,
       "deaths": 0.36
     },
+    "ovrwld(L16)": {
+      "win": 100,
+      "rounds": 2.9,
+      "hp": 90,
+      "deaths": 0
+    },
     "ruins (L16)": {
       "win": 100,
       "rounds": 3.2,
@@ -260,6 +356,12 @@
       "win": 100,
       "rounds": 2.1,
       "hp": 97,
+      "deaths": 0
+    },
+    "citadel(L17)": {
+      "win": 100,
+      "rounds": 3.6,
+      "hp": 83,
       "deaths": 0
     },
     "EMPEROR(L18)": {
@@ -285,6 +387,12 @@
       "rounds": 6.5,
       "hp": 42,
       "deaths": 0.89
+    },
+    "lvkeep(L26)": {
+      "win": 100,
+      "rounds": 2,
+      "hp": 96,
+      "deaths": 0
     },
     "VOIDLORD(L35)": {
       "win": 98,

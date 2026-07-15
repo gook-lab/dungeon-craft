@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>드래곤 크립트 — 타이틀</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/title.css">
+</head>
+<body>
+<div id="viewport">
+  <div id="stage" tabindex="0">
+    <canvas id="bgCanvas"></canvas>
+    <div id="wxHost" style="position:absolute;inset:0;z-index:2;pointer-events:none"></div>
+    <div class="vignette"></div>
+
+    <div id="heroShadow"></div>
+    <img id="hero" src="assets/knight.png" alt="">
+
+    <div class="title-wrap">
+      <div class="title-main">드래곤 크립트</div>
+      <div class="title-rule"></div>
+      <div class="title-sub">베어 끝낼 것인가, 길 잃은 영혼을 구할 것인가</div>
+    </div>
+
+    <div class="slots" id="slots"></div>
+
+    <div class="action-overlay" id="actionOverlay">
+      <div class="action-box">
+        <div class="action-title" id="actionTitle"></div>
+        <div id="actionList"></div>
+      </div>
+    </div>
+
+    <div class="hint" id="hint"></div>
+    <div class="version">ver 1.0 · 데모 목업</div>
+
+    <div class="wx-toggle">
+      <button data-wx="rain" class="on">비</button>
+      <button data-wx="storm">천둥</button>
+      <button data-wx="snow">눈</button>
+      <button data-wx="embers">잿불</button>
+      <button data-wx="clear">맑음</button>
+    </div>
+  </div>
+</div>
+
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<rect width="100" height="100" fill="#0a0b16"/>
+<circle cx="74" cy="26" r="9" fill="#cfc4e8"/>
+<path d="M10 70 L24 46 L38 70 Z M44 70 L60 40 L76 70 Z" fill="#171d38"/>
+<rect x="24" y="78" width="52" height="7" fill="#ffd766"/>
+<rect x="30" y="88" width="40" height="4" fill="#c98b2c"/>
+</svg>
+</template>
+
+<script src="js/weather.js"></script>
+<script src="js/title.js"></script>
+</body>
+</html>
