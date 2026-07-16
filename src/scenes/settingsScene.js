@@ -18,7 +18,7 @@ const PAGES = {
   game: [
     { id: 'textSpeed', name: '텍스트 속도', type: 'radio', opts: ['느림', '보통', '빠름', '즉시'], hint: '대사 출력 속도' },
     { id: 'battleSpeed', name: '전투 속도', type: 'radio', opts: ['보통', '빠름', '2배'], hint: '전투 연출·애니메이션 배속' },
-    { id: 'autosave', name: '자동 저장', type: 'toggle', hint: '지역 이동·전투 후 자동으로 저장' },
+    { id: 'autosave', name: '자동 저장', type: 'toggle', hint: '끄면 잦은 저장을 줄임 (전투·이동·상자 등 진행 지점은 항상 저장)' },
     { id: 'screenShake', name: '화면 흔들림', type: 'toggle', hint: '강타·피격 시 카메라 셰이크' },
     { id: 'colorblind', name: '색맹 모드', type: 'toggle', hint: '상태·속성을 색 외에 기호로도 구분', prev: true },
   ],

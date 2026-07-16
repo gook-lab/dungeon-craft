@@ -19,7 +19,7 @@ import { ShopScene } from './scenes/shopScene.js';
 import { WarpScene } from './scenes/warpScene.js';
 import { FastTravelScene } from './scenes/fastTravelScene.js';
 import { SettingsScene } from './scenes/settingsScene.js';
-import { loadSettings, applyAudioSettings } from './data/settings.js';
+import { loadSettings, applyAudioSettings, getSettings } from './data/settings.js';
 import { EndingScene } from './scenes/endingScene.js';
 import { levelForXp, spellsLearnedBetween, statsAtLevel, xpToReach } from './systems/progression.js';
 import { spoils, branchOutcome } from './systems/battle.js';
@@ -146,7 +146,9 @@ async function main() {
     }
   };
 
-  game.resumeField = () => { game.field?.resume(); game.saveNow(); };
+  // resumeField는 메뉴·대화 닫을 때마다 호출되는 잦은 편의 저장 — autosave OFF면
+  // 생략(진행 지점 저장은 전투/이동/상자/도덕/레벨업 경로에서 항상 수행되므로 손실 없음).
+  game.resumeField = () => { game.field?.resume(); if (getSettings().autosave) game.saveNow(); };
 
   // 퀘스트라인 tick — 4개 뮤테이션 지점에서 명시 호출: endBattle 승리(플래그/드랍
   // 반영 후), fieldScene.loadMap(reach 기록 후), openDialog 종료(talk 기록 후),
