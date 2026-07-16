@@ -8,6 +8,7 @@ import {
 } from './battle.js';
 import { buildHeroUnit, buildAllyUnit } from './progression.js';
 import { equipPassives } from '../content/items.js';
+import { getSpell } from '../content/spells.js';
 import { createRng } from '../util/rng.js';
 
 const fixedRng = () => createRng(12345);
@@ -748,15 +749,19 @@ describe('combat states', () => {
     expect(charged).toBe(Math.floor(base * CHARGE_MULT));
   });
 
-  it('명상(meditate, mana kind) restores the caster MP, scaled by mana depth, capped at maxMp', () => {
+  it('명상(meditate, mana kind) restores the caster MP as a flat fraction of maxMp, capped at maxMp', () => {
     const m = buildHeroUnit('mage', 6);
     const state = createBattle([m], [buildEnemyUnit('bog_brute')]);
-    m.mp = 1; // drained
+    m.mp = 2; // enough to cast (mpCost 2)
+    const spell = getSpell('meditate');
+    const mpBefore = m.mp - spell.mpCost; // after paying the cost
     const evs = resolveAction(state, { type: 'spell', actorId: m.id, spellId: 'meditate' }, null).events;
     const mana = evs.find((x) => x.type === 'mana');
     expect(mana).toBeDefined();
     expect(mana.amount).toBeGreaterThan(0);
-    expect(m.mp).toBe(1 + mana.amount);
+    // Restore should be ~40% of maxMp (flat, not scaled by magicScale)
+    expect(mana.amount).toBe(Math.floor(m.maxMp * spell.power));
+    expect(m.mp).toBe(mpBefore + mana.amount);
     expect(m.mp).toBeLessThanOrEqual(m.maxMp);
   });
 

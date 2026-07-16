@@ -33,7 +33,7 @@ export const PARTY_MEMBERS = {
     spells: ['crushblow'],
     // 분노(rage)는 L15 습득 — 늪지(L15)부터 AI/하네스에 반영. crushblow는 L1 주력기.
     // quake(대지가르기) L10 — 지면강타 earth AoE로 중반 빈 레벨을 메움(balance 재측정 완료).
-    learn: { 4: 'warcry', 6: 'sunder', 8: 'taunt', 10: 'quake', 11: 'whirlwind', 13: 'warroar', 15: 'bloodlust', 17: 'berserk', 20: 'meteor' },
+    learn: { 4: 'warcry', 6: 'sunder', 8: 'taunt', 10: 'quake', 11: 'whirlwind', 13: 'warroar', 15: 'bloodlust', 17: 'berserk' },
   },
   huntress: {
     id: 'huntress', name: '사냥꾼', sprite: 'huntress',

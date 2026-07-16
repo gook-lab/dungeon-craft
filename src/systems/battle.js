@@ -581,8 +581,12 @@ export function resolveAction(state, action, rng) {
       // 연막탄: also blinds enemies (atkdown) so they hit softer while the smoke holds.
       if (spell.debuffEnemyAcc) for (const e of living(state, 'enemy')) { applyStatus(e, 'atkdown', 2); events.push({ type: 'inflict', targetId: e.id, status: 'atkdown' }); }
     } else if (spell.kind === 'mana') {
-      // 명상: restore the caster's MP (scales with their mana depth).
-      const restore = Math.floor(spell.power * magicScale(actor) * VARIANCE(rng));
+      // 명상: restore the caster's MP. If power < 1, treat as % of maxMp (flat cap);
+      // otherwise scale with magicScale. This prevents infinite looping on zero-cost
+      // mana restoration (meditate).
+      const restore = spell.power < 1
+        ? Math.floor(actor.maxMp * spell.power)
+        : Math.floor(spell.power * magicScale(actor) * VARIANCE(rng));
       const before = actor.mp; actor.mp = Math.min(actor.maxMp, actor.mp + restore);
       events.push({ type: 'mana', actorId: actor.id, amount: actor.mp - before });
     } else if (spell.kind === 'state') {
