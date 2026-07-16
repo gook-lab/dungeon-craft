@@ -167,6 +167,12 @@ SCENARIOS에 dkfrst/dkWARDEN/ruins/sealGRD/starfl/FSTAR 동기 등록.
 NG+2부터 스토리 보스가 최적플레이로도 클리어 불가(늪 1%)가 된다(2026-07-16 수정).
 `scripts/balance.js`는 `NG=n` env로 회차 스케일 미리보기(battleScene와 동일 공식) —
 NG 미설정은 1회차 그대로. 회차 곡선/영웅 성장/보스 스탯 변경 후 `NG=1`·`NG=2`로 재확인.
+**`BASIC_ONLY=1 npm run balance`** — 영웅이 공격 스킬/상태기를 무시하고 통상공격만(+생존
+힐/허브). "스킬 없이 이기는가" 실측 진단: 트래시는 100% 승(스킬=선택)이지만 보스는 8~31%
+(스킬 사용 시 77~91%)로 붕괴 → 보스가 스킬 게이트임을 정량 확인. 보스 튜닝 후 이 토글로
+회귀 검증(5% 아래면 평균 플레이어에게 과튜닝 신호). **XP 곡선**: `progression.js stepCost`가
+L≤4는 `8+6·(L-1)`(그대로), L≥5는 `26+15·(L-4)`로 기울기 상향(레벨업 ~2배; 준2차는 후반
+grind 폭증이라 선형 채택). 레벨→스탯 매핑 불변이라 해니스(고정 레벨) 비접촉 — 순수 페이싱.
 
 ### 5. Save schema (data/save.js)
 Defensive `??` validation; old saves never crash. Mercy fields: `allies:[]`,
@@ -242,6 +248,25 @@ The mercy theme's mechanical payoff, split in two:
   runs on every `loadMap`, so map re-entry always respawns them (bosses are flag-gated
   map objects, never roamers — naturally excluded). Roamers are avoidable symbols, so
   raising density adds optional encounters, not forced grind.
+- **Random-encounter grace (ENC_GRACE, 2026-07-16)**: step-encounter maps (no
+  `symbolEncounters`: wild_cave/dungeon/darkforest/ruins_below/starfall/waterway) felt
+  "too fast" because `rollEncounter` is a pure per-step probability with NO cooldown, so
+  fights clustered on consecutive steps. `fieldScene._stepsSinceEnc` counts steps and
+  gates the encounter in `arrive()` on `>= ENC_GRACE` (config.js `ENC_GRACE=5`), resetting
+  to 0 on `loadMap` AND on battle start — the first ~5 tiles after entry/battle are
+  encounter-free. Per-step `rate` is UNCHANGED (overall frequency same; only clustering
+  removed). Player-side softening — balance harness never walks, so no re-run needed.
+- **Minimap POI glyphs + fog-independent markers (2026-07-16)**: the corner/big (M) minimap
+  draws points-of-interest as legible glyphs (not plain color dots): **`!`** gold = quest
+  giver (bright if offer/turn-in ready, dim while active, GONE when `quests[id]==='done'`),
+  **`?`** gold = unopened visible chest, **`?`** cyan/dim = open/gated portal; boss = red
+  dot, recruit/plain NPC = green dot (hidden once its join `flag` is set = 영입 완료),
+  runegate = gold square. `mmGlyph(g,tx,ty,cell,type,color,alpha)` renders into `mmStatic`
+  so glyphs scale in the enlarged view. **POI markers render REGARDLESS of fog** (the
+  terrain tiles stay fog-gated — exploration still fills the map) so a just-entered dark
+  dungeon shows chests/portals/boss to navigate toward (objective markers); only
+  `o.hidden` chests stay secret. Quest NPCs' static `!` label prefix (`"! 위병대장"`) is
+  also stripped when the quest is done (field label + minimap unified).
 - **Ground shadows (2026-05-30)**: a soft elliptical drop-shadow under characters +
   enemies so nothing floats. `renderer.shadowTexture()` (a baked radial-ellipse canvas
   texture, reused) is the shared primitive. FIELD: `fieldScene.makeFieldShadow(mult)`
