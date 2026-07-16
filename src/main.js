@@ -66,7 +66,8 @@ async function main() {
   game.slotSummaries = () => Array.from({ length: SAVE_SLOTS }, (_, i) => ({ slot: i + 1, summary: slotSummary(undefined, i + 1) }));
   game.deleteSlot = (slot) => clearSave(undefined, slot);
 
-  game.saveNow = () => { writeSave(runtimeToSave(game.runtime), undefined, game.slot); };
+  // saveNow: 디스크 기록 + 저장 시퀀스 증가(필드가 인디케이터 토스트를 띄우는 신호).
+  game.saveNow = () => { writeSave(runtimeToSave(game.runtime), undefined, game.slot); game._saveSeq = (game._saveSeq || 0) + 1; };
 
   // The heroes a new game may pick as its leader. Whoever isn't picked joins later
   // via a recruit NPC; the chosen one's joined flag is preset so its NPC stays

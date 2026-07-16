@@ -350,7 +350,11 @@ export class FieldScene {
     // walked a few tiles (once per session, tracked on `game`).
     this.hintLabel = label('방향키 이동 · Z 조사 · X 메뉴 · I 소지품 · M 지도 · Q 퀘스트', FS.caption, HEX.textMute);
     this.hintLabel.anchor = { x: 0.5, y: 1 };
-    this.hud.addChild(this.banner, this.minimap, this.fieldHud, this.hintLabel);
+    // 오토세이브 인디케이터 — saveNow(game._saveSeq 증가) 시 잠깐 떴다 사라진다.
+    this.saveToast = label('◆ 저장됨', FS.caption, HEX.gold);
+    this.saveToast.anchor = { x: 1, y: 1 };
+    this.saveToast.alpha = 0;
+    this.hud.addChild(this.banner, this.minimap, this.fieldHud, this.hintLabel, this.saveToast);
     this.container.addChild(this.hud);
     // Interaction prompt ("Z") that floats over a faced interactable. Lives on
     // `world` (not props) so buildObjects' clear doesn't remove it.
@@ -484,6 +488,7 @@ export class FieldScene {
     this.hintLabel.x = w / 2;
     this.hintLabel.y = h - 14;
     this.hintLabel.visible = !this.game.tutHintDone;
+    if (this.saveToast) { this.saveToast.x = w - 16; this.saveToast.y = h - 12; }
   }
 
   // Top-right minimap: walls/floor + portals (cyan), boss (red), chests (gold),
@@ -1927,6 +1932,13 @@ export class FieldScene {
   }
 
   update(dt) {
+    // 오토세이브 인디케이터 — saveSeq 증가 감지 시 토스트 페이드 (busy여도 계속 갱신).
+    if (this.saveToast) {
+      if (this._lastSaveSeq === undefined) this._lastSaveSeq = this.game._saveSeq || 0;
+      else if (this.game._saveSeq !== this._lastSaveSeq) { this._lastSaveSeq = this.game._saveSeq; this._saveToastT = 1.4; }
+      if (this._saveToastT > 0) { this._saveToastT -= dt; this.saveToast.alpha = Math.min(1, this._saveToastT); }
+      else this.saveToast.alpha = 0;
+    }
     if (this.busy) { if (this.prompt) this.prompt.visible = false; return; }
     const input = this.game.input;
     if (this.moving && this.prompt) this.prompt.visible = false;
