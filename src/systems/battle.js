@@ -51,18 +51,25 @@ export function physicalDamage(attacker, target, rng, heavyMult = 1) {
   if (target.defending) dmg *= 0.5;
   // 기본 공격도 장착 무기 속성의 상성을 탄다 (물리 클래스가 원소 무기로 약점을
   // 노릴 수 있게). weaponElement 없는 유닛(적·비무장)은 elementMultiplier(null)=×1.
-  dmg *= elementMultiplier(attacker.weaponElement, target);
-  dmg *= executeMult(attacker, target); // 처형(execute): 저체력 대상 마무리 배수 (상성 뒤)
+  const affMul = elementMultiplier(attacker.weaponElement, target);
+  dmg *= affMul;
+  dmg *= condMult(attacker, target, affMul > 1); // 조건부 공격 패시브 (상성 뒤·크리 앞)
   return Math.max(1, Math.floor(dmg));
 }
 
-// 처형(execute) passive: 대상 HP가 EXECUTE_THRESHOLD(30%) 이하면 피해 ×(1+execute).
-// 상성 뒤·크리 앞의 조건부 곱연산(스펙 파이프라인). passive 없으면 ×1.
+// 조건부 공격 패시브 곱연산 (스펙 파이프라인: 상성 → 조건부 → 크리). 장비/아티팩트
+// passive에서 합산된 값을 읽는다. `weak`=이번 타격이 약점(▲)이었는지. passive 없으면 ×1.
+//   execute: 대상 HP ≤ EXECUTE_THRESHOLD(30%) → ×(1+execute)  [처형 도끼]
+//   hpBelow50: 공격자 HP ≤ 50% → ×(1+hpBelow50)               [광전사의 인장]
+//   weaknessDmg: 약점 타격 시 → ×(1+weaknessDmg)              [원소 촉매]
 export const EXECUTE_THRESHOLD = 0.3;
-export function executeMult(attacker, target) {
-  const ex = attacker.passives && attacker.passives.execute;
-  if (ex > 0 && target.maxHp && target.hp <= target.maxHp * EXECUTE_THRESHOLD) return 1 + ex;
-  return 1;
+export function condMult(attacker, target, weak) {
+  const p = attacker.passives; if (!p) return 1;
+  let m = 1;
+  if (p.execute > 0 && target.maxHp && target.hp <= target.maxHp * EXECUTE_THRESHOLD) m *= (1 + p.execute);
+  if (p.hpBelow50 > 0 && attacker.maxHp && attacker.hp <= attacker.maxHp * 0.5) m *= (1 + p.hpBelow50);
+  if (p.weaknessDmg > 0 && weak) m *= (1 + p.weaknessDmg);
+  return m;
 }
 
 // Physical SKILL damage — atk-scaled (respects def, like a basic attack) instead
@@ -89,8 +96,9 @@ export function skillDamage(spell, attacker, target, rng) {
   const element = spell.element === 'physical' && attacker.weaponElement
     ? attacker.weaponElement
     : spell.element;
-  dmg *= elementMultiplier(element, target);
-  dmg *= executeMult(attacker, target); // 처형: 물리 스킬도 저체력 마무리 배수
+  const affMul = elementMultiplier(element, target);
+  dmg *= affMul;
+  dmg *= condMult(attacker, target, affMul > 1); // 처형/광전사/촉매: 물리 스킬에도 조건부 배수
   return Math.max(1, Math.floor(dmg));
 }
 
@@ -134,7 +142,13 @@ export function monsterSkillDamage(actor, target, skill, rng) {
 // the caster's magicScale, then by elemental affinity vs the target's family.
 export function magicDamage(spell, target, rng, caster) {
   let dmg = spell.power * magicScale(caster) * VARIANCE(rng);
-  dmg *= elementMultiplier(spell.element, target);
+  const affMul = elementMultiplier(spell.element, target);
+  dmg *= affMul;
+  const p = caster && caster.passives;
+  if (p) {
+    if (p.spellDmg > 0) dmg *= (1 + p.spellDmg);              // 현자의 눈: 주문 위력
+    if (p.weaknessDmg > 0 && affMul > 1) dmg *= (1 + p.weaknessDmg); // 원소 촉매: 약점 주문 강화
+  }
   if (target.defending) dmg *= 0.5;
   return Math.max(1, Math.floor(dmg));
 }

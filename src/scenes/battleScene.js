@@ -20,6 +20,7 @@ import { getSpell } from '../content/spells.js';
 import { getMonsterSkill } from '../content/monsterSkills.js';
 import { getMonster } from '../content/monsters.js';
 import { getItem, equipBonus as gearBonus, equipPassives as gearPassives, equipWeaponElement, itemSummary, itemKindKR } from '../content/items.js';
+import { artifactPassives, artifactSlotCount, mergePassives } from '../content/artifacts.js';
 import { statusDesc } from '../content/statusInfo.js';
 import { enemyUrl, heroUrl, heroWalkUrl, heroAttackUrl, structureUrl, ATTACK_FRAMES } from '../util/assets.js';
 import { makeSprite, swapTexture, preload, loadSheet, shadowTexture } from '../engine/renderer.js';
@@ -99,7 +100,7 @@ export class BattleScene {
     for (const refId of active.slice(0, 4)) {
       const p = rt.party.find((m) => m.refId === refId);
       if (p) {
-        this.heroUnits.push(buildHeroUnit(p.refId, p.level, { id: p.refId, hp: p.hp, mp: p.mp, equip: equipBonus(p), passives: gearPassives(p.equip), weaponElement: equipWeaponElement(p.equip) }));
+        this.heroUnits.push(this.buildHeroWithArtifacts(p));
         continue;
       }
       const a = (rt.allies || []).find((x) => x.refId === refId);
@@ -832,6 +833,25 @@ export class BattleScene {
         if (!this.game.audio.playElement?.('impact', 'heal')) this.game.audio.play('heal_chime');
       } else if (ev.type === 'death') this.game.audio.play('enemy_death');
     }
+  }
+
+  // Build a hero battle unit folding BOTH gear passives + equipped artifacts into
+  // one unified passive/stat stack (unitPassives = gear + artifacts). Artifact stat
+  // `mods` add to equipBonus; artifact `passive` merges with gear passives; survive1hp
+  // (불굴) primes lastStand. Slots are level-gated (1/8/16 → 1/2/3), so over-equipped
+  // saves only apply the first N. Scene-side triggers (battleEnd/onKill/fpGain) are
+  // read in endBattle via artifactPassives(...).trigger.
+  buildHeroWithArtifacts(p) {
+    const rt = this.game.runtime;
+    const stored = (rt.artifacts && rt.artifacts.equipped && rt.artifacts.equipped[p.refId]) || [];
+    const equipped = stored.slice(0, artifactSlotCount(p.level)).filter(Boolean);
+    const art = artifactPassives(equipped, p.refId);
+    const passives = mergePassives(gearPassives(p.equip), art.passive);
+    const eb = equipBonus(p);
+    for (const k in art.mods) eb[k] = (eb[k] || 0) + Math.round(art.mods[k]);
+    const unit = buildHeroUnit(p.refId, p.level, { id: p.refId, hp: p.hp, mp: p.mp, equip: eb, passives, weaponElement: equipWeaponElement(p.equip) });
+    if (passives.survive1hp) unit.lastStand = true; // 불굴의 문장: 치명상 1회 생존
+    return unit;
   }
 
   // Effective elemental affinity of a hit event vs its target's family, so the

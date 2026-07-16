@@ -38,6 +38,8 @@ export function freshSave() {
     playtime: 0,
     // 룬게이트 빠른이동 — 활성화한 맵 id 목록(현지 룬게이트 상호작용 시 추가). 마을 기본 활성.
     runegates: ['town'],
+    // 아티팩트: owned=보유 id 배열, equipped=클래스별 장착 슬롯(id|null 배열). 판매 불가.
+    artifacts: { owned: [], equipped: {} },
     // 도감(Bestiary): refIds of every monster the party has faced in battle.
     seen: [],
     // Quest log: { questId: 'active' | 'done' } (see content/quests.js).
@@ -165,6 +167,15 @@ export function validateSave(raw) {
     playtime: Number.isFinite(d.playtime) && d.playtime >= 0 ? Math.round(d.playtime) : 0,
     // 룬게이트 활성 맵 (문자열 id, 중복 제거). 구 세이브는 최소 'town' 보장.
     runegates: (() => { const a = Array.isArray(d.runegates) ? [...new Set(d.runegates.filter((x) => typeof x === 'string'))] : []; if (!a.includes('town')) a.push('town'); return a; })(),
+    artifacts: (() => {
+      const src = d.artifacts && typeof d.artifacts === 'object' ? d.artifacts : {};
+      const owned = Array.isArray(src.owned) ? [...new Set(src.owned.filter((x) => typeof x === 'string'))] : [];
+      const eq = {};
+      if (src.equipped && typeof src.equipped === 'object') {
+        for (const cls in src.equipped) if (Array.isArray(src.equipped[cls])) eq[cls] = src.equipped[cls].map((x) => (typeof x === 'string' ? x : null));
+      }
+      return { owned, equipped: eq };
+    })(),
     // 도감 seen-monster ids (string refIds, deduped).
     seen: Array.isArray(d.seen) ? [...new Set(d.seen.filter((s) => typeof s === 'string'))] : [],
     // Quest log: keep only string keys whose state is 'active' | 'done'.
@@ -274,6 +285,7 @@ export function toRuntime(save) {
     openedChests: [...(save.openedChests || [])],
     playtime: save.playtime || 0,
     runegates: [...(save.runegates || ['town'])],
+    artifacts: { owned: [...((save.artifacts && save.artifacts.owned) || [])], equipped: JSON.parse(JSON.stringify((save.artifacts && save.artifacts.equipped) || {})) },
     seen: [...(save.seen || [])],
     quests: { ...(save.quests || {}) },
     questlines: Object.fromEntries(Object.entries(save.questlines || {}).map(([k, v]) => [k, { ...v }])),
@@ -304,6 +316,7 @@ export function runtimeToSave(runtime) {
     openedChests: [...(runtime.openedChests || [])],
     playtime: Math.round(runtime.playtime || 0),
     runegates: [...(runtime.runegates || ['town'])],
+    artifacts: { owned: [...((runtime.artifacts && runtime.artifacts.owned) || [])], equipped: JSON.parse(JSON.stringify((runtime.artifacts && runtime.artifacts.equipped) || {})) },
     seen: [...(runtime.seen || [])],
     quests: { ...(runtime.quests || {}) },
     questlines: Object.fromEntries(Object.entries(runtime.questlines || {}).map(([k, v]) => [k, { ...v }])),

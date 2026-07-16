@@ -411,6 +411,7 @@ describe('toRuntime ∘ runtimeToSave round-trip (Gotcha #11 게이트)', () => 
       talkedNpcs: ['enoch_act1'],
       runegates: ['town', 'wild', 'dungeon'],
       playtime: 4200,
+      artifacts: { owned: ['lens', 'rearward'], equipped: { huntress: ['lens', null], knight: ['unbroken'] } },
       ngPlus: 2,
       fabula: 3,
       bonds: { 'knight|warrior': ['loyalty'] },
