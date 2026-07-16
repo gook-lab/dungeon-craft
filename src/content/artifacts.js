@@ -38,7 +38,7 @@ export const ARTIFACTS = {
   lens:        { id: 'lens', name: '정밀 렌즈', rarity: 'rare', cat: '공격', affinity: 'huntress', source: '설원 보상', passive: { crit: 0.12 } },
   catalyst:    { id: 'catalyst', name: '원소 촉매', rarity: 'rare', cat: '공격', affinity: 'mage', source: '늪 보상', passive: { weaknessDmg: 0.15 } },
   berserk_seal:{ id: 'berserk_seal', name: '광전사의 인장', rarity: 'rare', cat: '공격', affinity: 'warrior', source: '지하 묘지 상자', passive: { hpBelow50: 0.25 } },
-  clawgrip:    { id: 'clawgrip', name: '연격의 발톱', rarity: 'rare', cat: '공격', affinity: 'duelist', source: '항구 상자', passive: { crit: 0.10 } },
+  clawgrip:    { id: 'clawgrip', name: '연격의 발톱', rarity: 'rare', cat: '공격', affinity: 'duelist', source: '수로 상자', passive: { bleedChance: 0.20 } },
   sage_eye:    { id: 'sage_eye', name: '현자의 눈', rarity: 'legend', cat: '공격', affinity: 'mage', source: '황좌 상자', passive: { spellDmg: 0.18, spellMpCut: 1 } },
   // --- 생존 ---
   wardrune:    { id: 'wardrune', name: '수호룬', rarity: 'rare', cat: '생존', affinity: null, source: '제국 상자', passive: { dmgReduce: 0.10 } },

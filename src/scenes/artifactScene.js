@@ -153,6 +153,7 @@ function artifactDesc(a) {
   const p = a.passive || {}, m = a.mods || {}, t = a.trigger || {};
   const pct = (v) => `${Math.round(v * 100)}%`;
   if (p.crit) parts.push(`치명 +${pct(p.crit)}`);
+  if (p.bleedChance) parts.push(`적중 시 ${pct(p.bleedChance)} 출혈`);
   if (p.lifesteal) parts.push(`흡혈 ${pct(p.lifesteal)}`);
   if (p.weaknessDmg) parts.push(`약점 피해 +${pct(p.weaknessDmg)}`);
   if (p.hpBelow50) parts.push(`HP50%↓ 공격 +${pct(p.hpBelow50)}`);

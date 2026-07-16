@@ -539,7 +539,7 @@ export function resolveAction(state, action, rng) {
     if (crit) dmg = Math.floor(dmg * CRIT_MULT);
     events.push({ type: 'attack', actorId: actor.id, targetId: target.id, amount: dmg, heavy: !!action.heavy, crit });
     dealDamage(state, target, dmg, events);
-    applyOnHit(state, actor, target, dmg, true, events); // 흡혈/가시 (기본공격=근접)
+    applyOnHit(state, actor, target, dmg, true, events, rng); // 흡혈/가시/출혈 (기본공격=근접)
     // 반격(counter) passive (v1: 기본공격 피격만). 반격은 직접 dealDamage라 재반격
     // 없음(재귀 가드). 살아있는 반대편 피격자만 — 죽으면 반격 없음.
     if (target.alive && target.side !== actor.side && actor.alive
@@ -941,8 +941,15 @@ function dealDamage(state, target, dmg, events) {
 // counter precedent). 흡혈(lifesteal): attacker heals a fraction of damage dealt.
 // 가시(thorns): a MELEE-hit defender reflects a fraction back to the attacker
 // (recursion-safe — direct hp write, honours the attacker's 불굴/lastStand).
-function applyOnHit(state, attacker, target, dmg, melee, events) {
+function applyOnHit(state, attacker, target, dmg, melee, events, rng) {
   if (dmg <= 0) return;
+  // 연격의 발톱(bleedChance): 적중 시 % 확률로 출혈(bleed). applyStatus가 언데드
+  // 면역을 처리하므로 실제로 걸렸을 때만 inflict 이벤트를 낸다.
+  const bc = attacker.passives && attacker.passives.bleedChance;
+  if (bc > 0 && target.alive && target.side !== attacker.side && rng && rng.next() < bc) {
+    applyStatus(target, 'bleed', 3);
+    if (target.status && target.status.bleed) events.push({ type: 'inflict', targetId: target.id, status: 'bleed' });
+  }
   const ls = attacker.passives && attacker.passives.lifesteal;
   if (ls > 0 && attacker.alive) {
     const heal = Math.min(attacker.maxHp - attacker.hp, Math.max(1, Math.floor(dmg * ls)));

@@ -34,7 +34,7 @@ export default {
     // 처단 전용 보상 — 저주의 성물(상점/일반 loot 미등록) + 골드. 원혼 너머에 놓여
     // 자연히 보스를 유발.
     { x: 3, y: 3, kind: 'chest', loot: { item: 'hex_reliquary' } },
-    { x: 16, y: 3, kind: 'chest', loot: { gold: 200 } },
+    { x: 16, y: 3, kind: 'chest', loot: { artifact: 'brand' } },
     // 분위기 프롭.
     { x: 8, y: 8, kind: 'prop', ref: 'prop_bone_pile_hd', tiles: 1.4, walkable: true },
     { x: 13, y: 9, kind: 'prop', ref: 'prop_rotten_log' },

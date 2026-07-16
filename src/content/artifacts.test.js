@@ -13,7 +13,7 @@ const placedArtifacts = (() => {
 // Passive/mod/trigger keys the resolver + scene actually read. An artifact naming
 // a key outside these lists is dead data (silently ignored) — same trap as the
 // equip-passive coverage guard.
-const REAL_PASSIVE = new Set(['crit', 'lifesteal', 'weaknessDmg', 'hpBelow50', 'execute', 'dmgReduce', 'survive1hp', 'spellDmg', 'spellMpCut']);
+const REAL_PASSIVE = new Set(['crit', 'lifesteal', 'weaknessDmg', 'hpBelow50', 'execute', 'dmgReduce', 'survive1hp', 'spellDmg', 'spellMpCut', 'bleedChance']);
 const REAL_MOD = new Set(['spd', 'atk', 'def', 'maxHp', 'maxMp']);
 const REAL_TRIGGER = new Set(['hpRegenEnd', 'mpRegenEnd', 'goldBonus', 'fpGain', 'recruitBonus']);
 const RARITIES = new Set(['common', 'rare', 'legend']);

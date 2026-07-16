@@ -38,6 +38,6 @@ export default {
     // 사이드 퀘스트 giver (자비 루트 스펙) — 마녀의 약탕 재료 의뢰 표식.
     { x: 12, y: 5, kind: 'sign', quest: 'q_witch' },
     // Hidden reward chest
-    { x: 3, y: 3, kind: 'chest', loot: { gold: 150 }, hidden: true },
+    { x: 3, y: 3, kind: 'chest', loot: { artifact: 'mercy_relic' }, hidden: true },
   ],
 };

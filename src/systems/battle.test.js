@@ -1283,6 +1283,19 @@ describe('accessory passives', () => {
     expect(events.some((e) => e.type === 'lifesteal')).toBe(true);
   });
 
+  it('bleedChance inflicts bleed on hit (undead immune)', () => {
+    const atkr = makeUnit({ id: 'h', side: 'hero', maxHp: 100, hp: 100, atk: 20, passives: { bleedChance: 0.9 } });
+    const tgt = makeUnit({ id: 'e', side: 'enemy', maxHp: 200, hp: 200, def: 0 });
+    const st = miniState([atkr, tgt]);
+    resolveAction(st, { type: 'attack', actorId: 'h', targetId: 'e' }, { next: () => 0.1 }); // 0.1 < 0.9 → bleed
+    expect(tgt.status.bleed).toBeGreaterThan(0);
+    // undead is immune
+    const und = makeUnit({ id: 'u', side: 'enemy', maxHp: 200, hp: 200, def: 0, family: 'undead' });
+    const st2 = miniState([makeUnit({ id: 'h2', side: 'hero', maxHp: 100, hp: 100, atk: 20, passives: { bleedChance: 0.9 } }), und]);
+    resolveAction(st2, { type: 'attack', actorId: 'h2', targetId: 'u' }, { next: () => 0.1 });
+    expect(und.status.bleed || 0).toBe(0);
+  });
+
   it('thorns reflects damage to a melee attacker (recursion-safe)', () => {
     const atkr = makeUnit({ id: 'e', side: 'enemy', maxHp: 100, hp: 100, atk: 20 });
     const tgt = makeUnit({ id: 'h', side: 'hero', maxHp: 200, hp: 200, def: 0, passives: { thorns: 0.5 } });

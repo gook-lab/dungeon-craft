@@ -175,7 +175,7 @@ export default {
     // 탐험 보상 — 히든 상자(2026-07-16 페이싱 패스): 경로 밖 배치, content.test 도달성 검증.
     { x: 59, y: 15, kind: 'chest', loot: { artifact: 'sage_eye' } },
     { x: 49, y: 8, kind: 'chest', loot: { item: 'herb' } },
-    { x: 52, y: 14, kind: 'chest', loot: { artifact: 'mercy_relic' } },
+    { x: 52, y: 14, kind: 'chest', loot: { gold: 100 } },
     { x: 59, y: 21, kind: 'chest', loot: { item: 'antidote' } },
     // 역참 폐허의 모닥불 — 늪↔관문 대여정의 중간 쉼터 (여관 동작 재사용).
     { x: 10, y: 19, kind: "npc", ref: "elder", dir: "south", talk: "waystation_fire", label: "역참지기" },
