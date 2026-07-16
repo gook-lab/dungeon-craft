@@ -499,6 +499,23 @@ describe('mercy: canMercy / canRecruit eligibility', () => {
   });
 });
 
+describe('mercy: recruitBonus passive (자비의 성물)', () => {
+  it('actor.passives.recruitBonus raises recruit chance', () => {
+    // Enemy at 30% HP (mercy-eligible) → base chance ~0.73. rng.next()=0.8 fails
+    // base, but +0.15 → ~0.88 succeeds. (Higher HP = not mercy-eligible.)
+    const mk = () => { const e = buildEnemyUnit('goblin'); e.hp = Math.floor(e.maxHp * 0.3); return e; };
+    const h1 = buildHeroUnit('knight', 1); const e1 = mk();
+    const s1 = createBattle([h1], [e1]);
+    resolveAction(s1, { type: 'mercy', mode: 'recruit', actorId: 'knight', targetId: e1.id }, { next: () => 0.8 });
+    expect(e1.resolved).not.toBe('recruited'); // base ~0.73 < 0.8 → fail
+
+    const h2 = buildHeroUnit('knight', 1); h2.passives = { recruitBonus: 0.15 }; const e2 = mk();
+    const s2 = createBattle([h2], [e2]);
+    resolveAction(s2, { type: 'mercy', mode: 'recruit', actorId: 'knight', targetId: e2.id }, { next: () => 0.8 });
+    expect(e2.resolved).toBe('recruited'); // ~0.73+0.15=0.88 > 0.8 → success
+  });
+});
+
 describe('mercy: spare', () => {
   it('spare removes the enemy from the field, counts mercy, and still grants xp', () => {
     const h = buildHeroUnit('warrior', 1);

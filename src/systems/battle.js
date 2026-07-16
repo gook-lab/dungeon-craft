@@ -675,7 +675,9 @@ export function resolveAction(state, action, rng) {
       if (!canRecruit(target)) { events.push({ type: 'fizzle', actorId: actor.id, reason: 'recruit' }); return { events }; }
       // Recruit chance scales with how weakened the target is (1 - hp/maxHp):
       // a near-dead enemy is almost certain, a just-eligible one is a coin flip.
-      const chance = 1 - target.hp / target.maxHp;
+      // 자비의 성물(actor.passives.recruitBonus): +확률 (캡 0.95, 확정영입 방지).
+      const bonus = (actor.passives && actor.passives.recruitBonus) || 0;
+      const chance = Math.min(0.95, (1 - target.hp / target.maxHp) + bonus);
       const ok = (rng ? rng.next() : 0.5) < chance;
       if (ok) {
         target.alive = false;          // leaves the enemy side (isOver victory works)

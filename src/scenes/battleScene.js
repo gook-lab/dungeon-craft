@@ -849,6 +849,9 @@ export class BattleScene {
     const passives = mergePassives(gearPassives(p.equip), art.passive);
     const eb = equipBonus(p);
     for (const k in art.mods) eb[k] = (eb[k] || 0) + Math.round(art.mods[k]);
+    // 자비의 성물(recruitBonus)은 trigger지만 리졸버의 채용 롤이 actor.passives에서
+    // 읽도록 passives로 접합 — 이 유물을 낀 영웅이 자비를 행하면 영입 확률 상승.
+    if (art.trigger.recruitBonus) passives.recruitBonus = (passives.recruitBonus || 0) + art.trigger.recruitBonus;
     const unit = buildHeroUnit(p.refId, p.level, { id: p.refId, hp: p.hp, mp: p.mp, equip: eb, passives, weaponElement: equipWeaponElement(p.equip) });
     if (passives.survive1hp) unit.lastStand = true; // 불굴의 문장: 치명상 1회 생존
     return unit;
@@ -1173,9 +1176,7 @@ export class BattleScene {
     for (const u of this.heroUnits) {
       if (u.alive && u.hp > 0 && u.hp <= u.maxHp * 0.5 && !this.crisisAwarded.has(u.id)) {
         this.crisisAwarded.add(u.id);
-        const before = this.game.runtime.fabula || 0;
-        this.game.runtime.fabula = Math.min(6, before + 1);
-        if (this.game.runtime.fabula > before) this.game.audio?.play('phase');
+        if (this.game.gainFP(1) > 0) this.game.audio?.play('phase'); // 운명석 fpGain 반영
         // 애정 surge: partners bonded by affection rally when a friend falls into
         // Crisis (the deferred Crisis-partner-atk, now powered by the emotion).
         for (const pid of partnersWithEmotion(this.game.runtime.bonds || {}, u.refId, 'affection')) {
@@ -1630,10 +1631,9 @@ export class BattleScene {
     else if (it.effect.mp) { const b = t.mp; t.mp = Math.min(t.maxMp, t.mp + it.effect.mp); this.queueMsg(`${t.name}의 MP가 ${t.mp - b} 회복!`); }
     else if (it.effect.cure) { const ok = cureStatus(t, it.effect.cure); this.queueMsg(ok ? `${t.name}의 ${STATUS_KR[it.effect.cure]} 상태가 치료됐다!` : '아무 효과도 없었다.'); }
     else if (it.effect.fabula) {
-      const before = this.game.runtime.fabula || 0;
-      this.game.runtime.fabula = Math.min(FABULA_CAP, before + it.effect.fabula);
+      const g = this.game.gainFP(it.effect.fabula); // 운명석 fpGain 반영
       this.updateFabulaBadge();
-      this.queueMsg(`운명의 모래시계가 깨졌다 — ✦운명 +${this.game.runtime.fabula - before}!`);
+      this.queueMsg(`운명의 모래시계가 깨졌다 — ✦운명 +${g}!`);
     }
     this.game.runtime.inventory[itemId] = Math.max(0, (this.game.runtime.inventory[itemId] || 1) - 1);
     this.game.audio.play('heal_chime');
@@ -1988,9 +1988,7 @@ export class BattleScene {
       const u = this.heroUnits.find((h) => h.refId === refId);
       if (!u || !u.alive || this.flawAwarded.has(refId)) return;
       this.flawAwarded.add(refId);
-      const before = this.game.runtime.fabula || 0;
-      this.game.runtime.fabula = Math.min(6, before + 1);
-      if (this.game.runtime.fabula > before) { this.queueMsg(msg); this.game.audio?.play('phase'); this.updateFabulaBadge(); }
+      if (this.game.gainFP(1) > 0) { this.queueMsg(msg); this.game.audio?.play('phase'); this.updateFabulaBadge(); }
     };
     const actor = action && action.actorId ? findUnit(this.state, action.actorId) : null;
     if (action && action.type === 'attack' && actor && actor.refId === 'knight' && actor.hp <= actor.maxHp * 0.5)

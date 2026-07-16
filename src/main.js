@@ -386,6 +386,28 @@ async function main() {
     if (!Array.isArray(game.runtime.active)) game.runtime.active = [];
     if (!game.runtime.active.includes(refId) && game.runtime.active.length < MAX_ACTIVE) game.runtime.active.push(refId);
   };
+  // 운명(FP) 획득의 단일 관문 — 모든 FP 적립(위기/결점/자비/아이템)이 여기를 지난다.
+  // 운명석(fatestone, trigger.fpGain) 장착 시 획득량 ×(1+fpGain)을 분수 캐리(_fpCarry)로
+  // 누적해 정수 문턱을 넘을 때 보너스 FP를 지급(+1 단위 적립이라 확률 아닌 결정적 누적).
+  // 반환: 실제 증가한 FP 수(0이면 캡 도달 → 호출부가 연출 스킵). _fpCarry는 런타임 전용.
+  game.gainFP = (n) => {
+    const rt = game.runtime;
+    const before = rt.fabula || 0;
+    rt.fabula = Math.min(FABULA_CAP, before + n);
+    const gained = rt.fabula - before;
+    const activeSet = (rt.active && rt.active.length) ? rt.active : rt.party.map((p) => p.refId);
+    let mult = 0;
+    for (const p of rt.party) {
+      if (!activeSet.includes(p.refId)) continue;
+      const eq = ((rt.artifacts?.equipped?.[p.refId]) || []).slice(0, artifactSlotCount(p.level)).filter(Boolean);
+      mult += artifactPassives(eq, p.refId).trigger.fpGain || 0;
+    }
+    if (gained > 0 && mult > 0) {
+      rt._fpCarry = (rt._fpCarry || 0) + gained * mult;
+      if (rt._fpCarry >= 1) { const b = Math.floor(rt._fpCarry); rt._fpCarry -= b; rt.fabula = Math.min(FABULA_CAP, rt.fabula + b); }
+    }
+    return rt.fabula - before;
+  };
   game.showLines = (speaker, lines, afterClose) =>
     scenes.push(new DialogScene(game), { speaker, lines, afterClose: afterClose || (() => game.resumeField()) });
 
@@ -540,9 +562,8 @@ async function main() {
       // resource; the durable mercy reward is Bonds (below). Balance-tuned via
       // scripts/balance.js: per-enemy FP made rally spammable → bosses trivial.
       if ((state.mercied || 0) > 0) {
-        const before = game.runtime.fabula || 0;
-        game.runtime.fabula = Math.min(FABULA_CAP, before + 1);
-        if (game.runtime.fabula > before) msgs.push('운명의 실(파불라 포인트) +1');
+        const g = game.gainFP(1); // 운명석 fpGain 배수 반영
+        if (g > 0) msgs.push(`운명의 실(파불라 포인트) +${g}`);
       }
       // Bonds: each of three axes deepens on a battle event, and the POLE it
       // grows is set by whether you showed mercy this fight — the merciful path
