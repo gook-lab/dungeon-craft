@@ -179,6 +179,11 @@ export default {
   drops: [{"x":27,"y":16},{"x":27,"y":17},{"x":27,"y":18},{"x":27,"y":19},{"x":27,"y":20}],
   spawn: {"x":40,"y":49},
   objects: [
+    // 탐험 보상 — 히든 상자(2026-07-16 페이싱 패스): 경로 밖 배치, content.test 도달성 검증.
+    { x: 2, y: 1, kind: 'chest', loot: { gold: 30 } },
+    { x: 77, y: 1, kind: 'chest', loot: { item: 'herb' } },
+    { x: 1, y: 7, kind: 'chest', loot: { gold: 45 } },
+    { x: 8, y: 1, kind: 'chest', loot: { item: 'antidote' } },
     // 대형맵 볼거리 보강 (2026-07-15 밀도 패스)
     {x: 12, y: 44, kind: "chest", loot: {gold: 60}},
     {x: 10, y: 46, kind: "prop", ref: "prop_mossy_boulder", tiles: 1.6, walkable: true},
