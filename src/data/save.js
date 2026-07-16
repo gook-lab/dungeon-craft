@@ -59,6 +59,10 @@ export function freshSave() {
     bonds: {},
     // 회차+ (NG+): 0 = 1회차. 회차마다 적 스탯 +25%/골드 +15% (씬 레이어 스케일).
     ngPlus: 0,
+    // bossFate: per-boss choice outcome (spared|slain) for branchFlag gates.
+    // karma: cumulative mercy/execute tally (mercy +1 / execute -1) for regional divergence.
+    bossFate: {},
+    karma: 0,
     // mercied/slain drive the playstyle-reactive dialogue + ending branch.
     flags: {
       bossDefeated: false, frostBossDefeated: false, swampBossDefeated: false,
@@ -194,6 +198,13 @@ export function validateSave(raw) {
         .map(([k, v]) => [k, [...new Set(v.filter((e) => EMOTIONS.includes(e)))].slice(0, MAX_EMOTIONS_PER_PAIR)])
         .filter(([, v]) => v.length))
       : {},
+    // bossFate: per-boss outcome tracking (e.g., { bog_witch: 'spared' }).
+    bossFate: (d.bossFate && typeof d.bossFate === 'object' && !Array.isArray(d.bossFate))
+      ? Object.fromEntries(Object.entries(d.bossFate)
+        .filter(([k, v]) => typeof k === 'string' && (v === 'spared' || v === 'slain')))
+      : {},
+    // karma: cumulative mercy/execute tally for regional gating.
+    karma: Number.isFinite(d.karma) ? Math.max(-100, Math.min(100, Math.floor(d.karma))) : 0,
     flags: {
       bossDefeated: d.flags ? d.flags.bossDefeated === true : false,
       frostBossDefeated: d.flags ? d.flags.frostBossDefeated === true : false,
@@ -266,6 +277,8 @@ export function toRuntime(save) {
     fabula: save.fabula || 0,
     bonds: { ...(save.bonds || {}) },
     ngPlus: save.ngPlus || 0,
+    bossFate: { ...(save.bossFate || {}) },
+    karma: save.karma || 0,
     flags: { ...save.flags },
   };
 }
@@ -294,6 +307,8 @@ export function runtimeToSave(runtime) {
     fabula: runtime.fabula || 0,
     bonds: { ...(runtime.bonds || {}) },
     ngPlus: runtime.ngPlus || 0,
+    bossFate: { ...(runtime.bossFate || {}) },
+    karma: runtime.karma || 0,
     flags: { ...runtime.flags },
   };
 }

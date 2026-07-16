@@ -594,6 +594,12 @@ async function main() {
         if (opts.bossObj.branchFlag) {
           const outcome = branchOutcome(state, opts.bossObj.ref);
           game.runtime.flags[`${opts.bossObj.branchFlag}_${outcome}`] = true;
+          // Record the per-boss outcome in bossFate for broader regional routing.
+          if (!game.runtime.bossFate) game.runtime.bossFate = {};
+          game.runtime.bossFate[opts.bossObj.ref] = outcome;
+          // Update karma (mercy +1 / execute -1) for regional divergence gates.
+          if (!game.runtime.karma) game.runtime.karma = 0;
+          game.runtime.karma += outcome === 'spared' ? 1 : -1;
         }
         // Ending branch by mercy ratio: merciful (≥70% spared) / ruthless
         // (≥70% slain) / mixed. Boss win dialog can opt in via win_merciful /
