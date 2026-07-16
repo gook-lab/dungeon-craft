@@ -4,7 +4,10 @@
 import * as PIXI from 'pixi.js';
 import { windowBox, label, numLabel, menuList, frame } from '../ui/uikit.js';
 import { HEX, FS, FONT } from '../ui/tokens.js';
-import { ITEMS, getItem, MAX_UPGRADE, upgradeCost, itemSummary, itemKindKR } from '../content/items.js';
+import { ITEMS, getItem, MAX_UPGRADE, upgradeCost, itemSummary, itemKindKR, passiveParts } from '../content/items.js';
+
+const STAT_KR = { atk: '공격', def: '수비', spd: '속도', maxHp: 'HP', maxMp: 'MP' };
+const CMP_STATS = ['atk', 'def', 'spd', 'maxHp', 'maxMp'];
 
 const HERO_KR = { knight: '기사', warrior: '전사', huntress: '사냥꾼', mage: '마법사', duelist: '쌍검사' };
 const heroKR = (refId) => HERO_KR[refId] || refId;
@@ -63,8 +66,10 @@ export class ShopScene {
     this.opaque = false;
     this.container = new PIXI.Container();
     this.layer = new PIXI.Container();
-    this.container.addChild(this.layer);
+    this.compareLayer = new PIXI.Container(); // 2열 비교 패널 (커서 이동마다 갱신)
+    this.container.addChild(this.layer, this.compareLayer);
     this.index = 0;
+    this.cmpHero = 0; // 비교 기준 영웅 (▲▼ 아님 — Tab로 순환)
   }
 
   enter(args = {}) {
@@ -205,10 +210,12 @@ export class ShopScene {
     this.winStart = winStart;
 
     const m = menuList(visible, { width: 300 });
-    const mx = w / 2 - m.width / 2;
+    // 2열 레이아웃: 목록을 좌측으로 당기고 우측에 장착-대비 비교 패널을 둔다.
+    const mx = Math.max(40, w * 0.30 - m.width / 2);
     m.container.x = mx; m.container.y = listY;
     this.layer.addChild(m.container);
     this.menu = m; m.setIndex(this.index - winStart);
+    this._listRight = mx + m.width; this._listTop = listY;
 
     // ▲/▼ scroll markers.
     if (winStart > 0) { const up = label('▲', FS.caption, HEX.gold); up.anchor = { x: 0.5, y: 1 }; up.x = mx + m.width / 2; up.y = listY - 2; this.layer.addChild(up); }
@@ -237,6 +244,47 @@ export class ShopScene {
         : getItem(this.curIds[this.index]);
     }
     this.tipLabel.text = it ? `${it.name} — ${itemKindKR(it)} · ${itemSummary(it)}` : '';
+    this.renderCompare();
+  }
+
+  // 2열 비교 패널: 커서의 장비(무기/방어구/장신구)를 비교 기준 영웅의 장착 아이템과
+  // 스탯 대비(▲상승 녹 / ▼하락 적 / = 동일). Tab로 기준 영웅 순환. 강화 모드는 자체
+  // +N 흐름이라 스킵. 소비/비장비 아이템도 스킵.
+  renderCompare() {
+    this.compareLayer.removeChildren();
+    if (this.mode === 'upgrade' || this.index >= this.itemsLen) return;
+    const id = this.mode === 'sell' ? this.curIds[this.index] : this.curIds[this.index];
+    const it = id && getItem(id);
+    if (!it || !['weapon', 'armor', 'accessory'].includes(it.kind)) return;
+    const { w, h } = this.game.renderer.screen;
+    const px = Math.min(this._listRight + 30, w - 380);
+    const pw = Math.min(360, w - px - 30);
+    const py = this._listTop;
+    const box = windowBox(pw, 300); box.x = px; box.y = py; this.compareLayer.addChild(box);
+
+    const party = this.game.runtime.party;
+    const lead = party[this.cmpHero % party.length];
+    const cur = lead && getItem((lead.equip || {})[it.kind]);
+    const title = label(`${it.name}`, FS.label, HEX.gold); title.x = px + 16; title.y = py + 14; this.compareLayer.addChild(title);
+    const sub = label(`${itemKindKR(it)} · ${it.price ? it.price + 'G' : '보상'}`, FS.caption, HEX.textMute); sub.x = px + 16; sub.y = py + 36; this.compareLayer.addChild(sub);
+    const vs = label(`vs ${heroKR(lead.refId)} 장착: ${cur ? cur.name : '없음'}   [Tab 영웅]`, FS.caption, HEX.textSoft);
+    vs.x = px + 16; vs.y = py + 56; this.compareLayer.addChild(vs);
+
+    let ry = py + 84;
+    for (const stat of CMP_STATS) {
+      const nv = it[stat] || 0, cv = cur ? (cur[stat] || 0) : 0;
+      if (nv === 0 && cv === 0) continue;
+      const d = nv - cv;
+      const nm = label(STAT_KR[stat], FS.caption, HEX.textSoft); nm.x = px + 20; nm.y = ry; this.compareLayer.addChild(nm);
+      const val = label(String(nv), FS.stat, HEX.text); val.anchor.set(1, 0); val.x = px + 150; val.y = ry; this.compareLayer.addChild(val);
+      const arrow = d > 0 ? `▲ +${d}` : d < 0 ? `▼ ${d}` : '=';
+      const col = d > 0 ? 0x6ad06a : d < 0 ? 0xe25563 : HEX.textMute;
+      const dl = label(arrow, FS.caption, col); dl.x = px + 168; dl.y = ry + 1; this.compareLayer.addChild(dl);
+      ry += 24;
+    }
+    // 특수효과(passive) 비교 — 신규 아이템의 passive 나열 (▸)
+    for (const part of passiveParts(it.passive)) { const p = label(`▸ ${part}`, FS.caption, HEX.goldGlow); p.x = px + 20; p.y = ry; this.compareLayer.addChild(p); ry += 20; }
+    if (it.element) { const e = label(`▸ 속성: ${it.element}`, FS.caption, HEX.info); e.x = px + 20; e.y = ry; this.compareLayer.addChild(e); ry += 20; }
   }
 
   update() {
@@ -252,6 +300,7 @@ export class ShopScene {
       this.tab = (this.tab + (input.pressed('left') ? t - 1 : 1)) % t;
       this.index = 0; this.game.audio?.play('menu_cursor'); this.render(); return;
     }
+    if (input.pressed('tab')) { this.cmpHero = (this.cmpHero + 1) % this.game.runtime.party.length; this.game.audio?.play('menu_cursor'); this.renderCompare(); return; }
     if (input.pressed('cancel')) return this.close();
     if (input.pressed('confirm')) {
       if (this.index === this.exitIdx) return this.close();
