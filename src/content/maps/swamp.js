@@ -181,7 +181,7 @@ export default {
     // 탐험 보상 — 히든 상자(2026-07-16 페이싱 패스): 경로 밖 배치, content.test 도달성 검증.
     { x: 74, y: 45, kind: 'chest', loot: { gold: 90 } },
     { x: 73, y: 1, kind: 'chest', loot: { item: 'antidote' } },
-    { x: 68, y: 46, kind: 'chest', loot: { gold: 120 } },
+    { x: 68, y: 46, kind: 'chest', loot: { artifact: 'catalyst' } },
     { x: 74, y: 7, kind: 'chest', loot: { item: 'elixir' } },
     { x: 74, y: 39, kind: 'chest', loot: { item: 'herb' } },
     // 대형맵 볼거리 보강 (2026-07-15 밀도 패스)

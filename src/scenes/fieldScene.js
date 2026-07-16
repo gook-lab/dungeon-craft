@@ -14,6 +14,7 @@ import { heroUrl, heroWalkUrl, npcUrl, structureUrl, enemyUrl, pickupUrl } from 
 import { getItem } from '../content/items.js';
 import { recordVisit, isTalkTarget } from '../content/questlines.js';
 import { getQuest, isQuestComplete } from '../content/quests.js';
+import { getArtifact } from '../content/artifacts.js';
 import { worldNode } from '../content/worldmap.js';
 import { statsAtLevel, xpToReach } from '../systems/progression.js';
 import { loadSheet, makeSprite, swapTexture, shadowTexture } from '../engine/renderer.js';
@@ -2332,6 +2333,12 @@ export class FieldScene {
       const it = getItem(o.loot.item);
       this.game.runtime.inventory[o.loot.item] = (this.game.runtime.inventory[o.loot.item] || 0) + 1;
       msg = `보물상자를 열었다 — ${it ? it.name : o.loot.item}!`;
+    } else if (o.loot && o.loot.artifact) {
+      // 아티팩트 획득 — save.artifacts.owned에 추가(판매 불가, 중복 방지).
+      const art = getArtifact(o.loot.artifact);
+      const owned = (this.game.runtime.artifacts ||= { owned: [], equipped: {} }).owned;
+      if (!owned.includes(o.loot.artifact)) owned.push(o.loot.artifact);
+      msg = `✦ 유물을 발견했다 — ${art ? art.name : o.loot.artifact}!`;
     } else if (o.loot && o.loot.flag) {
       msg = o.loot.msg || '열쇠를 손에 넣었다!';
     }

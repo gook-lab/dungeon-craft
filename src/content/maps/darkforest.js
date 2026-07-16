@@ -140,7 +140,7 @@ export default {
     { x: 6, y: 10, kind: "prop", ref: "prop_wild_bush", tiles: 1.3, walkable: true },
     { x: 4, y: 14, kind: "sign", talk: "darkforest_sign" },
     { x: 35, y: 11, kind: "boss", ref: "dark_warden", talk: "dark_warden_intro", flag: "darkWardenDefeated", win: "dark_warden_win" },
-    { x: 40, y: 13, kind: "chest", loot: { gold: 90 } },
+    { x: 40, y: 13, kind: "chest", loot: { artifact: "swiftfeather" } },
     { x: 6, y: 21, kind: "chest", loot: { item: "herb" }, hidden: true },
     { x: 11, y: 7, kind: "prop", ref: "prop_dead_tree_hd", tiles: 2.2, walkable: true },
     { x: 31, y: 8, kind: "prop", ref: "prop_dead_tree_hd", tiles: 2.2, walkable: true },

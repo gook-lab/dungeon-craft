@@ -260,7 +260,7 @@ export default {
     { x: 72, y: 26, kind: "sign", talk: "swamp_gate" },
     { x: 10, y: 38, kind: "trigger", effect: "encounter", once: true, pool: ["frost_wisp", "frost_crow", "yeti"], min: 2, max: 3, fireMsg: "얼음이 쩍 갈라진다 — 냉기 속에서 무언가 솟구친다!" },
     { x: 70, y: 5, kind: "chest", loot: { item: "frost_blade" } },
-    { x: 50, y: 40, kind: "chest", loot: { gold: 150 } },
+    { x: 50, y: 40, kind: "chest", loot: { artifact: "lens" } },
     { x: 20, y: 10, kind: "chest", loot: { item: "antidote" } },
     { x: 60, y: 10, kind: "npc", ref: "guard", dir: "south", talk: "moral_frozen_hunter", moral: "frozen_hunter", flag: "frozenHunterJudged", label: "! 얼어붙은 자" },
     { x: 73, y: 45, kind: "chest", loot: { item: "sage_amulet" }, hidden: true },

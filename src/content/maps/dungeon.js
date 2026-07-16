@@ -152,7 +152,7 @@ export default {
     { x: 43, y: 11, kind: "prop", ref: "prop_crypt_rubble", tiles: 1.4, walkable: true },
     { x: 44, y: 4, kind: "prop", ref: "prop_crypt_rubble", tiles: 1.3, walkable: true },
     { x: 1, y: 9, kind: "sign", talk: "dungeon_warn" },
-    { x: 2, y: 2, kind: "chest", loot: { gold: 60 } },
+    { x: 2, y: 2, kind: "chest", loot: { artifact: "berserk_seal" } },
     { x: 46, y: 2, kind: "chest", loot: { item: "silver_sword" } },
     { x: 46, y: 15, kind: "chest", loot: { item: "guardian_shield" } },
     { x: 46, y: 10, kind: "sign", talk: "frost_gate" },

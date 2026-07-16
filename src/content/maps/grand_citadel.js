@@ -162,7 +162,7 @@ export default {
     { x: 38, y: 15, kind: "trigger", effect: "encounter", once: true, group: ["rune_guardian", "stone_gargoyle"], fireMsg: "석상들이 움직인다 — 룬이 깨어난다!" },
     { x: 17, y: 24, kind: "prop", ref: "prop_mossy_shrine" },
     { x: 30, y: 24, kind: "prop", ref: "prop_tombstone_hd" },
-    { x: 23, y: 6, kind: "chest", loot: { gold: 300 }, hidden: true },
+    { x: 23, y: 6, kind: "chest", loot: { artifact: "unbroken" }, hidden: true },
   ],
   portals: [
     {x: 23, y: 34, to: "empire_city", tx: 66, ty: 3},

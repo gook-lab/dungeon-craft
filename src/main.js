@@ -22,6 +22,7 @@ import { loadSettings, applyAudioSettings, getSettings } from './data/settings.j
 import { EndingScene } from './scenes/endingScene.js';
 import { levelForXp, spellsLearnedBetween, statsAtLevel, xpToReach } from './systems/progression.js';
 import { spoils, branchOutcome } from './systems/battle.js';
+import { artifactPassives, artifactSlotCount } from './content/artifacts.js';
 import { addEmotion, NEGATIVE_EMOTIONS, bondKey, bondPolarity } from './systems/bonds.js';
 import { BOND_SKILLS, bondModForCombo, availableBondStrikes } from './content/bondSkills.js';
 import { getSpell } from './content/spells.js';
@@ -483,6 +484,19 @@ async function main() {
       const ngGold = Math.round(sp.gold * (1 + 0.15 * (game.runtime.ngPlus || 0)));
       game.runtime.gold += ngGold;
       const msgs = [`${sp.xp} 경험치와 ${ngGold} 골드를 얻었다!`];
+      // 아티팩트 정산 트리거(battleEnd/onKill): 전투에 참가한 각 영웅의 장착 슬롯을
+      // 읽어 hpRegenEnd(HP 회복)·mpRegenEnd(MP 회복)·goldBonus(추가 골드) 적용.
+      // fpGain/recruitBonus는 FP-earn/영입 롤 경로라 별도(현재 미배선 — 데이터만).
+      let artGoldBonus = 0;
+      for (const p of game.runtime.party) {
+        if (!heroUnits.find((h) => h.id === p.refId)) continue; // 참전한 영웅만
+        const equipped = ((game.runtime.artifacts?.equipped?.[p.refId]) || []).slice(0, artifactSlotCount(p.level)).filter(Boolean);
+        const trig = artifactPassives(equipped, p.refId).trigger;
+        if (trig.hpRegenEnd > 0) { const mx = statsAtLevel(p.refId, p.level).stats.maxHp; p.hp = Math.min(mx, p.hp + Math.round(mx * trig.hpRegenEnd)); }
+        if (trig.mpRegenEnd > 0) { const mm = statsAtLevel(p.refId, p.level).stats.maxMp; p.mp = Math.min(mm, p.mp + Math.round(trig.mpRegenEnd)); }
+        if (trig.goldBonus > artGoldBonus) artGoldBonus = trig.goldBonus; // 처단자의 낙인(중복 방지 max)
+      }
+      if (artGoldBonus > 0) { const bonus = Math.round(ngGold * artGoldBonus); game.runtime.gold += bonus; msgs.push(`처단자의 낙인 — 골드 +${bonus}`); }
       // Battle loot — diverse drops (consumable / 운명의 모래시계 / tier-scaled gear).
       for (const id of rollDrops(state.units.filter((u) => u.side === 'enemy'), game.rng)) {
         game.runtime.inventory[id] = (game.runtime.inventory[id] || 0) + 1;

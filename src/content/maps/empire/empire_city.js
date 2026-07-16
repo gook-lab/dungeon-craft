@@ -191,7 +191,7 @@ export default {
   spawn: {"x":2,"y":26},
   objects: [
     // 대형맵 볼거리 보강 (2026-07-15 밀도 패스)
-    {x: 10, y: 46, kind: "chest", loot: {gold: 300}},
+    {x: 10, y: 46, kind: "chest", loot: {artifact: "wardrune"}},
     {x: 68, y: 12, kind: "chest", loot: {item: "power_ring"}, hidden: true},
     {x: 40, y: 46, kind: "trigger", effect: "encounter", once: true, pool: ["imperial_guard", "rusty_soldier", "wraith_sentinel"], min: 3, max: 4, fireMsg: "폐블록의 어둠에서 근위대 망령이 쏟아진다!"},
     {x: 12, y: 44, kind: "prop", ref: "prop_crypt_rubble", tiles: 1.5, walkable: true},
