@@ -157,8 +157,13 @@ SCENARIOS에 dkfrst/dkWARDEN/ruins/sealGRD/starfl/FSTAR 동기 등록.
 결말 문단을 EndingScene이 요약 아래 표시. 엔딩 Z → `game.offerNgPlus()` 선택
 다이얼로그 → 수락 시 `_ngCarry`(회차+도감 seen)를 들고 CharacterSelect부터 재시작
 (beginGame이 fresh 후 머지). `save.ngPlus`(0=1회차, save.js 4곳+라운드트립 테스트) —
-적 스케일은 battleScene.enter에서 HP+25%/atk+15%/회차(**씬 레이어 폴드 — 리졸버·밸런스
-해니스 비접촉**, bonds 패턴), 골드 +15%/회차는 endBattle. 챕터 카드에 회차 배지.
+적 스케일은 battleScene.enter에서 **회차 증분 diminishing 누적**(`f=1/(1+(i-1)·0.8)`,
+회차당 +0.25·f HP / +0.15·f atk → NG+1 +25%/+15% 그대로, NG+2 +39%/+23%; **씬 레이어
+폴드 — 리졸버·밸런스 해니스 비접촉**, bonds 패턴), 골드 +15%/회차는 endBattle. 챕터
+카드에 회차 배지. **선형 스케일 금지** — 영웅 성장 상한이 회차마다 고정이라 선형이면
+NG+2부터 스토리 보스가 최적플레이로도 클리어 불가(늪 1%)가 된다(2026-07-16 수정).
+`scripts/balance.js`는 `NG=n` env로 회차 스케일 미리보기(battleScene와 동일 공식) —
+NG 미설정은 1회차 그대로. 회차 곡선/영웅 성장/보스 스탯 변경 후 `NG=1`·`NG=2`로 재확인.
 
 ### 5. Save schema (data/save.js)
 Defensive `??` validation; old saves never crash. Mercy fields: `allies:[]`,
