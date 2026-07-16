@@ -236,6 +236,16 @@ async function main() {
       slain: { dialog: 'moral_smuggler_slain', gold: 220 },
     },
   };
+  // V1: one-time note when the run's playstyle tone commits/flips (merciful ↔
+  // mixed ↔ ruthless). Advances the volatile baseline (runtime._lastTone —
+  // NOT persisted, so a reload reseeds silently and never re-fires). Returns
+  // the note string or '' — callers append it to the current showLines batch.
+  game.toneShiftNote = () => {
+    const { tone, msg } = toneCrossNote(game.runtime._lastTone, game.runtime.flags);
+    game.runtime._lastTone = tone;
+    return msg || '';
+  };
+
   game.resolveMoral = (obj, pick) => {
     game.runtime.flags[obj.flag] = true;
     const m = MORALS[obj.moral];
@@ -247,7 +257,8 @@ async function main() {
     for (const [id, n] of Object.entries(out.items || {})) game.runtime.inventory[id] = (game.runtime.inventory[id] || 0) + n;
     game.saveNow();
     const d = getDialog(out.dialog) || { speaker: '', lines: ['...'] };
-    game.showLines(d.speaker || '', d.lines);
+    const toneMsg = game.toneShiftNote();
+    game.showLines(d.speaker || '', toneMsg ? [...d.lines, toneMsg] : d.lines);
   };
 
   game.openDialog = (dialogId, obj) => {
@@ -603,6 +614,9 @@ async function main() {
       // 퀘스트라인 tick — 보스 플래그/드랍/자비·처치 폴드가 끝난 지점. 전진 메시지를
       // 승리창에 함께 싣는다 (tick이 보상 지급 + saveNow까지 수행).
       msgs.push(...game.tickQuestlines({ collect: true }));
+      // V1: surface a tone commit/flip once the mercy/slain fold above lands.
+      const toneMsg = game.toneShiftNote();
+      if (toneMsg) msgs.push(toneMsg);
       game.saveNow();
       // Final/true-ending boss → ending screen → title; every other fight resumes.
       const after = isTrueEnding ? () => game.toEnding('true')
