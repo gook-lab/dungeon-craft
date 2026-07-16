@@ -555,9 +555,14 @@ export class BattleScene {
     const lo = Math.max(1, Math.floor(dmg * 0.9)), hi = Math.ceil(dmg * 1.1);
     // 색맹 모드: 속성 상성을 기호로 앞에 덧붙여 색이 아닌 문자로도 읽히게.
     let pre = '';
-    if (getSettings().colorblind && spell && spell.element && spell.element !== 'physical' && target.family) {
-      const k = affinityKind(spell.element, target.family);
-      pre = k === 'strong' ? '▲' : k === 'resist' ? '▼' : '';
+    if (getSettings().colorblind && spell && target.family) {
+      // 물리 스킬은 시전자 무기 속성으로 상성 판정 (툴팁·리졸버와 동일).
+      const effEl = (spell.element === 'physical' && this.actor && this.actor.weaponElement)
+        ? this.actor.weaponElement : spell.element;
+      if (effEl && effEl !== 'physical') {
+        const k = affinityKind(effEl, target.family);
+        pre = k === 'strong' ? '▲' : k === 'resist' ? '▼' : '';
+      }
     }
     this.setPreviewLabel(view, pre + (lo === hi ? `-${lo}` : `-${lo}~${hi}`), 0xffd0d0);
     if (target.hp - dmg <= 0 && view.killIcon) view.killIcon.visible = true;
@@ -1602,9 +1607,13 @@ export class BattleScene {
     };
     line(spell.name, HEX.gold, FS.label);
     // 속성 — colour dot + 이름
-    const elem = ELEM_INFO[spell.element] || ['#cfd8ec', '무속성'];
+    // 물리 스킬 + 원소 무기 → 무기 속성으로 상성 판정 (리졸버 skillDamage와 동일).
+    // 그래야 툴팁의 약점 ▲/반감 ▼ 표기가 물리 클래스(화염낙인검 든 전사 등)에도 뜬다.
+    const usesWeaponElem = spell.element === 'physical' && actor && actor.weaponElement;
+    const effElement = usesWeaponElem ? actor.weaponElement : spell.element;
+    const elem = ELEM_INFO[effElement] || ['#cfd8ec', '무속성'];
     const dot = new PIXI.Graphics(); dot.circle(lx + 5, yy + 7, 5).fill({ color: elem[0] }); c.addChild(dot);
-    line('     속성: ' + elem[1], HEX.textSoft);
+    line('     속성: ' + (usesWeaponElem ? `물리 · ${elem[1]} 무기` : elem[1]), HEX.textSoft);
     let fmt = TARGET_KR[spell.target] || spell.target;
     if (spell.hits > 1) fmt += ` · ${spell.hits}연타`;
     line('형식: ' + fmt, HEX.textSoft);
@@ -1626,7 +1635,7 @@ export class BattleScene {
     if (spell.inflict && statusDesc(spell.inflict)) line(`└ ${STATUS_KR[spell.inflict] || spell.inflict}: ${statusDesc(spell.inflict)}`, HEX.textMute);
     // Usage condition (그림자 일격류는 은신 필요) — green if met, red if not.
     if (spell.requiresStealth) line('조건: 은신 상태 필요', actor && actor.stealth ? HEX.hpHigh : HEX.hpLow);
-    if (spell.element && spell.element !== 'physical') {
+    if (effElement && effElement !== 'physical') {
       // 도감 연동 — 조우 기록(save.seen)이 있는 몬스터만 상성 공개, 미조우는 ???.
       const seen = this.game.runtime.seen || [];
       const known = (u) => u && u.refId && seen.includes(u.refId);
@@ -1636,7 +1645,7 @@ export class BattleScene {
         let weak = 0, res = 0, unk = 0;
         for (const f of foes) {
           if (!known(f)) { unk++; continue; }
-          const k = affinityKind(spell.element, f.family);
+          const k = affinityKind(effElement, f.family);
           if (k === 'strong') weak++; else if (k === 'resist') res++;
         }
         const parts = [];
@@ -1648,7 +1657,7 @@ export class BattleScene {
         if (!known(enemy)) {
           line('상성: ??? (미조우)', HEX.textOff);
         } else if (enemy.family) {
-          const k = affinityKind(spell.element, enemy.family);
+          const k = affinityKind(effElement, enemy.family);
           const info = k === 'strong' ? ['▲ 약점 — 피해 증가', HEX.goldGlow]
             : k === 'resist' ? ['▼ 반감 — 피해 감소', HEX.textMute] : ['● 보통', HEX.textMute];
           line('상성: ' + info[0], info[1]);
