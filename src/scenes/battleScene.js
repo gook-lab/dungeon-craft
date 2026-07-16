@@ -29,7 +29,7 @@ import { statusTexture, fxTexture, statTexture } from '../ui/pixelIcons.js';
 import { createWeather, createEmberAura } from '../ui/weather.js';
 import { SpellFx, LO as FX_LO, hasSpellFx } from '../fx/spellFx.js';
 import { Cutscene } from '../fx/cutscene.js';
-import { getSettings } from '../data/settings.js';
+import { getSettings, battleSpeedMult } from '../data/settings.js';
 
 const MSG_TIME = 0.85;
 const ATK_DUR = 0.55;   // hero attack animation length
@@ -1921,7 +1921,10 @@ export class BattleScene {
 
   update(dt) {
     this.elapsed = (this.elapsed || 0) + dt;
-    this.tickAnims(dt); // always advance animations, even during messages
+    // 전투 속도 설정 — 연출·메시지 페이싱만 배속(로직 불변). 애니메이션/스펠FX/
+    // 메시지 타이머에 곱해 전투가 빨리 흘러가게 한다 (tickJuice·날씨는 등속).
+    const bt = dt * battleSpeedMult();
+    this.tickAnims(bt); // always advance animations, even during messages
     this.tickJuice(dt);
     if (this.weather) this.weather.update(dt);
     if (this.buffAura) {
@@ -1931,7 +1934,7 @@ export class BattleScene {
       this.buffAura.setActive(buffed);
       this.buffAura.update(dt);
     }
-    if (this.spellFx) this.spellFx.update(dt);
+    if (this.spellFx) this.spellFx.update(bt);
 
     // 스킬 컷신 재생 중: everything else is locked (input, msg, turn flow). Z fast-
     // forwards. The cutscene drives the damage/FX itself via onImpact/onDone.
@@ -1951,7 +1954,7 @@ export class BattleScene {
     }
 
     if (this.msgTimer > 0) {
-      this.msgTimer -= dt;
+      this.msgTimer -= dt * battleSpeedMult();
       if (this.game.input.pressed('confirm') || this.msgTimer <= 0) { this.msgTimer = 0; this.showNextMsg(); }
       return;
     }
