@@ -59,6 +59,9 @@ export class ShopScene {
   }
 
   enter(args = {}) {
+    // 오버레이 진입 — 좌상단 파티 HUD를 숨겨 상점 골드 패널과 겹치지 않게(menuScene와
+    // 동일 패턴). close→resumeField→buildFieldHud가 visible=true로 복원.
+    if (this.game.field) this.game.field.fieldHud.visible = false;
     this.shopDef = SHOPS[args.shop] || SHOPS.general;
     this.stock = this.shopDef.stock;
     // Modes cycle on the toggle row: buy → sell → (upgrade, if this merchant
