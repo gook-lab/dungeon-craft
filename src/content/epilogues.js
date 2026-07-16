@@ -27,3 +27,11 @@ export const EPILOGUES = {
 };
 
 export function epilogueFor(refId) { return EPILOGUES[refId] || null; }
+
+// Karma-conditioned epilogue closer (one-liner appended after class epilogue).
+export function karmaEpilogueLine(karma) {
+  if (!karma) return '';
+  if (karma > 0) return '저 뒤에서, 구원받은 영혼들의 발자국이 따라왔다.';
+  if (karma < 0) return '저 뒤에서, 어둠의 그림자가 천천히 길어갔다.';
+  return '';
+}

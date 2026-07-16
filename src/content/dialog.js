@@ -829,6 +829,15 @@ export const DIALOG = {
     speaker: '살려 주신 마녀',
     lines: ['후후... 그 고귀한 자비가 널 이곳으로 이끌었구나.', '내 호의는 검은 마술이 아닌 다른 것으로 돌려주겠지.', '떨어진 별의 응축액과 구하는 마법사의 지팡이 — 네 여행에 부족한 것들이 여기 있다.'],
   },
+  // Empire camp NPC greeting — karma-branched (mercy vs execute playstyle)
+  empire_camp_greeting_merciful: {
+    speaker: '야영지 난민',
+    lines: ['당신이... 늪의 마녀를 품어주셨군요.', '그 자비로 얼마나 많은 영혼이 고개를 들었는지 모릅니다.', '제국의 부패도 당신의 그 마음 앞에선 약해질 겁니다.'],
+  },
+  empire_camp_greeting_ruthless: {
+    speaker: '야영지 난민',
+    lines: ['당신이... 악의 근원까지 무자비하게 내려쳤군요.', '늪 입구에서 듣지 못했던 비명이 이젠 들립니다.', '그 손이 제국의 문도 닫을 준비가 된 것 같습니다.'],
+  },
   flamewarden_intro: {
     speaker: '화염 파수장',
     lines: ['요새의 왕좌 앞, 백열하는 거체가 천천히 일어선다.', '"드레이크님의... 영역이다. 재가 되어 나가라."'],
