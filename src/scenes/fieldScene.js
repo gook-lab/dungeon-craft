@@ -513,14 +513,34 @@ export class FieldScene {
       this.mapHint.visible = true;
       this.mapHint.x = sw / 2 - this.mapHint.width / 2; this.mapHint.y = (sh + mh * scale) / 2 + 10;
       if (this.hintLabel) this.hintLabel.visible = false; // 확대 지도 중엔 필드 힌트 숨김 (겹침 방지)
+      this.buildMapLegend(sw, sh, mw, mh, scale); // 색 범례 (빠른이동 UI와 통일)
     } else {
       this.mapDim.visible = false;
       if (this.mapHint) this.mapHint.visible = false;
+      if (this.mapLegend) this.mapLegend.visible = false;
       if (this.hintLabel) this.hintLabel.visible = !this.game.tutHintDone; // 은퇴 상태면 계속 숨김
       this.minimap.scale.set(1);
       this.minimap.x = this._mmX ?? this.minimap.x;
       this.minimap.y = this._mmY ?? this.minimap.y;
     }
+  }
+
+  // 확대 지도 색 범례 — 빠른이동 월드맵과 동일 색 체계 (룬게이트/보스/NPC/포탈/상자).
+  buildMapLegend(sw, sh, mw, mh, scale) {
+    if (this.mapLegend) { this.mapLegend.destroy({ children: true }); this.mapLegend = null; }
+    const rows = [
+      [NUM.gold, '룬게이트/상자'], [NUM.danger, '보스'], [NUM.hpHigh, 'NPC'], [NUM.info, '포탈'], [NUM.gold, '현재 위치'],
+    ];
+    const c = new PIXI.Container();
+    const x0 = (sw + mw * scale) / 2 + 20;
+    let yy = (sh - mh * scale) / 2 + 4;
+    const head = label('범례', FS.caption, HEX.textSoft); head.x = x0; head.y = yy; c.addChild(head); yy += 22;
+    for (const [col, name] of rows) {
+      const sw2 = new PIXI.Graphics(); sw2.rect(x0, yy + 2, 12, 12).fill({ color: col }); c.addChild(sw2);
+      const t = label(name, FS.caption, HEX.textMute); t.x = x0 + 18; t.y = yy; c.addChild(t); yy += 20;
+    }
+    if (x0 + 120 > sw) c.x = -(x0 + 120 - sw + 8); // 우측 여백 부족하면 안쪽으로
+    this.hud.addChild(c); this.mapLegend = c;
   }
 
   buildMinimap() {
@@ -571,6 +591,11 @@ export class FieldScene {
       else if (o.kind === 'chest') { if (o.hidden || this.game.runtime.openedChests.includes(this.chestId(o))) continue; col = NUM.gold; }
       else if (o.kind === 'npc') { if (o.flag && this.game.runtime.flags[o.flag]) continue; col = NUM.hpHigh; }
       if (col != null) g.rect(o.x * cell, o.y * cell, cell, cell).fill({ color: col });
+    }
+    // 룬게이트 빠른이동 포인트 — 골드(월드맵 hub 색과 통일). 활성=밝은 골드, 미활성=흐림.
+    if (this.runeGate && seen(this.runeGate.y * w + this.runeGate.x)) {
+      g.rect(this.runeGate.x * cell, this.runeGate.y * cell, cell, cell)
+        .fill({ color: NUM.gold, alpha: this.runeGate.active ? 1 : 0.5 });
     }
     this.updateMinimapPlayer();
     if (this._bigMap) this.applyMinimapView(); // 확대 상태면 재빌드 후에도 유지
@@ -718,7 +743,8 @@ export class FieldScene {
     this.runeGate = { x: gx, y: gy, active };
     const eo = elevAt(this.map, gx, gy) * ELEV_STEP;
     const g = new PIXI.Graphics();
-    const col = active ? 0x59d8ff : 0x8a8f9c;
+    // 룬게이트=골드 (빠른이동 월드맵 hub 색과 통일) / 미활성=회색.
+    const col = active ? NUM.gold : 0x8a8f9c;
     const cx = (gx + 0.5) * TILE, cy = (gy + 0.6) * TILE - eo;
     g.ellipse(cx, cy, TILE * 0.40, TILE * 0.22).fill({ color: 0x101830, alpha: 0.5 });
     g.ellipse(cx, cy, TILE * 0.38, TILE * 0.20).stroke({ color: col, width: 2, alpha: 0.9 });
