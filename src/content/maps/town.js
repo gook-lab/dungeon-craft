@@ -218,7 +218,7 @@ export default {
     { x: 2, y: 28, kind: "prop", ref: "prop_tombstone_hd", tiles: 1.5 },
     { x: 2, y: 27, kind: "prop", ref: "prop_giant_tombstone", tiles: 1.8 },
     { x: 20, y: 28, kind: "sign", talk: "gate_sign" },
-    { x: 37, y: 4, kind: "chest", loot: { gold: 40 } },
+    { x: 37, y: 4, kind: "chest", loot: { artifact: "rearward" } },
     { x: 32, y: 18, kind: "prop", ref: "prop_dimensional_rift", talk: "town_portal" },
   ],
   portals: [

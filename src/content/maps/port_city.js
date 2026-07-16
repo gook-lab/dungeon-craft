@@ -149,7 +149,7 @@ export default {
     { x: 37, y: 3, kind: "prop", ref: "prop_broken_colonnade", tiles: 2.2, walkable: true },
     { x: 15, y: 18, kind: "prop", ref: "prop_broken_brazier", tiles: 1.6, walkable: true },
     { x: 39, y: 18, kind: "prop", ref: "prop_mossy_shrine" },
-    { x: 35, y: 4, kind: "chest", loot: { gold: 250 } },
+    { x: 35, y: 4, kind: "chest", loot: { artifact: "lifedrink" } },
     { x: 1, y: 22, kind: "chest", loot: { item: "elixir" }, hidden: true },
   ],
   portals: [

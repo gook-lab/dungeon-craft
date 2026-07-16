@@ -155,7 +155,7 @@ export default {
   spawn: {"x":36,"y":41},
   objects: [
     // 탐험 보상 — 히든 상자(2026-07-16 페이싱 패스): 경로 밖 배치, content.test 도달성 검증.
-    { x: 2, y: 1, kind: 'chest', loot: { gold: 180 } },
+    { x: 2, y: 1, kind: 'chest', loot: { artifact: 'brand' } },
     { x: 69, y: 1, kind: 'chest', loot: { item: 'elixir' } },
     { x: 1, y: 7, kind: 'chest', loot: { gold: 220 } },
     // 보드 장식 프롭 병합 (v3 원본 좌표, 2026-07-15)

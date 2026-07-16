@@ -89,7 +89,7 @@ export default {
     {x: 17, y: 12, kind: "prop", ref: "prop_bone_pile_hd", tiles: 1.4, walkable: true},
     {x: 28, y: 18, kind: "prop", ref: "prop_crypt_rubble", tiles: 1.5, walkable: true},
     {x: 14, y: 3, kind: "prop", ref: "prop_crypt_rubble", tiles: 1.5, walkable: true},
-    { x: 14, y: 8, kind: "chest", loot: { gold: 220 } },
+    { x: 14, y: 8, kind: "chest", loot: { artifact: "clawgrip" } },
     { x: 11, y: 8, kind: "prop", ref: "prop_broken_brazier", tiles: 1.6, walkable: true },
     { x: 18, y: 8, kind: "prop", ref: "prop_broken_brazier", tiles: 1.6, walkable: true },
     { x: 10, y: 12, kind: "prop", ref: "prop_crypt_rubble", tiles: 1.4, walkable: true },

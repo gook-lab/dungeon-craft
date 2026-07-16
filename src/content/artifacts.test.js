@@ -1,6 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { ARTIFACTS, artifactSlotCount, computeSetBonus, artifactPassives, mergePassives, ART_AFFINITY_MUL, SET_BONUS_2, SET_BONUS_3 } from './artifacts.js';
 import { PARTY_MEMBERS } from './party.js';
+import { MAPS } from './maps/index.js';
+
+// Every artifact id placed in a map chest's loot.
+const placedArtifacts = (() => {
+  const out = [];
+  for (const m of Object.values(MAPS)) for (const o of (m.objects || [])) if (o.kind === 'chest' && o.loot && o.loot.artifact) out.push(o.loot.artifact);
+  return out;
+})();
 
 // Passive/mod/trigger keys the resolver + scene actually read. An artifact naming
 // a key outside these lists is dead data (silently ignored) — same trap as the
@@ -51,6 +59,24 @@ describe('artifacts — data integrity', () => {
     const merged = mergePassives({ crit: 0.1 }, p);
     expect(merged.survive1hp).toBe(true);
     expect(merged.crit).toBe(0.1);
+  });
+
+  it('every artifact is obtainable (placed in a chest — no unobtainable relic)', () => {
+    for (const id of Object.keys(ARTIFACTS)) {
+      expect(placedArtifacts.includes(id), `artifact '${id}' has no acquisition point — unobtainable`).toBe(true);
+    }
+  });
+
+  it('no artifact is placed in more than one chest (unique collectible)', () => {
+    const seen = new Set();
+    for (const id of placedArtifacts) {
+      expect(seen.has(id), `artifact '${id}' placed in multiple chests`).toBe(false);
+      seen.add(id);
+    }
+  });
+
+  it('every placed loot.artifact references a real artifact', () => {
+    for (const id of placedArtifacts) expect(ARTIFACTS[id], `chest loot artifact '${id}' unknown`).toBeDefined();
   });
 
   it('mergePassives sums numeric keys + unions resist', () => {

@@ -112,7 +112,7 @@ export default {
     { x: 17, y: 15, kind: "prop", ref: "prop_wild_bush", tiles: 1.3, walkable: true },
     { x: 12, y: 13, kind: "prop", ref: "prop_wild_bush", tiles: 1.3, walkable: true },
     { x: 24, y: 12, kind: "prop", ref: "prop_mossy_boulder", tiles: 1.5, walkable: true },
-    { x: 2, y: 18, kind: "chest", loot: { gold: 90 } },
+    { x: 2, y: 18, kind: "chest", loot: { artifact: "manashard" } },
   ],
   portals: [
     {x: 1, y: 10, to: "wild", tx: 76, ty: 26},

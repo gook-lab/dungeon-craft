@@ -28,9 +28,9 @@ export const SET_BONUS_3 = 1.4;       // 3개 전부 동일 cat → ×1.4
 
 export const ARTIFACTS = {
   // --- 지속 (common/economy) ---
-  rearward:    { id: 'rearward', name: '후열의 부적', rarity: 'common', cat: '지속', affinity: null, source: '상점(마을)', trigger: { hpRegenEnd: 0.05 } },
-  manashard:   { id: 'manashard', name: '마나석 조각', rarity: 'common', cat: '지속', affinity: null, source: '상점(마을)', trigger: { mpRegenEnd: 3 } },
-  lifedrink:   { id: 'lifedrink', name: '흡정의 목걸이', rarity: 'rare', cat: '지속', affinity: null, source: '상점(항구)', passive: { lifesteal: 0.10 } },
+  rearward:    { id: 'rearward', name: '후열의 부적', rarity: 'common', cat: '지속', affinity: null, source: '마을 상자', trigger: { hpRegenEnd: 0.05 } },
+  manashard:   { id: 'manashard', name: '마나석 조각', rarity: 'common', cat: '지속', affinity: null, source: '마을 상자', trigger: { mpRegenEnd: 3 } },
+  lifedrink:   { id: 'lifedrink', name: '흡정의 목걸이', rarity: 'rare', cat: '지속', affinity: null, source: '항구 상자', passive: { lifesteal: 0.10 } },
   // --- 자원 ---
   swiftfeather:{ id: 'swiftfeather', name: '신속의 깃털', rarity: 'common', cat: '자원', affinity: null, source: '어둠숲 상자', mods: { spd: 4 } },
   fatestone:   { id: 'fatestone', name: '운명석', rarity: 'legend', cat: '자원', affinity: null, source: '용암 상자', trigger: { fpGain: 0.25 } },
@@ -38,7 +38,7 @@ export const ARTIFACTS = {
   lens:        { id: 'lens', name: '정밀 렌즈', rarity: 'rare', cat: '공격', affinity: 'huntress', source: '설원 보상', passive: { crit: 0.12 } },
   catalyst:    { id: 'catalyst', name: '원소 촉매', rarity: 'rare', cat: '공격', affinity: 'mage', source: '늪 보상', passive: { weaknessDmg: 0.15 } },
   berserk_seal:{ id: 'berserk_seal', name: '광전사의 인장', rarity: 'rare', cat: '공격', affinity: 'warrior', source: '지하 묘지 상자', passive: { hpBelow50: 0.25 } },
-  clawgrip:    { id: 'clawgrip', name: '연격의 발톱', rarity: 'rare', cat: '공격', affinity: 'duelist', source: '상점(항구)', passive: { crit: 0.10 } },
+  clawgrip:    { id: 'clawgrip', name: '연격의 발톱', rarity: 'rare', cat: '공격', affinity: 'duelist', source: '항구 상자', passive: { crit: 0.10 } },
   sage_eye:    { id: 'sage_eye', name: '현자의 눈', rarity: 'legend', cat: '공격', affinity: 'mage', source: '황좌 상자', passive: { spellDmg: 0.18, spellMpCut: 1 } },
   // --- 생존 ---
   wardrune:    { id: 'wardrune', name: '수호룬', rarity: 'rare', cat: '생존', affinity: null, source: '제국 상자', passive: { dmgReduce: 0.10 } },

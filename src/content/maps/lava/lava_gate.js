@@ -116,7 +116,7 @@ export default {
     { x: 6, y: 3, kind: "npc", ref: "alchemist", dir: "south", quest: "q_lava_cache", label: "! 잿불 연금술사" },
     { x: 2, y: 5, kind: "npc", ref: "guard", dir: "south", quest: "q_scout_core", label: "! 조사대 신참" },
     { x: 8, y: 3, kind: "npc", ref: "priest", npcId: "pilgrim_lava", dir: "south", talk: "pilgrim_lava", label: "? 순례자" },
-    { x: 4, y: 2, kind: "chest", loot: { gold: 400 } },
+    { x: 4, y: 2, kind: "chest", loot: { artifact: "fatestone" } },
     { x: 33, y: 19, kind: "chest", loot: { item: "dragon_scale" } },
     { x: 4, y: 20, kind: "chest", loot: { item: "power_ring" }, hidden: true },
     { x: 4, y: 18, kind: "trigger", effect: "warp", tx: 32, ty: 18, fireMsg: "용암 균열이 타오르며 몸이 건너편으로 빨려든다…" },
