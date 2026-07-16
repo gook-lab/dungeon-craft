@@ -61,12 +61,12 @@ export const PARTY_MEMBERS = {
     // All power<24 → still pre-L17, so the post-game nuke ladder + boss tuning hold
     // (mage is non-STARTING, so the 3-hero kill-build harness is untouched regardless).
     learn: {
-      3: 'firebolt', 5: 'ice_lance', 6: 'lullaby', 7: 'arcaneblast', 8: 'sandstorm',
+      3: 'firebolt', 5: 'ice_lance', 6: 'lullaby', 7: 'arcaneblast',
       9: 'thunderclap', 11: 'firestorm', 12: 'quake',
       13: 'manashield', 14: 'haste', 15: 'blizzard', 16: 'overcharge',
-      // Post-game nukes + fan-out (L17+) — past the balance harness ceiling.
-      17: 'meteor', 18: 'masshaste', 19: 'inferno', 20: 'cataclysm',
-      21: 'thunderstorm', 22: 'venomcloud', 23: 'darkmist', 24: 'cyclone', 25: 'divinewrath', 26: 'meditate',
+      // Post-game nukes + elemental coverage (L17+) — past the balance harness ceiling.
+      17: 'meteor', 18: 'masshaste', 20: 'cataclysm',
+      22: 'venomcloud', 25: 'divinewrath', 26: 'meditate',
     },
   },
 
