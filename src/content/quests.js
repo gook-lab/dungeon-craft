@@ -258,6 +258,16 @@ Object.assign(QUESTS, {
     active: ['창고는 남쪽 부두 쪽이오. 상자 뒤 그늘을 잘 살펴보시오.'],
     done: ['결말을 지었구려. 어느 쪽이었든... 항구는 답을 얻었소. 약속한 보수요.'],
   },
+  // 마녀의 오두막 사이드 퀘스트 (자비 루트 전용) — 약탕 재료 수집.
+  q_witch: {
+    id: 'q_witch', name: '마녀의 부탁', giver: '살려 주신 마녀',
+    desc: '마녀의 약탕에 쓸 약초 5개를 구해 오라.',
+    cond: { type: 'collect', item: 'herb', count: 5 },
+    reward: { gold: 120, item: 'fp_potion' },
+    offer: ['약솥이 식어가는구나... 늪의 약초 다섯 잎만 구해다 주겠니? 후한 보답을 하마.'],
+    active: ['약초 다섯 잎이 필요하다. (소지품을 확인해 보렴.)'],
+    done: ['딱 맞구나. 이 모래시계를 받으렴 — 운명이 필요한 순간에 쓰거라.'],
+  },
 });
 
 export function getQuest(id) { return QUESTS[id] || null; }
