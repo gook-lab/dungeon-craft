@@ -14,7 +14,7 @@ import {
 } from '../systems/battle.js';
 import { affinityKind } from '../systems/affinity.js';
 import { buildHeroUnit, buildAllyUnit } from '../systems/progression.js';
-import { bondStrength, emotionCount, partnersWithEmotion } from '../systems/bonds.js';
+import { bondStrength, emotionCount, partnersWithEmotion, EMOTION_KR, EMOTIONS, NEGATIVE_EMOTIONS } from '../systems/bonds.js';
 import { availableBondStrikes, bondModForCombo } from '../content/bondSkills.js';
 import { getSpell } from '../content/spells.js';
 import { getMonsterSkill } from '../content/monsterSkills.js';
@@ -364,6 +364,19 @@ export class BattleScene {
     nameT.anchor = { x: 0.5, y: 1 };
     nameT.x = 0; nameT.y = -3;
     bar.addChild(nameT);
+
+    // V3: 지속 유대 마커 — 파티 영웅의 지배 감정을 이름 위에 표시(자비 극 ♥금색 /
+    // 잔혹 극 †적색). 전투 중 어느 영웅이 어느 유대를 지녔는지 항상 읽히게 해
+    // '분기/격노' 서지 콜아웃과 짝을 이룬다.
+    if (unit.side === 'hero' && !unit.ally) {
+      const db = this.dominantBond(unit.refId);
+      if (db) {
+        const tag = label((db.negative ? '†' : '♥') + db.kr, FS.caption, db.negative ? HEX.hpLow : HEX.goldGlow, { font: FONT.ui });
+        tag.anchor = { x: 0.5, y: 1 };
+        tag.x = 0; tag.y = -24;
+        bar.addChild(tag);
+      }
+    }
 
     // Pixel-tick HP bar (auto-color by fraction via hpbar()).
     const hpBarObj = hpbar(unit.hp / unit.maxHp, { w: 76, h: 11 });
@@ -1094,6 +1107,18 @@ export class BattleScene {
 
   // Bank +1 Fabula Point the first time each hero enters Crisis (≤50% HP) this
   // battle. Silent (badge ticks up + a chime); no blocking message.
+  // V3: a hero's strongest bond emotion (for the unit-card marker). Returns
+  // { kr, negative } or null. Reads runtime.bonds — cosmetic, no state change.
+  dominantBond(refId) {
+    const bonds = this.game.runtime.bonds || {};
+    let best = null, bestN = 0;
+    for (const e of EMOTIONS) {
+      const n = emotionCount(bonds, refId, e);
+      if (n > bestN) { bestN = n; best = e; }
+    }
+    return best ? { kr: EMOTION_KR[best] || best, negative: NEGATIVE_EMOTIONS.includes(best) } : null;
+  }
+
   checkCrisisFP() {
     if (!this.crisisAwarded) return;
     for (const u of this.heroUnits) {
@@ -1110,6 +1135,7 @@ export class BattleScene {
             pv.atkBuff = (pv.atkBuff || 0) + 0.2;
             pv._affectionSurge = true;
             this.queueMsg(`${pv.name}는 ${u.name}를 지키려 분기한다! 공격력 상승!`);
+            this.spawnLabel(pv.id, '자비 · 애정 분기!', HEX.goldGlow); // V3: 유대→전투 연결 콜아웃
           }
         }
       }
@@ -1132,6 +1158,7 @@ export class BattleScene {
             pv.atkBuff = (pv.atkBuff || 0) + 0.35;
             pv._hatredSurge = true;
             this.queueMsg(`${pv.name}는 ${u.name}의 죽음에 격노한다! 공격력 급상승!`);
+            this.spawnLabel(pv.id, '잔혹 · 증오 격노!', HEX.hpLow); // V3: 유대→전투 연결 콜아웃
           }
         }
       }
