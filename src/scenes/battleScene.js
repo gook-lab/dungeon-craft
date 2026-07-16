@@ -543,7 +543,13 @@ export class BattleScene {
     g.rect(W * newFrac, 0, Math.max(1, W * (curFrac - newFrac)), 11).fill({ color: 0xff5566, alpha: 0.85 });
     g.visible = true; view._previewing = true;
     const lo = Math.max(1, Math.floor(dmg * 0.9)), hi = Math.ceil(dmg * 1.1);
-    this.setPreviewLabel(view, lo === hi ? `-${lo}` : `-${lo}~${hi}`, 0xffd0d0);
+    // 색맹 모드: 속성 상성을 기호로 앞에 덧붙여 색이 아닌 문자로도 읽히게.
+    let pre = '';
+    if (getSettings().colorblind && spell && spell.element && spell.element !== 'physical' && target.family) {
+      const k = affinityKind(spell.element, target.family);
+      pre = k === 'strong' ? '▲' : k === 'resist' ? '▼' : '';
+    }
+    this.setPreviewLabel(view, pre + (lo === hi ? `-${lo}` : `-${lo}~${hi}`), 0xffd0d0);
     if (target.hp - dmg <= 0 && view.killIcon) view.killIcon.visible = true;
   }
 
@@ -583,6 +589,7 @@ export class BattleScene {
       view.statusCont.removeChildren();
       const s = view.unit.status || {};
       const activeStatuses = Object.keys(s).filter((k) => s[k] > 0);
+      const cb = getSettings().colorblind; // 색맹 모드: 아이콘 아래 글자 태그 부착
       let xOff = 0;
       for (const kind of activeStatuses) {
         const tex = statusTexture(kind, 2);
@@ -590,6 +597,12 @@ export class BattleScene {
           const spr = new PIXI.Sprite(tex);
           spr.x = xOff;
           view.statusCont.addChild(spr);
+          if (cb && STATUS_TAG[kind]) {
+            const tg = label(STATUS_TAG[kind], FS.caption, HEX.text, { font: FONT.ui });
+            tg.scale.set(0.72); tg.anchor = { x: 0.5, y: 0 };
+            tg.x = xOff + tex.width / 2; tg.y = tex.height + 1;
+            view.statusCont.addChild(tg);
+          }
           xOff += tex.width + 4;
         }
       }
