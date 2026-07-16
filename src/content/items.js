@@ -49,6 +49,9 @@ export const ITEMS = {
   hex_reliquary: { id: 'hex_reliquary', name: '저주의 성물', kind: 'accessory', atk: 6, spd: 4, price: 0, sprite: 'pickup_rune', passive: { crit: 0.12, resist: { poison: 0.6 } } },
   gale_bow: { id: 'gale_bow', name: '질풍궁', kind: 'weapon', atk: 13, spd: 3, element: 'wind', price: 280, sprite: 'pickup_rune', passive: { crit: 0.1 } },                 // 사냥꾼 경량(eva 미구현→crit)
   titan_greataxe: { id: 'titan_greataxe', name: '거인의 도끼', kind: 'weapon', atk: 19, element: 'earth', price: 0, sprite: 'pickup_rune', passive: { counter: 0.15 } },      // 고티어 대지 보상
+  // --- 특색 장비 (armory NEW) — 신규 passive 키(lifesteal/execute/thorns) ---
+  vampiric_blade: { id: 'vampiric_blade', name: '흡혈검', kind: 'weapon', atk: 14, element: 'dark', price: 300, sprite: 'pickup_rune', passive: { lifesteal: 0.10 } },        // 장기전 자력 유지
+  executioner_axe: { id: 'executioner_axe', name: '처형 도끼', kind: 'weapon', atk: 17, element: 'earth', price: 420, sprite: 'pickup_rune', passive: { execute: 0.50 } },     // HP≤30% 마무리 특화
 
   // --- Armor (def, sometimes +maxHp; cloth trades def for caster MP) ---
   cloth_robe: { id: 'cloth_robe', name: '천 로브', kind: 'armor', def: 1, maxMp: 8, price: 28, sprite: 'pickup_scroll' },      // caster early
@@ -64,6 +67,7 @@ export const ITEMS = {
   scale_mail: { id: 'scale_mail', name: '비늘 갑옷', kind: 'armor', def: 5, spd: 1, price: 130, sprite: 'pickup_scroll' },                                                     // 중반 (def 5 채움)
   mage_robe: { id: 'mage_robe', name: '마도 로브', kind: 'armor', def: 3, maxMp: 14, price: 180, sprite: 'pickup_scroll' },                                                    // 캐스터 방어구
   spiked_armor: { id: 'spiked_armor', name: '가시 갑옷', kind: 'armor', def: 6, price: 240, sprite: 'pickup_scroll', passive: { counter: 0.2 } },                              // 가시 반격
+  thornmail: { id: 'thornmail', name: '가시 판금', kind: 'armor', def: 8, price: 320, sprite: 'pickup_scroll', passive: { thorns: 0.15 } },                                     // 근접 피격 15% 반사 (탱커/어그로)
   warded_plate: { id: 'warded_plate', name: '수호 판금', kind: 'armor', def: 8, maxHp: 16, price: 360, sprite: 'pickup_scroll', passive: { resistAll: 0.2 } },                 // 상태이상 저항 탱크
   phoenix_mail: { id: 'phoenix_mail', name: '불사조 갑옷', kind: 'armor', def: 10, maxHp: 20, price: 520, sprite: 'pickup_scroll', passive: { regenHp: 0.05 } },               // 고티어 재생 탱크
 
@@ -145,6 +149,9 @@ export function passiveParts(passive) {
   if (passive.dmgReduce) out.push(`✦피해 -${PCT(passive.dmgReduce)}`);
   if (passive.regenHp) out.push(`✦HP ${PCT(passive.regenHp)}/턴`);
   if (passive.regenMp) out.push(`✦MP ${PCT(passive.regenMp)}/턴`);
+  if (passive.lifesteal) out.push(`✦흡혈 ${PCT(passive.lifesteal)}`);
+  if (passive.execute) out.push(`✦처형 +${PCT(passive.execute)} (HP≤30%)`);
+  if (passive.thorns) out.push(`✦가시 ${PCT(passive.thorns)} 반사`);
   if (passive.resistAll) out.push(`✦전 상태이상 ${PCT(passive.resistAll)} 저항`);
   if (passive.resist) for (const k in passive.resist) out.push(`✦${ITEM_CURE_KR[k] || k} ${PCT(passive.resist[k])} 저항`);
   return out;
@@ -193,7 +200,7 @@ export function equipBonus(equip) {
 // resist per-status ≤0.9 (no full immunity stacking), dmgReduce ≤0.4 (DoT stays
 // meaningful), crit/counter ≤0.75, regen ≤0.2. An item declares `item.passive`.
 export function equipPassives(equip) {
-  const out = { resist: {}, regenHp: 0, regenMp: 0, counter: 0, crit: 0, dmgReduce: 0 };
+  const out = { resist: {}, regenHp: 0, regenMp: 0, counter: 0, crit: 0, dmgReduce: 0, lifesteal: 0, execute: 0, thorns: 0 };
   forEachEquipped(equip, (it) => {
     const p = it.passive;
     if (!p) return;
@@ -204,6 +211,9 @@ export function equipPassives(equip) {
     out.counter += p.counter || 0;
     out.crit += p.crit || 0;
     out.dmgReduce += p.dmgReduce || 0;
+    out.lifesteal += p.lifesteal || 0;   // 흡혈: 가한 피해의 % 회복
+    out.execute += p.execute || 0;        // 처형: 저체력(≤30%) 대상 피해 배수
+    out.thorns += p.thorns || 0;          // 가시: 근접 피격 시 받은 피해 % 반사
   });
   for (const k in out.resist) out.resist[k] = Math.min(0.9, out.resist[k]);
   out.regenHp = Math.min(0.2, out.regenHp);
@@ -211,6 +221,9 @@ export function equipPassives(equip) {
   out.counter = Math.min(0.75, out.counter);
   out.crit = Math.min(0.75, out.crit);
   out.dmgReduce = Math.min(0.4, out.dmgReduce);
+  out.lifesteal = Math.min(0.5, out.lifesteal);
+  out.execute = Math.min(1.0, out.execute);
+  out.thorns = Math.min(0.5, out.thorns);
   return out;
 }
 
@@ -231,7 +244,7 @@ const DROP_CONSUMABLES = ['herb', 'herb', 'herb', 'mana_drop', 'mana_drop', 'ant
 const DROP_GEAR = {
   low: ['bronze_sword', 'iron_dagger', 'leather_armor', 'padded_vest', 'studded_leather', 'power_ring', 'cloth_robe'],
   mid: ['iron_sword', 'hunters_bow', 'battle_spear', 'chain_armor', 'scale_mail', 'mage_robe', 'swift_boots', 'sage_amulet', 'ward_amulet', 'assassin_dagger', 'crystal_staff', 'venom_fang', 'berserker_axe', 'paladin_mace', 'focus_band', 'berserker_ring', 'twin_fang_pistols', 'blessed_flail', 'storm_crossbow'],
-  high: ['silver_sword', 'frost_blade', 'runeblade', 'plate_armor', 'knight_plate', 'spiked_armor', 'warded_plate', 'phoenix_mail', 'guardian_shield', 'vitality_charm', 'guard_brooch', 'guardian_greatsword', 'marksman_longbow', 'warlords_axe', 'archmage_staff', 'iron_brooch', 'phoenix_charm', 'duelist_gunblade', 'hollowpoint_revolver', 'stone_maul', 'umbral_dagger', 'gale_bow'],
+  high: ['silver_sword', 'frost_blade', 'runeblade', 'plate_armor', 'knight_plate', 'spiked_armor', 'warded_plate', 'phoenix_mail', 'guardian_shield', 'vitality_charm', 'guard_brooch', 'guardian_greatsword', 'marksman_longbow', 'warlords_axe', 'archmage_staff', 'iron_brooch', 'phoenix_charm', 'duelist_gunblade', 'hollowpoint_revolver', 'stone_maul', 'umbral_dagger', 'gale_bow', 'vampiric_blade', 'thornmail', 'executioner_axe'],
 };
 export function rollDrops(enemies, rng) {
   const next = () => (rng ? rng.next() : 0.5);

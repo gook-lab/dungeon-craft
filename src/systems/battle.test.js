@@ -55,6 +55,15 @@ describe('damage formulas', () => {
     expect(physicalDamage(enemy, undead, null)).toBe(physicalDamage(enemy, plain, null));
   });
 
+  it('execute passive boosts damage vs low-HP targets only', () => {
+    const exe = { atk: 20, atkBuff: 0, passives: { execute: 0.5 } };
+    const plain = { atk: 20, atkBuff: 0 };
+    const lowHp = { def: 5, defending: false, hp: 3, maxHp: 30 };   // 10% ≤ 30%
+    const highHp = { def: 5, defending: false, hp: 30, maxHp: 30 }; // 100% > 30%
+    expect(physicalDamage(exe, lowHp, null)).toBeGreaterThan(physicalDamage(plain, lowHp, null));
+    expect(physicalDamage(exe, highHp, null)).toBe(physicalDamage(plain, highHp, null)); // no boost at high HP
+  });
+
   it('magic damage ignores def', () => {
     const spell = { power: 12 };
     const t1 = { def: 0, defending: false };
@@ -1243,9 +1252,27 @@ describe('accessory passives', () => {
     expect(p.counter).toBe(0.3);
     expect(p.regenHp).toBe(0);
     const empty = equipPassives({ weapon: null, armor: null, accessory: null });
-    expect(empty).toEqual({ resist: {}, regenHp: 0, regenMp: 0, counter: 0, crit: 0, dmgReduce: 0 });
+    expect(empty).toEqual({ resist: {}, regenHp: 0, regenMp: 0, counter: 0, crit: 0, dmgReduce: 0, lifesteal: 0, execute: 0, thorns: 0 });
     // antitoxin resist map
     expect(equipPassives({ accessory: 'antitoxin_charm' }).resist.poison).toBe(0.6);
+  });
+
+  it('lifesteal heals the attacker a fraction of damage dealt (basic attack)', () => {
+    const atkr = makeUnit({ id: 'h', side: 'hero', maxHp: 100, hp: 40, atk: 30, passives: { lifesteal: 0.5 } });
+    const tgt = makeUnit({ id: 'e', side: 'enemy', maxHp: 200, hp: 200, def: 0 });
+    const st = miniState([atkr, tgt]);
+    const { events } = resolveAction(st, { type: 'attack', actorId: 'h', targetId: 'e' }, createRng(1));
+    expect(atkr.hp).toBeGreaterThan(40); // healed
+    expect(events.some((e) => e.type === 'lifesteal')).toBe(true);
+  });
+
+  it('thorns reflects damage to a melee attacker (recursion-safe)', () => {
+    const atkr = makeUnit({ id: 'e', side: 'enemy', maxHp: 100, hp: 100, atk: 20 });
+    const tgt = makeUnit({ id: 'h', side: 'hero', maxHp: 200, hp: 200, def: 0, passives: { thorns: 0.5 } });
+    const st = miniState([atkr, tgt]);
+    const { events } = resolveAction(st, { type: 'attack', actorId: 'e', targetId: 'h' }, createRng(1));
+    expect(atkr.hp).toBeLessThan(100); // reflected back
+    expect(events.some((e) => e.type === 'thorns')).toBe(true);
   });
 
   it('regen heals a fraction of max at round start, clamped (no overheal)', () => {

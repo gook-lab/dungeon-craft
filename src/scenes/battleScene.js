@@ -912,6 +912,13 @@ export class BattleScene {
         this.tintPulse(ev.unitId, 0x9ad6ff, 150);
         const now = this.elapsed || 0;
         if (now - (this._lastGuardLabel || -9) > 1.4) { this._lastGuardLabel = now; this.spawnLabel(ev.unitId, '경감', 0xcfe0ff); }
+      } else if (ev.type === 'lifesteal') {
+        this.spawnLabel(ev.unitId, `흡혈 +${ev.amount}`, 0x8fe08a); // 흡혈 회복 (초록)
+        this.tintPulse(ev.unitId, 0x6ad06a, 160);
+      } else if (ev.type === 'thorns') {
+        this.spawnLabel(ev.unitId, '가시!', 0xff9a6a);
+        if (typeof ev.amount === 'number') this.spawnDamageNumber(ev.targetId, ev.amount, false);
+        this.spawnHitFx(ev.targetId, 'spark');
       }
     }
   }

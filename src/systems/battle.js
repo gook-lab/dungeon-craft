@@ -52,7 +52,17 @@ export function physicalDamage(attacker, target, rng, heavyMult = 1) {
   // 기본 공격도 장착 무기 속성의 상성을 탄다 (물리 클래스가 원소 무기로 약점을
   // 노릴 수 있게). weaponElement 없는 유닛(적·비무장)은 elementMultiplier(null)=×1.
   dmg *= elementMultiplier(attacker.weaponElement, target);
+  dmg *= executeMult(attacker, target); // 처형(execute): 저체력 대상 마무리 배수 (상성 뒤)
   return Math.max(1, Math.floor(dmg));
+}
+
+// 처형(execute) passive: 대상 HP가 EXECUTE_THRESHOLD(30%) 이하면 피해 ×(1+execute).
+// 상성 뒤·크리 앞의 조건부 곱연산(스펙 파이프라인). passive 없으면 ×1.
+export const EXECUTE_THRESHOLD = 0.3;
+export function executeMult(attacker, target) {
+  const ex = attacker.passives && attacker.passives.execute;
+  if (ex > 0 && target.maxHp && target.hp <= target.maxHp * EXECUTE_THRESHOLD) return 1 + ex;
+  return 1;
 }
 
 // Physical SKILL damage — atk-scaled (respects def, like a basic attack) instead
@@ -80,6 +90,7 @@ export function skillDamage(spell, attacker, target, rng) {
     ? attacker.weaponElement
     : spell.element;
   dmg *= elementMultiplier(element, target);
+  dmg *= executeMult(attacker, target); // 처형: 물리 스킬도 저체력 마무리 배수
   return Math.max(1, Math.floor(dmg));
 }
 
@@ -514,6 +525,7 @@ export function resolveAction(state, action, rng) {
     if (crit) dmg = Math.floor(dmg * CRIT_MULT);
     events.push({ type: 'attack', actorId: actor.id, targetId: target.id, amount: dmg, heavy: !!action.heavy, crit });
     dealDamage(state, target, dmg, events);
+    applyOnHit(state, actor, target, dmg, true, events); // 흡혈/가시 (기본공격=근접)
     // 반격(counter) passive (v1: 기본공격 피격만). 반격은 직접 dealDamage라 재반격
     // 없음(재귀 가드). 살아있는 반대편 피격자만 — 죽으면 반격 없음.
     if (target.alive && target.side !== actor.side && actor.alive
@@ -907,6 +919,27 @@ function dealDamage(state, target, dmg, events) {
   }
   if (target.hp === 0) { killUnit(state, target, events); return true; }
   return false;
+}
+
+// On-hit passive effects after damage lands (v1: basic-attack path, mirroring the
+// counter precedent). 흡혈(lifesteal): attacker heals a fraction of damage dealt.
+// 가시(thorns): a MELEE-hit defender reflects a fraction back to the attacker
+// (recursion-safe — direct hp write, honours the attacker's 불굴/lastStand).
+function applyOnHit(state, attacker, target, dmg, melee, events) {
+  if (dmg <= 0) return;
+  const ls = attacker.passives && attacker.passives.lifesteal;
+  if (ls > 0 && attacker.alive) {
+    const heal = Math.min(attacker.maxHp - attacker.hp, Math.max(1, Math.floor(dmg * ls)));
+    if (heal > 0) { attacker.hp += heal; events.push({ type: 'lifesteal', unitId: attacker.id, amount: heal }); }
+  }
+  const th = target.passives && target.passives.thorns;
+  if (th > 0 && melee && attacker.alive && target.side !== attacker.side) {
+    const refl = Math.max(1, Math.floor(dmg * th));
+    events.push({ type: 'thorns', unitId: target.id, targetId: attacker.id, amount: refl });
+    attacker.hp = Math.max(0, attacker.hp - refl);
+    if (attacker.hp === 0 && attacker.lastStand) { attacker.hp = 1; attacker.lastStand = false; events.push({ type: 'lastStand', unitId: attacker.id }); }
+    else if (attacker.hp === 0) killUnit(state, attacker, events);
+  }
 }
 
 // Mark a unit dead, emit its death event, and tally enemy kills on the battle

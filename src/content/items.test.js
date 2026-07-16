@@ -4,7 +4,7 @@ import { AFFINITY } from '../systems/affinity.js';
 
 // Real passive keys understood by equipPassives (items.js). `eva` is NOT one —
 // a weapon shipped with an invented passive silently no-ops, so guard the set.
-const REAL_PASSIVES = new Set(['resist', 'resistAll', 'regenHp', 'regenMp', 'counter', 'crit', 'dmgReduce']);
+const REAL_PASSIVES = new Set(['resist', 'resistAll', 'regenHp', 'regenMp', 'counter', 'crit', 'dmgReduce', 'lifesteal', 'execute', 'thorns']);
 
 // Elements a physical class can reach via a WEAPON. Derived from the affinity
 // table so a future spell-element addition (added to AFFINITY) auto-requires a
