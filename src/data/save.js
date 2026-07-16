@@ -59,9 +59,15 @@ export function freshSave() {
     bonds: {},
     // 회차+ (NG+): 0 = 1회차. 회차마다 적 스탯 +25%/골드 +15% (씬 레이어 스케일).
     ngPlus: 0,
+    // bossFate: per-boss choice outcome (spared|slain) for branchFlag gates.
+    // karma: cumulative mercy/execute tally (mercy +1 / execute -1) for regional divergence.
+    bossFate: {},
+    karma: 0,
     // mercied/slain drive the playstyle-reactive dialogue + ending branch.
     flags: {
       bossDefeated: false, frostBossDefeated: false, swampBossDefeated: false,
+      // 늪의 마녀 자비/처단 갈림(C 슬라이스): gates 마녀 오두막(spared) / 원혼의 늪(slain).
+      swampBoss_spared: false, swampBoss_slain: false,
       // Fallen Empire progression: knight miniboss (+ its spare/slay branch
       // that gates the throne gates) and the new final boss, the emperor.
       empireKnightDefeated: false, empireKnight_spared: false, empireKnight_slain: false, empireBossDefeated: false,
@@ -71,6 +77,8 @@ export function freshSave() {
       frostQueenDefeated: false, bloodCountDefeated: false, wraithLichDefeated: false, bridgeWardenDefeated: false, darkWardenDefeated: false, sealGuardianDefeated: false, fallenStarDefeated: false,
       // v3 옵션 던전 미니보스 (성채 집사 / 화염 파수장).
       citadelSeneschalDefeated: false, flameWardenDefeated: false,
+      // 처단 루트 전용 미니보스 (원혼의 늪).
+      wraithBogCleared: false,
       // joinedKnight: the chosen leader's join flag is preset at new-game so their
       // town recruit NPC stays hidden (you can't re-recruit your own leader).
       joinedKnight: false, joinedWarrior: false, joinedHuntress: false, joinedMage: false, joinedDuelist: false,
@@ -194,10 +202,19 @@ export function validateSave(raw) {
         .map(([k, v]) => [k, [...new Set(v.filter((e) => EMOTIONS.includes(e)))].slice(0, MAX_EMOTIONS_PER_PAIR)])
         .filter(([, v]) => v.length))
       : {},
+    // bossFate: per-boss outcome tracking (e.g., { bog_witch: 'spared' }).
+    bossFate: (d.bossFate && typeof d.bossFate === 'object' && !Array.isArray(d.bossFate))
+      ? Object.fromEntries(Object.entries(d.bossFate)
+        .filter(([k, v]) => typeof k === 'string' && (v === 'spared' || v === 'slain')))
+      : {},
+    // karma: cumulative mercy/execute tally for regional gating.
+    karma: Number.isFinite(d.karma) ? Math.max(-100, Math.min(100, Math.floor(d.karma))) : 0,
     flags: {
       bossDefeated: d.flags ? d.flags.bossDefeated === true : false,
       frostBossDefeated: d.flags ? d.flags.frostBossDefeated === true : false,
       swampBossDefeated: d.flags ? d.flags.swampBossDefeated === true : false,
+      swampBoss_spared: d.flags ? d.flags.swampBoss_spared === true : false,
+      swampBoss_slain: d.flags ? d.flags.swampBoss_slain === true : false,
       empireKnightDefeated: d.flags ? d.flags.empireKnightDefeated === true : false,
       empireKnight_spared: d.flags ? d.flags.empireKnight_spared === true : false,
       empireKnight_slain: d.flags ? d.flags.empireKnight_slain === true : false,
@@ -213,6 +230,7 @@ export function validateSave(raw) {
       fallenStarDefeated: d.flags ? d.flags.fallenStarDefeated === true : false,
       citadelSeneschalDefeated: d.flags ? d.flags.citadelSeneschalDefeated === true : false,
       flameWardenDefeated: d.flags ? d.flags.flameWardenDefeated === true : false,
+      wraithBogCleared: d.flags ? d.flags.wraithBogCleared === true : false,
       // Town companion recruits — persist so the NPC stays gone + isn't re-recruitable.
       joinedKnight: d.flags ? d.flags.joinedKnight === true : false,
       joinedWarrior: d.flags ? d.flags.joinedWarrior === true : false,
@@ -266,6 +284,8 @@ export function toRuntime(save) {
     fabula: save.fabula || 0,
     bonds: { ...(save.bonds || {}) },
     ngPlus: save.ngPlus || 0,
+    bossFate: { ...(save.bossFate || {}) },
+    karma: save.karma || 0,
     flags: { ...save.flags },
   };
 }
@@ -294,6 +314,8 @@ export function runtimeToSave(runtime) {
     fabula: runtime.fabula || 0,
     bonds: { ...(runtime.bonds || {}) },
     ngPlus: runtime.ngPlus || 0,
+    bossFate: { ...(runtime.bossFate || {}) },
+    karma: runtime.karma || 0,
     flags: { ...runtime.flags },
   };
 }

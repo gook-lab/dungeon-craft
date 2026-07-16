@@ -11,7 +11,7 @@ import * as PIXI from 'pixi.js';
 import { label, frame } from '../ui/uikit.js';
 import { HEX, FS, FONT, NUM } from '../ui/tokens.js';
 import { toneFromFlags } from '../content/dialog.js';
-import { epilogueFor } from '../content/epilogues.js';
+import { epilogueFor, karmaEpilogueLine } from '../content/epilogues.js';
 
 const MEMBER_NAME = { knight: '기사', warrior: '전사', huntress: '사냥꾼', mage: '마법사', duelist: '쌍검사' };
 const memberName = (refId) => MEMBER_NAME[refId] || refId;
@@ -104,6 +104,9 @@ export class EndingScene {
     // 리더 클래스 에필로그 — 같은 결말이라도 "누구의 눈으로 끝났는가".
     const epi = epilogueFor(rt.party[0]?.refId);
     if (epi) { lines.push(''); for (const ln of epi) lines.push(ln); }
+    // Karma-conditioned closer (mercy vs execution playstyle).
+    const karmaLine = karmaEpilogueLine(rt.karma || 0);
+    if (karmaLine) lines.push(karmaLine);
 
     this.summary = [];
     let y = h * 0.42;

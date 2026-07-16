@@ -244,7 +244,8 @@ export default {
         "ref": "bog_witch",
         "talk": "swamp_boss_intro",
         "flag": "swampBossDefeated",
-        "win": "swamp_boss_win"
+        "win": "swamp_boss_win",
+        "branchFlag": "swampBoss"
       },
       {
         "x": 50,
@@ -366,6 +367,9 @@ export default {
       }
     ],
   portals: [
+    // C 슬라이스 — 마녀 자비/처단 갈림이 여는 대칭 서브맵 (보스 자리 좌우, 처치 후 개방).
+    { "x": 55, "y": 19, "to": "witchs_hut", "tx": 10, "ty": 12, "requires": "swampBoss_spared", "label": "마녀의 오두막" },
+    { "x": 51, "y": 19, "to": "wraith_bog", "tx": 10, "ty": 12, "requires": "swampBoss_slain", "label": "원혼의 늪" },
     {
       "x": 1,
       "y": 23,

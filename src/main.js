@@ -280,7 +280,11 @@ async function main() {
     // 반응한다 (현재 에녹 3차 계시만 저술; 변형이 없으면 톤 경로로 폴백).
     const grim = bondPolarity(game.runtime.bonds) === 'dark' && getDialog(`${baseId}_grim`)
       ? `${baseId}_grim` : null;
-    const resolved = grim || tonedDialogId(baseId, game.runtime.flags);
+    // Karma-based dialogue branching (empire region NPCs react to execution vs mercy playstyle).
+    const karma = game.runtime.karma || 0;
+    const karmaVariant = karma > 0 && getDialog(`${baseId}_merciful`) ? `${baseId}_merciful`
+      : karma < 0 && getDialog(`${baseId}_ruthless`) ? `${baseId}_ruthless` : null;
+    const resolved = grim || karmaVariant || tonedDialogId(baseId, game.runtime.flags);
     // Companion-recruit NPC: on dialog close, fold the hero into the party (once).
     // recruitHero chains its own join-line dialog → resume, so DON'T also resume
     // here on that path (would resume the field under the join-line dialog).
@@ -594,6 +598,19 @@ async function main() {
         if (opts.bossObj.branchFlag) {
           const outcome = branchOutcome(state, opts.bossObj.ref);
           game.runtime.flags[`${opts.bossObj.branchFlag}_${outcome}`] = true;
+          // Record the per-boss outcome in bossFate for broader regional routing.
+          if (!game.runtime.bossFate) game.runtime.bossFate = {};
+          game.runtime.bossFate[opts.bossObj.ref] = outcome;
+          // Update karma (mercy +1 / execute -1) for regional divergence gates.
+          if (!game.runtime.karma) game.runtime.karma = 0;
+          game.runtime.karma += outcome === 'spared' ? 1 : -1;
+          // Execution-route rewards for specific branch bosses.
+          if (outcome === 'slain' && opts.bossObj.ref === 'bog_witch') {
+            // Witch's remains → dark-element weapon drop (execution-route exclusive).
+            game.runtime.inventory['umbral_dagger'] = (game.runtime.inventory['umbral_dagger'] || 0) + 1;
+            const it = getItem('umbral_dagger');
+            if (it) msgs.push(`${it.name}을(를) 손에 넣었다! (마녀의 유해)`);
+          }
         }
         // Ending branch by mercy ratio: merciful (≥70% spared) / ruthless
         // (≥70% slain) / mixed. Boss win dialog can opt in via win_merciful /

@@ -201,10 +201,13 @@ export function buildEnemyUnit(monsterId, opts = {}) {
     inflict: m.inflict || null, // {status, chance} applied on this enemy's hits
     family: m.family || null,   // 'undead'|'icy'|'fiery' — elemental affinity tag
     skills: m.skills || null,   // [{id,chance,cd,max?}] — enemy skill kit (monsterSkills.js)
-    // Mercy gating: bosses are never spareable/recruitable; a monster can opt
-    // out of recruiting via `recruitable: false` in monsters.js.
+    // Mercy gating: bosses are normally never spareable/recruitable, but a boss
+    // can opt IN via `spareable: true` (a story boss the player may show mercy —
+    // e.g. 늪의 마녀's 자비/처단 갈림). `recruitable` honors an explicit override
+    // so a spareable boss can also join; else defaults to non-boss + opt-out.
     mercyThreshold: m.mercyThreshold != null ? m.mercyThreshold : MERCY_THRESHOLD,
-    recruitable: !m.boss && m.recruitable !== false,
+    spareable: !!m.spareable,
+    recruitable: m.recruitable != null ? !!m.recruitable : (!m.boss && m.recruitable !== false),
     _bossTick: 0,
   });
 }
@@ -213,7 +216,7 @@ export function buildEnemyUnit(monsterId, opts = {}) {
 // option and the renderer/scene uses to decide spare-vs-recruit availability.
 // An enemy can be shown mercy once weakened to its HP threshold; bosses never.
 export function canMercy(target) {
-  return !!(target && target.side === 'enemy' && target.alive && !target.boss && !target.summoned
+  return !!(target && target.side === 'enemy' && target.alive && (!target.boss || target.spareable) && !target.summoned
     && target.hp <= target.maxHp * (target.mercyThreshold != null ? target.mercyThreshold : MERCY_THRESHOLD));
 }
 export function canRecruit(target) {

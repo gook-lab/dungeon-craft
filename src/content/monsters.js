@@ -80,6 +80,8 @@ export const MONSTERS = {
   bog_witch: {
     id: 'bog_witch', name: '늪의 마녀', maxHp: 790, atk: 56, def: 16, spd: 13, // 660→790 (2026-07-14: L16 3인 magicScale 화력에 swampBOSS 100%/64%HP 무저항 — deaths 0.4-0.8 밴드 복원)
     xp: 520, gold: 720, ai: 'boss', sprite: 'boss_bog_witch', boss: true,
+    // 자비/처단 갈림(C 슬라이스): boss지만 spareable — 약화 시 살려주기/영입 가능.
+    spareable: true, recruitable: true, recruitLine: '늪의 마녀가 지팡이를 거두며 너의 곁에 서기로 한다.',
     inflict: { status: 'poison', chance: 0.5, turns: 4 },
     // P1: 독 + 저주 압박. P2(격노): 재생으로 장기전 + 저주/독 유지.
     skills: [{ id: 'venomspit', chance: 0.4, cd: 1 }, { id: 'curse', chance: 0.35, cd: 3 }],
@@ -102,6 +104,11 @@ export const MONSTERS = {
   imperial_guard: { id: 'imperial_guard', name: '제국 근위병', maxHp: 120, atk: 30, def: 14, spd: 8, xp: 52, gold: 34, ai: 'attack', sprite: 'rusty_soldier', spriteScale: 1.18, tint: 0xd9c27a, family: 'metal', skills: [{ id: 'warcry', chance: 0.4, cd: 3, max: 2 }, { id: 'monslam', chance: 0.3, cd: 2 }], joinSkill: 'crushblow', recruitLine: '제국 근위병이 금빛 갑주를 울리며 새 황제에게 경례한다.' },
   // 원혼 위병: a spectral-violet 유령 위병 recolour — a fast curse-caster.
   wraith_sentinel: { id: 'wraith_sentinel', name: '원혼 위병', maxHp: 84, atk: 31, def: 7, spd: 26, xp: 48, gold: 26, ai: 'attack', sprite: 'spirit_guard', tint: 0xc4b8ff, family: 'undead', inflict: { status: 'weaken', chance: 0.45, turns: 3 }, skills: [{ id: 'curse', chance: 0.3, cd: 3 }, { id: 'monshock', chance: 0.35, cd: 2 }], joinSkill: 'aimedshot', recruitLine: '원혼 위병이 원한을 거두고 너의 곁을 지킨다.' },
+  // 처단 루트 전용 미니보스(원혼의 늪) — 벤 마녀의 원한이 뭉친 망령. spirit_guard 암보라 리컬러.
+  bog_revenant: { id: 'bog_revenant', name: '늪의 원혼', maxHp: 380, atk: 42, def: 11, spd: 20, xp: 240, gold: 180, ai: 'boss', sprite: 'spirit_guard', tint: 0x7a5cc4, spriteScale: 1.35, boss: true, family: 'undead',
+    inflict: { status: 'weaken', chance: 0.4, turns: 3 },
+    skills: [{ id: 'curse', chance: 0.4, cd: 2 }, { id: 'lifedrain', chance: 0.4, cd: 2 }],
+    phase2: { at: 0.5, atkMult: 1.4, spdBonus: 5, cry: '늪의 원혼이 저주를 토한다 — 죽은 자들의 손이 뻗어온다!', skills: [{ id: 'curse', chance: 0.45, cd: 2 }, { id: 'monshock', chance: 0.35, cd: 2 }, { id: 'lifedrain', chance: 0.4, cd: 2 }] } },
   // Optional empire MINIBOSS (spareable, not recruitable). A blood count haunting
   // the ruins; lifedrain pressure. Gated field encounter (bloodCountDefeated).
   blood_count:   { id: 'blood_count', name: '핏빛 백작', maxHp: 580, atk: 44, def: 14, spd: 15, xp: 320, gold: 420, ai: 'boss', sprite: 'boss_vampire', spriteScale: 0.8, family: 'undead', recruitable: false, inflict: { status: 'weaken', chance: 0.4, turns: 3 },
