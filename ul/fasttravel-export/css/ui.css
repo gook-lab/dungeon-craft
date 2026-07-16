@@ -1,0 +1,226 @@
+/* ============================================================
+   던전크래프트 — UI 컴포넌트 (PixiJS 창/메뉴/바 HTML 재현)
+   3종 프레임 시스템 + 명령창 + 대화창 + HP바 + 상태태그
+   ============================================================ */
+
+/* ---- 공통 텍스트 -------------------------------------------- */
+.ui { font-family: var(--f-ui); color: var(--c-text); line-height: 1.5;
+  -webkit-font-smoothing: none; }
+.ui .gold { color: var(--c-gold); }
+.ui .soft { color: var(--c-text-soft); }
+.ui .mute { color: var(--c-text-mute); }
+.ui .off  { color: var(--c-text-off); }
+.num { font-family: var(--f-mono); }
+
+/* =============================================================
+   프레임 시스템 — 동일 창에 적용되는 3가지 테두리 스타일
+   ============================================================= */
+
+/* (A) 정통+  ·  현재 스타일 정련: 둥근 모서리 + 양피지 2중 테두리 */
+.frame-classic {
+  position: relative;
+  background: rgba(18,21,46,0.94);
+  border-radius: 7px;
+  padding: 16px 20px;
+  box-shadow: inset 0 0 0 3px var(--c-frame),
+              inset 0 0 0 5px var(--c-ink-800),
+              0 6px 0 rgba(0,0,0,0.35);
+}
+
+/* (B) 양각 베벨  ·  SNES풍 픽셀 입체 테두리 (라운드 X) */
+.frame-bevel {
+  position: relative;
+  background: var(--c-ink-800);
+  padding: 16px 20px;
+  border: 4px solid var(--c-ink-800);
+  border-top-color: #3a4170;
+  border-left-color: #3a4170;
+  border-right-color: #05060f;
+  border-bottom-color: #05060f;
+  box-shadow: inset 0 0 0 2px var(--c-frame),
+              inset 0 0 0 4px var(--c-frame-shadow);
+  image-rendering: pixelated;
+}
+
+/* (C) 길디드 슬랩  ·  평면 다크 + 골드 헤어라인 + 코너 장식 */
+.frame-gilded {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(27,32,70,0.96), rgba(10,11,22,0.96));
+  padding: 18px 22px;
+  border: 2px solid var(--c-gold-deep);
+  box-shadow: inset 0 0 0 1px rgba(255,215,102,0.25),
+              0 4px 16px rgba(0,0,0,0.5);
+}
+.frame-gilded::before,
+.frame-gilded::after {
+  content: ""; position: absolute; width: 10px; height: 10px;
+  border: 2px solid var(--c-gold); 
+}
+.frame-gilded::before { top: 4px; left: 4px; border-right: 0; border-bottom: 0; }
+.frame-gilded::after  { bottom: 4px; right: 4px; border-left: 0; border-top: 0; }
+
+/* =============================================================
+   화자 이름표 (NPC 토스트)
+   ============================================================= */
+.speaker-tag {
+  display: inline-block;
+  font-family: var(--f-ui); font-size: var(--t-label);
+  color: var(--c-gold);
+  background: var(--c-ink-800);
+  padding: 4px 14px;
+  box-shadow: inset 0 0 0 2px var(--c-frame);
+  border-radius: 5px;
+  margin-bottom: -2px; position: relative; z-index: 2;
+}
+.speaker-tag.bevel {
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px var(--c-frame);
+  border: 3px solid var(--c-ink-800);
+  border-top-color:#3a4170; border-left-color:#3a4170;
+  border-right-color:#05060f; border-bottom-color:#05060f;
+}
+.speaker-tag.gilded {
+  border-radius:0; background: var(--c-ink-900);
+  box-shadow: none; border: 1px solid var(--c-gold-deep);
+  color: var(--c-gold);
+}
+
+/* 대화 본문 */
+.dialog-body { font-size: var(--t-body); color: var(--c-text); }
+.dialog-hint { font-size: var(--t-caption); color: var(--c-text-mute);
+  text-align: right; margin-top: 12px; }
+.blink { animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* 말풍선 변형 (필드 위 floating) */
+.bubble { position: relative; }
+.bubble::after {
+  content:""; position:absolute; bottom:-12px; left:36px;
+  border:7px solid transparent; border-top-color: var(--c-frame);
+}
+
+/* =============================================================
+   명령창 / 메뉴 리스트
+   ============================================================= */
+.menu { display: flex; flex-direction: column; gap: 2px; }
+.menu-row {
+  display: flex; align-items: center; gap: 10px;
+  font-size: var(--t-command); padding: 5px 10px 5px 6px;
+  color: var(--c-text); position: relative; white-space: nowrap;
+}
+.menu-row .cursor {
+  width: 14px; color: var(--c-gold); opacity: 0;
+  font-size: var(--t-command); line-height: 1;
+}
+.menu-row.sel { color: var(--c-gold); transform: translateZ(0); }
+.menu-row.sel .cursor { opacity: 1; }
+.menu-row.sel .lbl { display: inline-block; transform: scale(1.12);
+  transform-origin: left center; text-shadow: 0 0 8px rgba(255,215,102,.4); }
+.menu-row.disabled { color: var(--c-text-off); }
+.menu-row.disabled .reason { color: var(--c-text-off); font-size: var(--t-caption);
+  margin-left: 6px; }
+.menu-row .meta { margin-left: auto; color: var(--c-text-soft);
+  font-family: var(--f-mono); font-size: var(--t-stat); padding-left: 18px; }
+.menu-row.sel .meta { color: var(--c-gold-glow); }
+
+/* 행 하이라이트 바 변형 (필 배경) */
+.menu.filled .menu-row.sel {
+  background: linear-gradient(90deg, rgba(255,215,102,.16), rgba(255,215,102,0));
+  box-shadow: inset 2px 0 0 var(--c-gold);
+}
+
+/* 자비(시그니처) 강조 행 */
+.menu-row.mercy .lbl { color: var(--c-mercy); }
+.menu-row.mercy.disabled .lbl { color: var(--c-text-off); }
+.menu-row .sig {
+  font-size: var(--t-caption); color: var(--c-gold-deep);
+  border: 1px solid var(--c-gold-deep); padding: 0 5px; border-radius: 3px;
+  margin-left: 8px;
+}
+
+/* =============================================================
+   유닛 HP 바 (전투 머리 위) + 이름표 + 상태 태그
+   ============================================================= */
+.unit-bar { display: flex; flex-direction: column; align-items: center;
+  gap: 3px; width: 120px; }
+.unit-name { font-size: var(--t-label); }
+.unit-name.hero { color: var(--c-info); }
+.unit-name.enemy { color: #ffb3b3; }
+.unit-name.active { color: var(--c-gold); text-shadow: 0 0 8px rgba(255,215,102,.5); }
+.hpbar {
+  width: 110px; height: 13px; background: rgba(0,0,0,.7);
+  box-shadow: inset 0 0 0 1.5px var(--c-frame); position: relative;
+  overflow: hidden;
+}
+.hpbar .fill { height: 100%; transition: width .5s cubic-bezier(.4,0,.2,1);
+  image-rendering: pixelated; }
+.hpbar .fill.high { background: var(--c-hp-high); }
+.hpbar .fill.mid  { background: var(--c-hp-mid); }
+.hpbar .fill.low  { background: var(--c-hp-low); }
+/* 픽셀 눈금 오버레이 */
+.hpbar::after {
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background-image: repeating-linear-gradient(90deg,
+    transparent 0 9px, rgba(0,0,0,.28) 9px 10px);
+}
+.mpbar { width: 80px; height: 9px; }
+.mpbar .fill { background: var(--c-mp); }
+
+/* 상태 태그 칩 */
+.tags { display: flex; gap: 4px; }
+.tag {
+  font-family: var(--f-small); font-size: var(--t-caption);
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 1px 6px 1px 4px; border-radius: 3px;
+  background: rgba(0,0,0,.55);
+}
+.tag .ico { width: 14px; height: 14px; image-rendering: pixelated; }
+.tag.poison { color: var(--c-poison); box-shadow: inset 0 0 0 1px var(--c-poison); }
+.tag.sleep  { color: var(--c-sleep);  box-shadow: inset 0 0 0 1px var(--c-sleep); }
+.tag.weaken { color: var(--c-weaken); box-shadow: inset 0 0 0 1px var(--c-weaken); }
+
+/* =============================================================
+   데미지 / 회복 팝업
+   ============================================================= */
+.popup { font-family: var(--f-mono); font-weight: 700;
+  text-shadow: 2px 2px 0 #000; position: absolute; pointer-events: none; }
+.popup.dmg  { color: var(--c-text); font-size: 28px; }
+.popup.crit { color: var(--c-gold-glow); font-size: 40px; }
+.popup.heal { color: var(--c-hp-high); font-size: 28px; }
+.popup.miss { color: var(--c-text-soft); font-size: 26px; }
+@keyframes floatUp {
+  0% { transform: translateY(6px) scale(.6); opacity: 0; }
+  20% { transform: translateY(0) scale(1.1); opacity: 1; }
+  35% { transform: scale(1); }
+  100% { transform: translateY(-54px); opacity: 0; }
+}
+.popup.anim { animation: floatUp .9s ease-out forwards; }
+
+/* =============================================================
+   페이즈 배너
+   ============================================================= */
+.phase-banner {
+  width: 100%; text-align: center; padding: 12px 0;
+  font-family: var(--f-display); font-size: var(--t-display);
+  letter-spacing: 2px;
+}
+.phase-banner.hero  { background: rgba(27,58,107,.85); color: var(--c-phase-hero-fg); }
+.phase-banner.enemy { background: rgba(107,27,27,.85); color: var(--c-phase-enemy-fg); }
+
+/* =============================================================
+   필드 HUD (좌상단 파티 상태)
+   ============================================================= */
+.hud-row { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px;
+  align-items: center; margin-bottom: 8px; }
+.hud-name { font-size: var(--t-stat); }
+.hud-vit { display: flex; flex-direction: column; gap: 3px; }
+.hud-foot { display: flex; justify-content: space-between; align-items: center;
+  margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--c-frame-shadow);
+  font-size: var(--t-stat); }
+
+/* 골드/운명 배지 */
+.badge { display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--f-mono); font-size: var(--t-stat); }
+.badge.gold { color: var(--c-gold); }
+.badge.fate { color: var(--c-gold-glow); }

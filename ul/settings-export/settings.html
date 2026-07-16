@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>던전크래프트 — 설정</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/ui.css">
+<style>
+  html, body { margin: 0; height: 100%; background: #05060d; overflow: hidden; }
+  body { font-family: var(--f-ui); -webkit-font-smoothing: none; }
+  a { color: var(--c-gold); } a:hover { color: var(--c-gold-glow); }
+
+  #stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(1000px 640px at 50% 40%, rgba(30,26,66,.5), transparent 70%),
+      linear-gradient(180deg, #06070f, #0a0b1a 60%, #06070f); }
+  #stage::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image: repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,0,0,.10) 3px 4px); }
+
+  .settings { position: relative; width: min(640px, 94vw); max-height: 90vh;
+    background: linear-gradient(180deg, rgba(27,32,70,.97), rgba(10,11,22,.98));
+    border: 2px solid var(--c-gold-deep);
+    box-shadow: inset 0 0 0 1px rgba(255,215,102,.22), 0 24px 70px rgba(0,0,0,.7);
+    display: flex; flex-direction: column; animation: rise .28s cubic-bezier(.2,.7,.3,1); }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px) scale(.98); } }
+  .settings::before, .settings::after { content: ""; position: absolute; width: 13px; height: 13px;
+    border: 2px solid var(--c-gold); z-index: 5; }
+  .settings::before { top: 5px; left: 5px; border-right: 0; border-bottom: 0; }
+  .settings::after { bottom: 5px; right: 5px; border-left: 0; border-top: 0; }
+
+  .sh { display: flex; align-items: center; gap: 12px; padding: 16px 24px 12px; }
+  .sh svg { width: 22px; height: 22px; }
+  .sh h1 { font-family: var(--f-display); font-size: 24px; color: var(--c-gold); margin: 0;
+    text-shadow: 0 0 12px rgba(255,215,102,.35); letter-spacing: 1px; }
+  .sh .tabs { margin-left: auto; display: flex; gap: 4px; }
+  .sh .tab { font-size: 15px; color: var(--c-text-mute); padding: 4px 12px; cursor: pointer;
+    border-bottom: 2px solid transparent; }
+  .sh .tab.on { color: var(--c-gold); border-bottom-color: var(--c-gold); }
+
+  .body { padding: 6px 24px 8px; overflow-y: auto; }
+  .page { display: none; } .page.on { display: block; }
+
+  /* 설정 행 */
+  .opt { display: grid; grid-template-columns: 190px 1fr; gap: 16px; align-items: center;
+    padding: 12px 12px; border-radius: 6px; }
+  .opt.sel { background: rgba(255,215,102,.09); box-shadow: inset 2px 0 0 var(--c-gold); }
+  .opt .name { font-size: 19px; color: var(--c-text); display: flex; align-items: center; gap: 8px; }
+  .opt.sel .name { color: var(--c-gold); }
+  .opt .name .cur { color: var(--c-gold); opacity: 0; }
+  .opt.sel .name .cur { opacity: 1; }
+  .opt .hint { font-size: 13px; color: var(--c-text-mute); grid-column: 1 / -1; margin-top: -6px;
+    padding: 0 12px 4px; }
+
+  /* 슬라이더 (막대 눈금) */
+  .slider { display: flex; align-items: center; gap: 12px; }
+  .bar { flex: 1; height: 16px; background: rgba(0,0,0,.6); box-shadow: inset 0 0 0 2px var(--c-frame);
+    position: relative; display: flex; gap: 2px; padding: 2px; }
+  .bar .seg { flex: 1; background: var(--c-ink-600); }
+  .bar .seg.f { background: var(--c-gold); }
+  .opt.sel .bar { box-shadow: inset 0 0 0 2px var(--c-gold-glow); }
+  .slider .val { font-family: var(--f-mono); font-size: 17px; color: var(--c-text); width: 46px; text-align: right; }
+
+  /* 토글 */
+  .toggle { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
+  .toggle .sw { width: 52px; height: 24px; background: var(--c-ink-600); box-shadow: inset 0 0 0 2px var(--c-frame);
+    position: relative; transition: background .15s; }
+  .toggle .sw .knob { position: absolute; top: 2px; left: 2px; width: 20px; height: 16px;
+    background: var(--c-frame); transition: left .15s; }
+  .toggle.on .sw { background: var(--c-hp-high); }
+  .toggle.on .sw .knob { left: 30px; }
+  .toggle .txt { font-family: var(--f-mono); font-size: 16px; color: var(--c-text-soft); width: 34px; }
+
+  /* 라디오(세그먼트) */
+  .seg-radio { display: inline-flex; gap: 4px; }
+  .seg-radio button { font-family: var(--f-ui); font-size: 16px; padding: 6px 16px; cursor: pointer;
+    color: var(--c-text-soft); background: var(--c-ink-700); border: 1px solid var(--c-frame-shadow); }
+  .seg-radio button.on { color: var(--c-ink-900); background: var(--c-gold); border-color: var(--c-gold); }
+
+  /* 조작 안내표 */
+  .keys { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; padding: 6px 12px 12px; }
+  .keys .k { display: flex; justify-content: space-between; align-items: center; padding: 6px 0;
+    border-bottom: 1px solid rgba(57,64,110,.3); font-size: 16px; }
+  .keys .k .act { color: var(--c-text-soft); }
+  .kbd { font-family: var(--f-mono); font-size: 14px; color: var(--c-text); background: var(--c-ink-700);
+    border: 1px solid var(--c-frame-shadow); border-bottom-width: 3px; border-radius: 4px; padding: 1px 8px; }
+
+  /* 미리보기(색맹) */
+  .cbprev { display: flex; gap: 8px; margin-top: 10px; padding: 0 12px 8px; flex-wrap: wrap; }
+  .cbprev .chip { font-family: var(--f-small); font-size: 14px; display: inline-flex; align-items: center;
+    gap: 5px; padding: 2px 9px; border-radius: 3px; }
+
+  .sf { display: flex; align-items: center; gap: 12px; padding: 12px 24px 16px;
+    border-top: 1px solid var(--c-frame-shadow); }
+  .sf .savenote { font-size: 14px; color: var(--c-hp-high); display: flex; align-items: center; gap: 6px; }
+  .sf .spacer { flex: 1; }
+  .btn2 { font-family: var(--f-ui); font-size: 17px; padding: 8px 18px; cursor: pointer;
+    color: var(--c-text-soft); background: var(--c-ink-700); border: 1px solid var(--c-frame-shadow); }
+  .btn2:hover { color: var(--c-text); border-color: var(--c-frame-dim); }
+  .btn2.primary { color: var(--c-ink-900); background: var(--c-gold); border-color: var(--c-gold);
+    box-shadow: 0 3px 0 var(--c-gold-deep); }
+  .btn2.primary:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--c-gold-deep); }
+  .foot-hint { font-size: 13px; color: var(--c-text-mute); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="settings ui" id="settings">
+    <div class="sh">
+      <svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="4" fill="none" stroke="#ffd766" stroke-width="1.5"/><g stroke="#c98b2c" stroke-width="1.5"><path d="M11 1v3M11 18v3M1 11h3M18 11h3M4 4l2 2M16 16l2 2M18 4l-2 2M6 16l-2 2"/></g></svg>
+      <h1>설정</h1>
+      <div class="tabs" id="tabs">
+        <span class="tab on" data-page="audio">사운드</span>
+        <span class="tab" data-page="game">게임</span>
+        <span class="tab" data-page="controls">조작</span>
+      </div>
+    </div>
+    <div class="body" id="body"></div>
+    <div class="sf">
+      <span class="savenote" id="savenote" style="opacity:0">◆ 저장됨</span>
+      <span class="spacer"></span>
+      <span class="foot-hint"><span class="kbd">↑↓</span> 항목 · <span class="kbd">←→</span> 조절 · <span class="kbd">X</span> 닫기</span>
+      <button class="btn2" id="resetBtn">기본값</button>
+      <button class="btn2 primary" id="closeBtn">확인</button>
+    </div>
+  </div>
+</div>
+
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<rect width="100" height="100" fill="#0a0b1a"/>
+<circle cx="50" cy="50" r="16" fill="none" stroke="#ffd766" stroke-width="6"/>
+<g stroke="#c98b2c" stroke-width="6"><path d="M50 18v10M50 72v10M18 50h10M72 50h10"/></g>
+</svg>
+</template>
+
+<script src="js/settings.js"></script>
+</body>
+</html>

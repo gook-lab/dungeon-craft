@@ -13,6 +13,7 @@ const ACTION_CODES = {
   quest: ['KeyQ'],      // open the quest log directly from the field
   inventory: ['KeyI'],  // open the item/inventory menu directly
   map: ['KeyM'],        // toggle the enlarged minimap overlay
+  worldmap: ['KeyW'],   // from the enlarged minimap → world-map fast travel
 };
 
 export function createInput() {

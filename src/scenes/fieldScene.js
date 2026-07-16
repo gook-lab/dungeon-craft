@@ -13,6 +13,7 @@ import { getMonster } from '../content/monsters.js';
 import { heroUrl, heroWalkUrl, npcUrl, structureUrl, enemyUrl, pickupUrl } from '../util/assets.js';
 import { getItem } from '../content/items.js';
 import { recordVisit, isTalkTarget } from '../content/questlines.js';
+import { worldNode } from '../content/worldmap.js';
 import { statsAtLevel, xpToReach } from '../systems/progression.js';
 import { loadSheet, makeSprite, swapTexture, shadowTexture } from '../engine/renderer.js';
 import { label, frame, hpbar, bar } from '../ui/uikit.js';
@@ -438,6 +439,7 @@ export class FieldScene {
     this.buildWalls();
     this.buildDoors();
     this.buildObjects();
+    this.buildRuneGate();
     this.buildLights();
     // 로머 밀도는 맵 면적 비례(roamerCount) — loadMap마다 재스폰이라 맵을
     // 나갔다 오면 쓰러뜨린 로머도 돌아온다 (보스 오브젝트는 플래그 게이트 별개).
@@ -507,7 +509,7 @@ export class FieldScene {
       this.minimap.scale.set(scale);
       this.minimap.x = (sw - mw * scale) / 2;
       this.minimap.y = (sh - mh * scale) / 2;
-      if (!this.mapHint) { this.mapHint = label('M · X 닫기', FS.caption, HEX.textMute); this.hud.addChild(this.mapHint); }
+      if (!this.mapHint) { this.mapHint = label('W 월드맵 (빠른 이동) · X 닫기', FS.caption, HEX.textMute); this.hud.addChild(this.mapHint); }
       this.mapHint.visible = true;
       this.mapHint.x = sw / 2 - this.mapHint.width / 2; this.mapHint.y = (sh + mh * scale) / 2 + 10;
       if (this.hintLabel) this.hintLabel.visible = false; // 확대 지도 중엔 필드 힌트 숨김 (겹침 방지)
@@ -673,12 +675,60 @@ export class FieldScene {
     const delta = { south: [0, 1], north: [0, -1], east: [1, 0], west: [-1, 0] }[this.player.dir] || [0, 1];
     const fx = this.player.x + delta[0], fy = this.player.y + delta[1];
     const obj = objectAt(this.map, fx, fy);
-    const interactable = obj && (obj.kind === 'chest' || obj.kind === 'boss' || obj.talk || obj.quest);
+    // 룬게이트는 밟고 서 있거나(walkable pad) 마주 보면 상호작용.
+    const onGate = this.runeGate && ((this.runeGate.x === fx && this.runeGate.y === fy)
+      || (this.runeGate.x === this.player.x && this.runeGate.y === this.player.y));
+    const interactable = onGate || (obj && (obj.kind === 'chest' || obj.kind === 'boss' || obj.talk || obj.quest));
     this.prompt.visible = !!interactable && !this.moving;
     if (interactable) {
-      this.prompt.x = (fx + 0.5) * TILE;
-      this.prompt.y = (fy + 0.2) * TILE;
+      // 룬게이트를 밟고 서 있으면 프롬프트를 발밑(플레이어 타일)에 표시.
+      const standGate = this.runeGate && this.runeGate.x === this.player.x && this.runeGate.y === this.player.y;
+      const tx = standGate && !obj ? this.player.x : fx, ty = standGate && !obj ? this.player.y : fy;
+      this.prompt.x = (tx + 0.5) * TILE;
+      this.prompt.y = (ty + 0.2) * TILE;
     }
+  }
+
+  // 빠른이동 룬게이트 — 빠른이동 노드 맵마다 하나. 마을은 자체 차원석이 있으니 생략.
+  // 스폰 근처의 도달 가능·비점유 타일에 배치. 상호작용(Z) 시 활성화(save.runegates)
+  // + 월드맵 열기. 코드 드로잉 룬 패드(활성=골드 발광 / 미활성=회색).
+  buildRuneGate() {
+    this.runeGate = null;
+    if (this.runeGateSpr) { this.runeGateSpr.destroy(); this.runeGateSpr = null; }
+    const id = this.map.id;
+    if (id === 'town' || !worldNode(id)) return; // 마을=차원석 별도, 노드 아닌 맵=없음
+    const { w } = this.map;
+    const sp = this.map.spawn;
+    const occupied = new Set((this.map.objects || []).map((o) => o.y * w + o.x));
+    for (const p of this.map.portals || []) occupied.add(p.y * w + p.x);
+    // 스폰에서 바깥으로 나선 탐색: 벽 아님 + 오브젝트 없음 + 스폰과 다른 타일.
+    let gx = null, gy = null;
+    for (let r = 1; r < 8 && gx === null; r++) {
+      for (let dy = -r; dy <= r && gx === null; dy++) for (let dx = -r; dx <= r; dx++) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+        const x = sp.x + dx, y = sp.y + dy;
+        if (x < 1 || y < 1 || x >= this.map.w - 1 || y >= this.map.h - 1) continue;
+        const k = y * w + x;
+        if (this.map.collision[k] || occupied.has(k)) continue;
+        gx = x; gy = y; break;
+      }
+    }
+    if (gx === null) return;
+    const active = (this.game.runtime.runegates || []).includes(id);
+    this.runeGate = { x: gx, y: gy, active };
+    const eo = elevAt(this.map, gx, gy) * ELEV_STEP;
+    const g = new PIXI.Graphics();
+    const col = active ? 0x59d8ff : 0x8a8f9c;
+    const cx = (gx + 0.5) * TILE, cy = (gy + 0.6) * TILE - eo;
+    g.ellipse(cx, cy, TILE * 0.40, TILE * 0.22).fill({ color: 0x101830, alpha: 0.5 });
+    g.ellipse(cx, cy, TILE * 0.38, TILE * 0.20).stroke({ color: col, width: 2, alpha: 0.9 });
+    g.ellipse(cx, cy, TILE * 0.22, TILE * 0.12).stroke({ color: col, width: 1, alpha: 0.55 });
+    // 룬 마름모
+    g.moveTo(cx, cy - TILE * 0.14).lineTo(cx + TILE * 0.1, cy).lineTo(cx, cy + TILE * 0.14).lineTo(cx - TILE * 0.1, cy).closePath().fill({ color: col, alpha: 0.55 });
+    g.zIndex = gy - 0.4;
+    this.props.addChild(g);
+    this.runeGateSpr = g;
+    this._runeGateT = Math.random() * 6.28;
   }
 
   // HD-2D "공기" layer (P1). Screen-space, keyed by region (REGION_MOOD):
@@ -1989,9 +2039,13 @@ export class FieldScene {
 
     // Idle: show the interaction prompt for whatever the player faces.
     this.updatePrompt();
+    // 확대 지도가 열려 있을 때: W/Z → 월드맵 빠른 이동, X/M → 닫기.
+    if (this._bigMap) {
+      if (input.pressed('worldmap') || input.pressed('confirm')) { this.toggleBigMap(); this.busy = true; this.game.openFastTravel(); return; }
+      if (input.pressed('cancel') || input.pressed('map')) { this.toggleBigMap(); return; }
+      return; // 확대 중엔 이동/상호작용 입력 소비
+    }
     if (input.pressed('map')) { this.toggleBigMap(); return; }       // M → 미니맵 확대 토글
-    // 확대 지도가 열려 있으면 X/M/Z가 지도를 먼저 닫는다 (메뉴 대신).
-    if (this._bigMap && (input.pressed('cancel') || input.pressed('confirm'))) { this.toggleBigMap(); return; }
     if (input.pressed('confirm')) { this.interact(); return; }
     if (input.pressed('cancel')) { this.busy = true; this.game.openMenu(); return; }
     if (input.pressed('quest')) { this.busy = true; this.game.openMenu('quests'); return; }   // Q → 퀘스트 로그
@@ -2119,6 +2173,15 @@ export class FieldScene {
     const delta = { south: [0, 1], north: [0, -1], east: [1, 0], west: [-1, 0] }[this.player.dir];
     const fx = this.player.x + delta[0], fy = this.player.y + delta[1];
     const obj = objectAt(this.map, fx, fy);
+    // 룬게이트 활성화 + 월드맵 열기 (밟고 서 있거나 마주 본 상태에서 Z).
+    const g = this.runeGate;
+    if (g && ((g.x === fx && g.y === fy) || (g.x === this.player.x && g.y === this.player.y))) {
+      const rt = this.game.runtime;
+      if (!Array.isArray(rt.runegates)) rt.runegates = ['town'];
+      const first = !rt.runegates.includes(this.map.id);
+      if (first) { rt.runegates.push(this.map.id); this.game.saveNow(); this.game.audio?.play('buy'); }
+      this.busy = true; this.game.openFastTravel(); return;
+    }
     if (!obj) return;
     if (obj.kind === 'chest') { this.openChest(obj); return; }
     // Quest giver NPC (offer / progress / turn-in) — drives its own dialog.

@@ -17,6 +17,7 @@ import { DialogScene } from './scenes/dialogScene.js';
 import { MenuScene } from './scenes/menuScene.js';
 import { ShopScene } from './scenes/shopScene.js';
 import { WarpScene } from './scenes/warpScene.js';
+import { FastTravelScene } from './scenes/fastTravelScene.js';
 import { EndingScene } from './scenes/endingScene.js';
 import { levelForXp, spellsLearnedBetween, statsAtLevel, xpToReach } from './systems/progression.js';
 import { spoils, branchOutcome } from './systems/battle.js';
@@ -355,6 +356,8 @@ async function main() {
   game.openMenu = (mode) => scenes.push(new MenuScene(game), { mode });
   game.openShop = (shop) => scenes.push(new ShopScene(game), { shop });
   game.openWarp = () => scenes.push(new WarpScene(game));
+  // 룬게이트 월드맵 빠른 이동 (WarpScene 대체 — 발견한 지역으로 이동).
+  game.openFastTravel = () => scenes.push(new FastTravelScene(game));
 
   // Quest giver NPC interaction. State machine on save.quests[id]:
   //   (none) → show offer, accept (→ 'active')

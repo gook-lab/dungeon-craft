@@ -36,6 +36,8 @@ export function freshSave() {
     openedChests: [],
     // 누적 플레이타임 (초) — 메인 루프가 runtime에 적산, 타이틀 슬롯 카드가 표시.
     playtime: 0,
+    // 룬게이트 빠른이동 — 활성화한 맵 id 목록(현지 룬게이트 상호작용 시 추가). 마을 기본 활성.
+    runegates: ['town'],
     // 도감(Bestiary): refIds of every monster the party has faced in battle.
     seen: [],
     // Quest log: { questId: 'active' | 'done' } (see content/quests.js).
@@ -153,6 +155,8 @@ export function validateSave(raw) {
     pos: d.pos && Number.isFinite(d.pos.x) && Number.isFinite(d.pos.y) ? { x: d.pos.x, y: d.pos.y } : { ...fresh.pos },
     openedChests: Array.isArray(d.openedChests) ? d.openedChests.filter((c) => typeof c === 'string') : [],
     playtime: Number.isFinite(d.playtime) && d.playtime >= 0 ? Math.round(d.playtime) : 0,
+    // 룬게이트 활성 맵 (문자열 id, 중복 제거). 구 세이브는 최소 'town' 보장.
+    runegates: (() => { const a = Array.isArray(d.runegates) ? [...new Set(d.runegates.filter((x) => typeof x === 'string'))] : []; if (!a.includes('town')) a.push('town'); return a; })(),
     // 도감 seen-monster ids (string refIds, deduped).
     seen: Array.isArray(d.seen) ? [...new Set(d.seen.filter((s) => typeof s === 'string'))] : [],
     // Quest log: keep only string keys whose state is 'active' | 'done'.
@@ -251,6 +255,7 @@ export function toRuntime(save) {
     pos: { ...save.pos },
     openedChests: [...(save.openedChests || [])],
     playtime: save.playtime || 0,
+    runegates: [...(save.runegates || ['town'])],
     seen: [...(save.seen || [])],
     quests: { ...(save.quests || {}) },
     questlines: Object.fromEntries(Object.entries(save.questlines || {}).map(([k, v]) => [k, { ...v }])),
@@ -278,6 +283,7 @@ export function runtimeToSave(runtime) {
     pos: { ...runtime.pos },
     openedChests: [...(runtime.openedChests || [])],
     playtime: Math.round(runtime.playtime || 0),
+    runegates: [...(runtime.runegates || ['town'])],
     seen: [...(runtime.seen || [])],
     quests: { ...(runtime.quests || {}) },
     questlines: Object.fromEntries(Object.entries(runtime.questlines || {}).map(([k, v]) => [k, { ...v }])),

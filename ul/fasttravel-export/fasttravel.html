@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>던전크래프트 — 빠른 이동 (룬게이트)</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/ui.css">
+<style>
+  html, body { margin: 0; height: 100%; background: #05060d; overflow: hidden; }
+  body { font-family: var(--f-ui); -webkit-font-smoothing: none; }
+  a { color: var(--c-gold); } a:hover { color: var(--c-gold-glow); }
+
+  /* 게임 위에 뜬 오버레이 느낌 */
+  #stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background:
+      radial-gradient(1100px 700px at 50% 40%, rgba(30,26,66,.55), transparent 70%),
+      linear-gradient(180deg, #06070f, #0a0b1a 60%, #06070f); }
+  #stage::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image: repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,0,0,.10) 3px 4px); }
+
+  /* 룬게이트 모달 창 */
+  .travel {
+    position: relative; width: min(1120px, 94vw); height: min(640px, 90vh);
+    display: grid; grid-template-columns: 1fr 316px; gap: 0;
+    background: linear-gradient(180deg, rgba(27,32,70,.97), rgba(10,11,22,.98));
+    border: 2px solid var(--c-gold-deep);
+    box-shadow: inset 0 0 0 1px rgba(255,215,102,.22), 0 24px 70px rgba(0,0,0,.7);
+    animation: rise .3s cubic-bezier(.2,.7,.3,1); }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px) scale(.98); } }
+  .travel::before, .travel::after { content: ""; position: absolute; width: 14px; height: 14px;
+    border: 2px solid var(--c-gold); z-index: 5; }
+  .travel::before { top: 5px; left: 5px; border-right: 0; border-bottom: 0; }
+  .travel::after { bottom: 5px; right: 5px; border-left: 0; border-top: 0; }
+
+  /* 헤더 */
+  .th { position: absolute; top: -1px; left: 0; right: 316px; display: flex; align-items: center;
+    gap: 12px; padding: 12px 22px; z-index: 4; }
+  .th .rune { width: 22px; height: 22px; }
+  .th h1 { font-family: var(--f-display); font-size: 24px; color: var(--c-gold); margin: 0;
+    text-shadow: 0 0 12px rgba(255,215,102,.35); letter-spacing: 1px; }
+  .th .sub { font-size: 16px; color: var(--c-text-mute); margin-left: auto; }
+
+  /* 지도 영역 */
+  .mapwrap { position: relative; overflow: hidden; border-right: 1px solid var(--c-frame-shadow); }
+  #mapcanvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .nodes { position: absolute; inset: 0; }
+
+  /* 지역 노드 마커 */
+  .node { position: absolute; transform: translate(-50%, -50%); cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 4px; z-index: 2; }
+  .node .dot { width: 15px; height: 15px; background: var(--c-ink-700);
+    box-shadow: inset 0 0 0 2px var(--c-frame); transform: rotate(45deg); transition: all .12s; }
+  .node .lbl { font-size: 15px; color: var(--c-text-soft); white-space: nowrap;
+    padding: 1px 6px; background: rgba(6,7,15,.72); border-radius: 3px; text-shadow: 1px 1px 0 #000; }
+  .node:hover .dot { transform: rotate(45deg) scale(1.28); }
+  .node:hover .lbl { color: var(--c-text); }
+
+  /* 상태별 색 */
+  .node.hub .dot { background: var(--c-gold); box-shadow: inset 0 0 0 2px #7a5a12, 0 0 10px rgba(255,215,102,.5); }
+  .node.hub .lbl { color: var(--c-gold); }
+  .node.boss .dot { background: var(--c-danger); box-shadow: inset 0 0 0 2px #5a1a1f, 0 0 8px rgba(226,85,99,.5); }
+  .node.safe .dot { background: var(--c-hp-high); box-shadow: inset 0 0 0 2px #1f5a26; }
+  .node.locked { cursor: not-allowed; }
+  .node.locked .dot { background: #1a1c2e; box-shadow: inset 0 0 0 2px var(--c-frame-shadow); }
+  .node.locked .lbl { color: var(--c-text-off); }
+  .node.sel .dot { transform: rotate(45deg) scale(1.4); outline: 2px solid var(--c-gold);
+    outline-offset: 3px; }
+  .node.sel .lbl { color: var(--c-gold); background: rgba(6,7,15,.9); }
+
+  /* 현재 위치 — 맥동 링 */
+  .node.current .dot { background: var(--c-gold-glow); box-shadow: inset 0 0 0 2px #7a5a12; }
+  .node.current::before { content: ""; position: absolute; top: 7px; width: 15px; height: 15px;
+    border: 2px solid var(--c-gold); border-radius: 50%; animation: ping 1.6s ease-out infinite; }
+  @keyframes ping { 0% { transform: scale(.6); opacity: .9; } 100% { transform: scale(2.8); opacity: 0; } }
+  .node.current .lbl { color: var(--c-gold-glow); }
+
+  /* 액트 라벨 */
+  .actlabel { position: absolute; font-family: var(--f-display); font-size: 16px;
+    color: var(--c-gold-deep); letter-spacing: 2px; opacity: .8; z-index: 1;
+    text-shadow: 1px 1px 0 #000; pointer-events: none; }
+
+  /* 범례 */
+  .legend { position: absolute; left: 12px; top: 56px; bottom: auto; display: flex; flex-direction: column;
+    align-items: flex-start; gap: 5px; z-index: 3;
+    font-size: 14px; color: var(--c-text-mute); background: rgba(6,7,15,.66); padding: 8px 11px;
+    border-radius: 4px; }
+  .legend i { display: inline-block; width: 9px; height: 9px; transform: rotate(45deg);
+    margin-right: 5px; vertical-align: middle; }
+
+  /* 사이드 상세 패널 */
+  .side { display: flex; flex-direction: column; padding: 16px 18px; gap: 0; position: relative; }
+  .side .region-tag { font-family: var(--f-small); font-size: 14px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--c-gold-deep); }
+  .side h2 { font-family: var(--f-display); font-size: 26px; color: var(--c-text); margin: 6px 0 2px; }
+  .side .kind { font-size: 15px; color: var(--c-text-soft); }
+  .preview { margin: 14px 0; height: 150px; position: relative; overflow: hidden;
+    background: #0a0b18; border: 1px solid var(--c-frame-shadow); }
+  .preview canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .preview .fog { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 8px; background: rgba(6,7,15,.86); color: var(--c-text-off);
+    font-size: 15px; }
+  .preview .fog .q { font-family: var(--f-display); font-size: 40px; color: var(--c-frame-shadow); }
+  .desc { font-size: 16px; color: var(--c-text-soft); line-height: 1.65; flex: 1; }
+  .desc .row { display: flex; justify-content: space-between; padding: 5px 0;
+    border-bottom: 1px solid rgba(57,64,110,.3); }
+  .desc .row .k { color: var(--c-text-mute); } .desc .row .v { color: var(--c-text); font-family: var(--f-mono); }
+  .desc .row .v.danger { color: var(--c-danger); } .desc .row .v.safe { color: var(--c-hp-high); }
+
+  .travelbtn { margin-top: 12px; font-family: var(--f-ui); font-size: 20px; padding: 12px;
+    text-align: center; color: var(--c-ink-900); background: var(--c-gold); border: 0; cursor: pointer;
+    box-shadow: 0 4px 0 var(--c-gold-deep); transition: all .1s; letter-spacing: 1px; }
+  .travelbtn:hover { background: var(--c-gold-glow); }
+  .travelbtn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--c-gold-deep); }
+  .travelbtn.disabled { background: var(--c-ink-600); color: var(--c-text-off);
+    box-shadow: 0 4px 0 #0a0b16; cursor: not-allowed; }
+  .travelbtn .cost { font-size: 15px; opacity: .8; }
+  .foot-hint { margin-top: 10px; font-size: 14px; color: var(--c-text-mute); text-align: center; }
+  .kbd { font-family: var(--f-mono); font-size: 13px; background: var(--c-ink-700);
+    border: 1px solid var(--c-frame-shadow); border-bottom-width: 2px; border-radius: 3px; padding: 0 5px; }
+
+  /* 이동 트랜지션 오버레이 */
+  #warp { position: fixed; inset: 0; z-index: 30; pointer-events: none; opacity: 0;
+    background: radial-gradient(circle at var(--wx,50%) var(--wy,50%), var(--c-gold-glow), var(--c-gold) 12%, #1a1442 40%, #05060d 70%); }
+
+  #closeHint { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 8;
+    font-size: 15px; color: var(--c-text-mute); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="travel ui" id="travel">
+    <div class="th">
+      <svg class="rune" viewBox="0 0 22 22"><path d="M11 1 L21 11 L11 21 L1 11 Z" fill="none" stroke="#ffd766" stroke-width="1.5"/><path d="M11 5 L17 11 L11 17 L5 11 Z" fill="none" stroke="#c98b2c" stroke-width="1"/><circle cx="11" cy="11" r="2" fill="#fff0b8"/></svg>
+      <h1>빠른 이동</h1>
+    </div>
+    <div class="mapwrap">
+      <canvas id="mapcanvas"></canvas>
+      <div class="nodes" id="nodes"></div>
+      <div class="legend">
+        <span><i style="background:var(--c-gold-glow)"></i>현재</span>
+        <span><i style="background:var(--c-gold)"></i>룬게이트</span>
+        <span><i style="background:var(--c-hp-high)"></i>안전지대</span>
+        <span><i style="background:var(--c-danger)"></i>위험</span>
+        <span><i style="background:#1a1c2e;box-shadow:inset 0 0 0 1px #39406e"></i>미발견</span>
+      </div>
+    </div>
+    <div class="side" id="side"></div>
+  </div>
+</div>
+<div id="warp"></div>
+<div id="closeHint"><span class="kbd">↑↓←→</span> 선택 · <span class="kbd">Z</span> 이동 · <span class="kbd">X</span> 닫기</div>
+
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<rect width="100" height="100" fill="#0a0b1a"/>
+<path d="M50 20 L74 44 L50 68 L26 44 Z" fill="none" stroke="#ffd766" stroke-width="4"/>
+<circle cx="50" cy="44" r="6" fill="#fff0b8"/>
+<rect x="20" y="78" width="10" height="10" fill="#62c46a" transform="rotate(45 25 83)"/>
+<rect x="70" y="78" width="10" height="10" fill="#e25563" transform="rotate(45 75 83)"/>
+</svg>
+</template>
+
+<script src="js/fasttravel.js"></script>
+</body>
+</html>

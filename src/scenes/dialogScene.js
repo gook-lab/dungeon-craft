@@ -135,7 +135,7 @@ export class DialogScene {
     const after = this.afterClose;
     if (this.action === 'shop') { this.game.openShop(this.shop); }
     else if (this.action === 'inn') { this.game.tryInn(); }
-    else if (this.action === 'warp') { this.game.openWarp(); }
+    else if (this.action === 'warp') { this.game.openFastTravel(); }
     else if (after) { after(); }
     else { this.game.resumeField(); }
   }

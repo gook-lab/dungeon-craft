@@ -409,6 +409,8 @@ describe('toRuntime ∘ runtimeToSave round-trip (Gotcha #11 게이트)', () => 
       questlines: { ql_act1: { stage: 2, status: 'active' } },
       visitedMaps: ['town', 'wild', 'darkforest'],
       talkedNpcs: ['enoch_act1'],
+      runegates: ['town', 'wild', 'dungeon'],
+      playtime: 4200,
       ngPlus: 2,
       fabula: 3,
       bonds: { 'knight|warrior': ['loyalty'] },
