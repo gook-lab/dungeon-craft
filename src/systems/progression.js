@@ -1,9 +1,12 @@
 // Progression: XP curve, level-for-xp, and building a battle-ready hero unit
 // from a party-member definition at a given level. Pure — no Pixi, no globals.
 //
-// XP curve: cost to go from level L to L+1 is stepCost(L) = 8 + 6*(L-1)
-//   L1→2: 8, L2→3: 14, L3→4: 20 ...  (gentle linear growth, tuned so a
-//   slice player reaching the boss is roughly level 7-9).
+// XP curve: cost to go from level L to L+1.
+//   L≤4 (초반, 그대로): 8 + 6*(L-1) → L1→2:8, 2→3:14, 3→4:20, 4→5:26
+//   L≥5 (구간을 길게 — 2026-07-16): 26 + 15*(L-4) → 5→6:41, 6→7:56, 7→8:71,
+//     10→11:116, 16→17:206 … 5렙 이후 기울기 6→15로 올려 레벨업 간격을 ~2배로.
+//   선형 유지(후반 grind 폭증 방지 — 준2차는 L21에서 ~3배가 돼 과했다). 레벨→스탯
+//   매핑은 불변이라 밸런스 해니스(고정 레벨)엔 영향 없음 — 순수 페이싱.
 
 import { getMember } from '../content/party.js';
 import { getMonster } from '../content/monsters.js';
@@ -15,7 +18,9 @@ import { makeUnit } from './battle.js';
 export const ALLY_GROWTH = { hpMul: 0.10, atkMul: 0.10, defMul: 0.10, spdAdd: 0.5 };
 
 export function stepCost(level) {
-  return 8 + 6 * (level - 1);
+  if (level <= 4) return 8 + 6 * (level - 1);      // 초반 완만 (L5 도달까지 그대로)
+  const d = level - 4;
+  return 26 + 14 * d + d * d;                        // L5 이후 점증 (레벨업 구간 확대)
 }
 
 // Cumulative XP required to BE `level` (level 1 = 0 xp).
