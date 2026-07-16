@@ -40,11 +40,15 @@ const SAME_SOUND_GAP = 0.045; // s
 export function createAudio() {
   let voices = 0;
   let enabled = true;
-  let volume = 0.8;
+  // 음량 분리 (설정 화면 배선): master × bgm|sfx, muted는 전체 게이트. 0~1.
+  let master = 0.8, bgmVol = 0.6, sfxVol = 0.9, muted = false;
+  const sfxV = () => (muted ? 0 : master * sfxVol);
+  const bgmV = () => (muted ? 0 : master * bgmVol);
   const lastAt = new Map();
 
   function play(name) {
-    if (!enabled || volume <= 0) return;
+    const v = sfxV();
+    if (!enabled || v <= 0) return;
     const params = SOUNDS[name];
     if (!params) return;
     const now = (typeof performance !== 'undefined' ? performance.now() : 0) / 1000;
@@ -52,7 +56,7 @@ export function createAudio() {
     if (voices >= MAX_VOICES) return;
     lastAt.set(name, now);
     const scaled = params.slice();
-    scaled[0] = (params[0] ?? 1) * volume;
+    scaled[0] = (params[0] ?? 1) * v;
     try {
       const src = zzfx(...scaled);
       if (src) { voices++; src.onended = () => { voices = Math.max(0, voices - 1); }; }
@@ -146,7 +150,7 @@ export function createAudio() {
     src.loopStart = entry.trim[0];
     src.loopEnd = entry.trim[1];
     const g = c.createGain();
-    g.gain.value = BGM_ASSET_VOL * volume;
+    g.gain.value = BGM_ASSET_VOL * bgmV();
     src.connect(g); g.connect(c.destination);
     src.start(0, entry.trim[0]);
     bgmSrc = src; bgmGain = g;
@@ -162,7 +166,8 @@ export function createAudio() {
   // One-shot asset playback. false → not ready/missing (caller keeps its ZzFX
   // fallback); kicks off the load so the NEXT play lands the real sample.
   function playBuffer(name, vol) {
-    if (!enabled || volume <= 0) return false;
+    const v = sfxV();
+    if (!enabled || v <= 0) return false;
     const entry = buffers.get(name);
     if (!entry || typeof entry === 'string') { loadBuffer(name); return false; }
     const c = ctx();
@@ -170,7 +175,7 @@ export function createAudio() {
     const src = c.createBufferSource();
     src.buffer = entry.buf;
     const g = c.createGain();
-    g.gain.value = (vol ?? 1) * volume;
+    g.gain.value = (vol ?? 1) * v;
     src.connect(g); g.connect(c.destination);
     src.start(0, entry.trim[0]);
     return true;
@@ -210,7 +215,8 @@ export function createAudio() {
   let musicTimer = null;
   let beatIdx = 0;
   function playNote(track) {
-    if (!enabled || volume <= 0) return;
+    const v = bgmV();
+    if (!enabled || v <= 0) return;
     const i = beatIdx % track.notes.length;
     const f = track.notes[i];
     const bass = track.bass ? track.bass[i % track.bass.length] : null;
@@ -218,8 +224,8 @@ export function createAudio() {
     // Array literal allows elided slots; spread passes undefined for the holes
     // (a direct zzfx(... , , ...) call is a syntax error). null = rest (skip).
     try {
-      if (f) zzfx(...[track.vol * volume, 0.02, f, 0.02, 0.16, 0.22, track.shape, 1, , , , , , , , , 0.05, 0.6]);
-      if (bass) zzfx(...[track.vol * volume * 0.7, 0.02, bass, 0.03, 0.3, 0.4, 0, 0.6, , , , , , , , , 0.1, 0.5]);
+      if (f) zzfx(...[track.vol * v, 0.02, f, 0.02, 0.16, 0.22, track.shape, 1, , , , , , , , , 0.05, 0.6]);
+      if (bass) zzfx(...[track.vol * v * 0.7, 0.02, bass, 0.03, 0.3, 0.4, 0, 0.6, , , , , , , , , 0.1, 0.5]);
     } catch { /* not ready */ }
   }
   function setMusic(mode) {
@@ -255,9 +261,14 @@ export function createAudio() {
         musicMode = 'off';
       }
     },
-    setVolume: (v) => {
-      volume = Math.max(0, Math.min(1, v));
-      if (bgmGain) bgmGain.gain.value = BGM_ASSET_VOL * volume;
-    },
+    // 레거시: setVolume(v) = 전체 음량(master) 설정.
+    setVolume: (v) => { setMaster(v); },
+    setMaster, setBgm, setSfx, setMuted,
+    getLevels: () => ({ master, bgm: bgmVol, sfx: sfxVol, muted }),
   };
+  function refreshBgmGain() { if (bgmGain) bgmGain.gain.value = BGM_ASSET_VOL * bgmV(); }
+  function setMaster(v) { master = Math.max(0, Math.min(1, v)); refreshBgmGain(); }
+  function setBgm(v) { bgmVol = Math.max(0, Math.min(1, v)); refreshBgmGain(); }
+  function setSfx(v) { sfxVol = Math.max(0, Math.min(1, v)); }
+  function setMuted(m) { muted = !!m; refreshBgmGain(); }
 }

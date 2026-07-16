@@ -14,6 +14,8 @@ const ACTION_CODES = {
   inventory: ['KeyI'],  // open the item/inventory menu directly
   map: ['KeyM'],        // toggle the enlarged minimap overlay
   worldmap: ['KeyW'],   // from the enlarged minimap → world-map fast travel
+  tab: ['Tab'],         // settings tab switch
+  reset: ['KeyR'],      // settings → reset to defaults
 };
 
 export function createInput() {
@@ -23,7 +25,7 @@ export function createInput() {
 
   const onDown = (e) => {
     // Prevent the page from scrolling on arrows/space.
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) e.preventDefault();
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'Tab'].includes(e.code)) e.preventDefault();
     if (!held.has(e.code)) { justPressed.add(e.code); heldSince.set(e.code, 0); }
     held.add(e.code);
   };

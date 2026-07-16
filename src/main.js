@@ -18,6 +18,8 @@ import { MenuScene } from './scenes/menuScene.js';
 import { ShopScene } from './scenes/shopScene.js';
 import { WarpScene } from './scenes/warpScene.js';
 import { FastTravelScene } from './scenes/fastTravelScene.js';
+import { SettingsScene } from './scenes/settingsScene.js';
+import { loadSettings, applyAudioSettings } from './data/settings.js';
 import { EndingScene } from './scenes/endingScene.js';
 import { levelForXp, spellsLearnedBetween, statsAtLevel, xpToReach } from './systems/progression.js';
 import { spoils, branchOutcome } from './systems/battle.js';
@@ -47,6 +49,7 @@ async function main() {
   const rng = createRng(((Date.now ? Date.now() : 1) & 0x7fffffff) || 1);
 
   const audio = createAudio();
+  loadSettings(); applyAudioSettings(audio); // 전역 설정 적용 (음량 등)
   const game = { renderer, input, scenes, rng, audio };
   game.slot = 1; // active save slot — set by the title slot-picker (startGame)
   game.runtime = toRuntime(loadSave()); // placeholder until a slot is chosen
@@ -358,6 +361,7 @@ async function main() {
   game.openWarp = () => scenes.push(new WarpScene(game));
   // 룬게이트 월드맵 빠른 이동 (WarpScene 대체 — 발견한 지역으로 이동).
   game.openFastTravel = () => scenes.push(new FastTravelScene(game));
+  game.openSettings = () => scenes.push(new SettingsScene(game));
 
   // Quest giver NPC interaction. State machine on save.quests[id]:
   //   (none) → show offer, accept (→ 'active')

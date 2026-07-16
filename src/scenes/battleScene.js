@@ -29,6 +29,7 @@ import { statusTexture, fxTexture, statTexture } from '../ui/pixelIcons.js';
 import { createWeather, createEmberAura } from '../ui/weather.js';
 import { SpellFx, LO as FX_LO, hasSpellFx } from '../fx/spellFx.js';
 import { Cutscene } from '../fx/cutscene.js';
+import { getSettings } from '../data/settings.js';
 
 const MSG_TIME = 0.85;
 const ATK_DUR = 0.55;   // hero attack animation length
@@ -900,7 +901,9 @@ export class BattleScene {
   }
 
   // Screen shake: jitter the field layer, decaying to rest.
+  // 설정 '화면 흔들림' OFF면 no-op (멀미 접근성).
   shake(durMs, mag) {
+    if (!getSettings().screenShake) return;
     this._shake = { t: 0, dur: durMs / 1000, mag };
   }
 

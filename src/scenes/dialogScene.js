@@ -6,6 +6,7 @@ import * as PIXI from 'pixi.js';
 import { frame, label } from '../ui/uikit.js';
 import { HEX, FS, FONT } from '../ui/tokens.js';
 import { getDialog } from '../content/dialog.js';
+import { textSpeedSec } from '../data/settings.js';
 
 export class DialogScene {
   constructor(game) {
@@ -80,7 +81,13 @@ export class DialogScene {
     this.choiceLabels = [];
   }
 
-  render() { this.text.text = this.lines[this.idx] || ''; }
+  render() {
+    // 타자기 효과 — 설정 텍스트 속도(초/글자). 즉시(0)면 한 번에 출력.
+    this.fullText = this.lines[this.idx] || '';
+    const spd = textSpeedSec();
+    if (spd <= 0) { this.reveal = this.fullText.length; this.text.text = this.fullText; }
+    else { this.reveal = 0; this.charT = 0; this.text.text = ''; }
+  }
 
   // Terminal choice selector — replaces the message text with a vertical option
   // list; ▶ marks the cursor. Picking (confirm) pops + calls onChoice(index).
@@ -98,7 +105,16 @@ export class DialogScene {
     });
   }
 
-  update() {
+  update(dt = 0.016) {
+    // 타자기 진행 — 아직 다 안 나왔으면 글자 노출.
+    if (!this.choosing && this.fullText !== undefined && this.reveal < this.fullText.length) {
+      const spd = textSpeedSec();
+      if (spd > 0) {
+        this.charT = (this.charT || 0) + dt;
+        while (this.charT >= spd && this.reveal < this.fullText.length) { this.charT -= spd; this.reveal++; }
+        this.text.text = this.fullText.slice(0, this.reveal);
+      }
+    }
     // Blink the hint by cycling alpha
     this.hintAlpha += this.hintDirection;
     if (this.hintAlpha <= 0.3) this.hintDirection = 0.04;
@@ -120,6 +136,10 @@ export class DialogScene {
     }
 
     if (this.game.input.pressed('confirm') || this.game.input.pressed('cancel')) {
+      // 타자 중이면 먼저 전체 노출 (한 번 더 눌러야 다음 줄).
+      if (this.fullText !== undefined && this.reveal < this.fullText.length) {
+        this.reveal = this.fullText.length; this.text.text = this.fullText; return;
+      }
       this.idx++;
       if (this.idx >= this.lines.length) {
         // After the last line: enter the choice selector if this dialog has one.

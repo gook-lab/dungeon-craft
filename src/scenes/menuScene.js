@@ -17,6 +17,7 @@ import { getQuest, questProgress } from '../content/quests.js';
 import { QUESTLINES, questlineState, questlineUnlocked } from '../content/questlines.js';
 import { EMOTION_KR, NEGATIVE_EMOTIONS } from '../systems/bonds.js';
 import { EquipScene } from './equipScene.js';
+import { SettingsScene } from './settingsScene.js';
 import { CompendiumScene } from './compendiumScene.js';
 
 export class MenuScene {
@@ -152,7 +153,7 @@ export class MenuScene {
     this.menuLayer.removeChildren();
     const { w, h } = this.game.renderer.screen;
     let options;
-    if (this.mode === 'root') options = ['아이템', '장비', '편성', '유대', '퀘스트', '도감', '빠른 이동', '닫기'];
+    if (this.mode === 'root') options = ['아이템', '장비', '편성', '유대', '퀘스트', '도감', '빠른 이동', '설정', '닫기'];
     else if (this.mode === 'quests') options = [...this.questLines(), '← 뒤로'];
     else if (this.mode === 'bonds') options = [...this.bondLines(), '← 뒤로'];
     else if (this.mode === 'item') options = [...this.consumables().map(formatItem), '← 뒤로'];
@@ -304,6 +305,7 @@ export class MenuScene {
       else if (this.index === 4) { this.mode = 'quests'; }
       else if (this.index === 5) { this.game.scenes.push(new CompendiumScene(this.game)); return; }
       else if (this.index === 6) { this.game.scenes.pop(); this.game.openFastTravel(); return; } // 빠른 이동
+      else if (this.index === 7) { this.game.scenes.push(new SettingsScene(this.game)); return; } // 설정
       else { this.game.scenes.pop(); this.game.resumeField(); return; }
       this.index = 0; this.renderMenu(); return;
     }
