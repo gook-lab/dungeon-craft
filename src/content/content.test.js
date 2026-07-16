@@ -330,6 +330,31 @@ describe('map connectivity (completable playthrough)', () => {
 // art:'hero'→/heroes/ref_dir.png, plain npc→/npcs/ref_dir.png, boss→/enemies/
 // <monster.sprite>_east.png). Catches a stray ref like the witch NPC's old
 // 'bog_witch_npc' (no such file → invisible NPC) before it ships. 2026-07-16.
+// A portal MUST live in `map.portals` — `portalAt()` reads only that array, so an
+// object with kind:'portal' is silently INERT (the map renders, you walk onto the tile,
+// nothing happens). Shipped twice as a soft-lock: witchs_hut + wraith_bog had their only
+// exit written as an object → you could enter but never leave. 2026-07-16.
+describe('portal wiring integrity', () => {
+  it('no map declares a portal as an object (portals must live in map.portals)', () => {
+    const bad = [];
+    for (const [id, map] of Object.entries(MAPS)) {
+      for (const o of (map.objects || [])) {
+        if (o.kind === 'portal') bad.push(`${id}:(${o.x},${o.y}) → ${o.to} — move it into map.portals`);
+      }
+    }
+    expect(bad, `portal declared as an object (inert — portalAt only reads map.portals):\n${bad.join('\n')}`).toEqual([]);
+  });
+
+  it('every map you can walk INTO has a way back out (no portal-less dead ends)', () => {
+    // A map that any portal targets must itself expose ≥1 portal, else entering it
+    // strands the player (warp-only regions are exempt: nothing portals into them).
+    const targeted = new Set();
+    for (const map of Object.values(MAPS)) for (const p of (map.portals || [])) targeted.add(p.to);
+    const stranding = [...targeted].filter((id) => !(MAPS[id]?.portals || []).length);
+    expect(stranding, `enterable maps with NO exit portal: ${stranding.join(', ')}`).toEqual([]);
+  });
+});
+
 describe('map sprite-ref integrity', () => {
   const pub = (...p) => join(process.cwd(), 'public', ...p);
   it('every NPC/boss object renders from an existing sprite file', () => {

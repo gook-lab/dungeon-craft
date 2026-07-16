@@ -26,9 +26,11 @@ export default {
   ground,
   collision,
   spawn: { x: 10, y: 12 },
+  // 출구 — portalAt()은 map.portals만 읽는다 (objects의 kind:'portal'은 무시됨 → 소프트락).
+  portals: [
+    { x: 10, y: 13, to: 'swamp', tx: 51, ty: 20, label: '나가기' },
+  ],
   objects: [
-    // Portal back to swamp (lands beside the swamp boss spot).
-    { x: 10, y: 13, kind: 'portal', to: 'swamp', tx: 51, ty: 20, label: '나가기' },
     // 원혼 미니보스 — 벤 마녀의 원한. 처단 루트 전용 도전.
     { x: 10, y: 6, kind: 'boss', ref: 'bog_revenant', talk: 'wraith_bog_intro', flag: 'wraithBogCleared', win: 'wraith_bog_win' },
     // 처단 전용 보상 — 저주의 성물(상점/일반 loot 미등록) + 골드. 원혼 너머에 놓여

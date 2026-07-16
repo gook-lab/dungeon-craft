@@ -23,9 +23,12 @@ export default {
   ground,
   collision,
   spawn: { x: 10, y: 12 },
+  // 출구 — portalAt()은 map.portals만 읽는다. objects의 kind:'portal'은 엔진이 무시해
+  // 나갈 수 없는 소프트락이 된다 (2026-07-16 수정).
+  portals: [
+    { x: 10, y: 13, to: 'swamp', tx: 53, ty: 20, label: '나가기' },
+  ],
   objects: [
-    // Portal back to swamp
-    { x: 10, y: 13, kind: 'portal', to: 'swamp', tx: 53, ty: 20, label: '나가기' },
     // Witch shopkeeper NPC (merged shop+inn+quest into one friendly NPC)
     // art:'enemy' → enemyUrl(ref) 직접 사용이라 ref는 실존 스프라이트 키여야 함
     // (bog_witch_npc는 파일 없음 → boss_bog_witch_east.png 사용).
