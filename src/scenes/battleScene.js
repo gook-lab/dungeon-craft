@@ -566,20 +566,21 @@ export class BattleScene {
     g.rect(W * newFrac, 0, Math.max(1, W * (curFrac - newFrac)), 11).fill({ color: 0xff5566, alpha: 0.85 });
     g.visible = true; view._previewing = true;
     const lo = Math.max(1, Math.floor(dmg * 0.9)), hi = Math.ceil(dmg * 1.1);
-    // 색맹 모드: 속성 상성을 기호로 앞에 덧붙여 색이 아닌 문자로도 읽히게.
-    let pre = '';
-    if (getSettings().colorblind && target.family) {
-      // 물리 스킬은 시전자 무기 속성으로, 기본 공격은 시전자 무기 속성 그대로 상성 판정
-      // (툴팁·리졸버와 동일 — 기본 공격도 무기 속성을 탄다).
+    // 속성 상성 프리뷰 — 전 모드 표시(예전엔 색맹 전용). ▲약점/▼반감 기호 + 색으로
+    // "이 대상은 이 속성에 약하다"를 커밋 전에 보여줘 상성을 노리게 유도.
+    // 물리 스킬/기본 공격은 시전자 무기 속성으로 판정(툴팁·리졸버와 동일).
+    let pre = '', col = 0xffd0d0;
+    if (target.family) {
       const effEl = spell
         ? (spell.element === 'physical' && this.actor && this.actor.weaponElement ? this.actor.weaponElement : spell.element)
         : (this.actor && this.actor.weaponElement);
       if (effEl && effEl !== 'physical') {
         const k = affinityKind(effEl, target.family);
-        pre = k === 'strong' ? '▲' : k === 'resist' ? '▼' : '';
+        if (k === 'strong') { pre = '▲'; col = 0xffe08a; }        // 약점 — 골드
+        else if (k === 'resist') { pre = '▼'; col = 0x8fc4ff; }   // 반감 — 블루
       }
     }
-    this.setPreviewLabel(view, pre + (lo === hi ? `-${lo}` : `-${lo}~${hi}`), 0xffd0d0);
+    this.setPreviewLabel(view, pre + (lo === hi ? `-${lo}` : `-${lo}~${hi}`), col);
     if (target.hp - dmg <= 0 && view.killIcon) view.killIcon.visible = true;
   }
 
@@ -809,8 +810,9 @@ export class BattleScene {
         const restTint = v.unit.side === 'enemy' ? (v.unit.tint || 0xd4d4d4) : 0xffffff;
         v.sprite.tint = NUM.danger;
         setTimeout(() => { if (v.sprite && !v.sprite.destroyed) v.sprite.tint = restTint; }, 140);
-        // damage number popup (crit → big gold number, like heavy strikes)
-        if (typeof ev.amount === 'number') this.spawnDamageNumber(tid, ev.amount, ev.heavy || ev.crit);
+        // damage number popup (crit → big gold number, like heavy strikes;
+        // 약점 ▲ / 반감 ▼ prefix + tint so affinity is readable in any mode)
+        if (typeof ev.amount === 'number') this.spawnDamageNumber(tid, ev.amount, ev.heavy || ev.crit, this.affinityKindForEvent(ev, v.unit));
         if (ev.crit) this.tintPulse(tid, 0xffe28a, 120); // 치명타 골드 글린트 (장신구 crit 포함)
         if (!fxOwned) {
           // hit effect sprite (slash for attack, fire/ice/spark for spells)
@@ -832,14 +834,32 @@ export class BattleScene {
     }
   }
 
+  // Effective elemental affinity of a hit event vs its target's family, so the
+  // damage number can flag 약점(▲)/반감(▼) in ALL modes (not just colorblind) —
+  // the "did I hit a weakness?" feedback. Reads the same shared affinity table as
+  // the resolver, so the badge matches the dealt number. null = neutral/no element.
+  affinityKindForEvent(ev, target) {
+    if (!target || !target.family) return null;
+    const actor = this.state && findUnit(this.state, ev.actorId);
+    let element = null;
+    if (ev.type === 'attack') element = actor && actor.weaponElement;
+    else if (ev.type === 'spellHit') { const s = getSpell(ev.spellId); if (s) element = (s.element === 'physical' && actor && actor.weaponElement) ? actor.weaponElement : s.element; }
+    else if (ev.type === 'monsterSkillHit') { const s = getMonsterSkill(ev.spellId); element = s && s.element; }
+    if (!element || element === 'physical') return null;
+    const k = affinityKind(element, target.family);
+    return k === 'neutral' ? null : k; // 'strong' | 'resist'
+  }
+
   // Floating damage number above a unit, rising + fading over ~0.8s.
-  // Crit: larger, goldGlow; normal dmg: body size, frame text.
-  spawnDamageNumber(unitId, amount, crit) {
+  // Crit: larger, goldGlow; normal dmg: body size, frame text. `aff` ('strong'/
+  // 'resist') prefixes ▲/▼ + tints so a weakness/resist hit is obvious in any mode.
+  spawnDamageNumber(unitId, amount, crit, aff) {
     const view = this.viewOf.get(unitId);
     if (!view) return;
     const size = crit ? 40 : FS.num;
-    const color = crit ? HEX.goldGlow : HEX.text;
-    const t = label(String(amount), size, color, { font: FONT.mono });
+    const pre = aff === 'strong' ? '▲' : aff === 'resist' ? '▼' : '';
+    const color = crit ? HEX.goldGlow : aff === 'strong' ? HEX.gold : aff === 'resist' ? HEX.mp : HEX.text;
+    const t = label(pre + String(amount), size, color, { font: FONT.mono });
     t.anchor = { x: 0.5, y: 0.5 };
     t.x = view.baseX; t.y = view.root.y - view.targetH - 26;
     this.fieldLayer.addChild(t);
