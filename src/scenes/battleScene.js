@@ -140,14 +140,20 @@ export class BattleScene {
     this.deathRaged = new Set(); // 증오 death-rage, once per fallen ally
     this.flawAwarded = new Set(); // per-hero flaw FP, once per battle (Trait→FP)
     const enemies = (args.monsters || ['goblin']).map((id) => buildEnemyUnit(id));
-    // 회차+ (NG+) 적 스케일: 회차당 HP +25% / atk +15%. bonds 버프처럼 씬 레이어에서
-    // 유닛에 폴드 — 리졸버·밸런스 해니스는 1회차 기준 그대로 (스케일 비접촉).
+    // 회차+ (NG+) 적 스케일. bonds 버프처럼 씬 레이어에서 유닛에 폴드 — 리졸버·밸런스
+    // 해니스는 1회차 기준 그대로 (스케일 비접촉). 회차당 증분은 체감(diminishing):
+    // 1회차 +25%HP/+15%atk 그대로 두되, 이후 회차는 증분을 줄인다. 선형(0.25·ng)이면
+    // 영웅 성장 상한은 회차마다 고정인데 적만 계속 벌어져 NG+2부터 스토리 보스가
+    // 최적플레이로도 사실상 클리어 불가(늪 1%)가 됐다 — 체감곡선으로 NG+2를
+    // 어렵지만 가능한 대역(늪 7%·황제 78%)으로 되돌린다. 해니스와 동일 공식.
     const ng = this.game.runtime.ngPlus || 0;
     if (ng > 0) {
+      let hpAdd = 0, atkAdd = 0;
+      for (let i = 1; i <= ng; i++) { const f = 1 / (1 + (i - 1) * 0.8); hpAdd += 0.25 * f; atkAdd += 0.15 * f; }
       for (const u of enemies) {
-        u.maxHp = Math.round(u.maxHp * (1 + 0.25 * ng));
+        u.maxHp = Math.round(u.maxHp * (1 + hpAdd));
         u.hp = u.maxHp;
-        u.atk = Math.round(u.atk * (1 + 0.15 * ng));
+        u.atk = Math.round(u.atk * (1 + atkAdd));
       }
     }
     this.state = createBattle(this.heroUnits, enemies);
@@ -1227,10 +1233,11 @@ export class BattleScene {
   // ---- turn flow ----
   nextTurn() {
     const over = isOver(this.state);
-    if (over) return this.handleEnd(over);
+    if (over) { if (this.turnStrip) this.turnStrip.visible = false; return this.handleEnd(over); }
     const actor = currentActor(this.state);
     this.activeId = actor ? actor.id : null;
     this.refreshUnits();
+    this.renderTurnStrip();
     if (!actor) { advanceTurn(this.state); return this.nextTurn(); }
     // Round banner: with interleaved initiative the acting side flips often, so
     // announce once per round (for whoever leads it) instead of on every flip —
@@ -1277,6 +1284,49 @@ export class BattleScene {
     // true start of each hero turn (re-opening the command menu mid-turn doesn't).
     if (actor.side === 'hero') { this.fateUsedThisTurn = false; this.phase = 'command'; this.openCommand(actor); }
     else { this.phase = 'enemy'; this.applyAction(enemyChooseAction(this.state, actor.id, this.game.rng)); }
+  }
+
+  // Turn-order preview strip (top-center): surfaces the interleaved-by-spd
+  // initiative track so the player can READ speed as a real decision surface —
+  // a fast mob that strikes first, or a frozen/slowed unit (❄) that visibly
+  // drops down the queue. Cosmetic: reads state.turnOrder/turnIndex only, never
+  // mutates. Refreshed every turn from nextTurn().
+  renderTurnStrip() {
+    const { w } = this.game.renderer.screen;
+    if (!this.turnStrip) {
+      this.turnStrip = new PIXI.Container();
+      const idx = this.container.children.indexOf(this.panelBg);
+      this.container.addChildAt(this.turnStrip, idx >= 0 ? idx : this.container.children.length);
+    }
+    this.turnStrip.removeChildren();
+    const st = this.state;
+    if (!st || !st.turnOrder || isOver(st)) { this.turnStrip.visible = false; return; }
+    const upcoming = st.turnOrder.slice(st.turnIndex)
+      .map((id) => findUnit(st, id)).filter((u) => u && u.alive);
+    if (!upcoming.length) { this.turnStrip.visible = false; return; }
+    this.turnStrip.visible = true;
+    const list = upcoming.slice(0, 8);
+    const chipW = 62, chipH = 22, gap = 6, padL = 40;
+    const totalW = padL + list.length * chipW + (list.length - 1) * gap;
+    let x = Math.max(10, (w - totalW) / 2);
+    const lead = label('턴 ▸', FS.caption, HEX.textMute, { font: FONT.ui });
+    lead.x = x; lead.y = 13; this.turnStrip.addChild(lead);
+    x += padL;
+    list.forEach((u, i) => {
+      const cur = i === 0;
+      const hero = u.side === 'hero';
+      const g = new PIXI.Graphics();
+      g.roundRect(x, 10, chipW, chipH, 5).fill({ color: hero ? 0x3f74b0 : 0xa84545, alpha: cur ? 1 : 0.5 });
+      if (cur) g.roundRect(x, 10, chipW, chipH, 5).stroke({ color: HEX.gold, width: 2 });
+      this.turnStrip.addChild(g);
+      const slowed = u.status && (u.status.freeze || u.status.slow);
+      const t = label((slowed ? '❄' : '') + u.name, FS.caption, cur ? HEX.gold : HEX.text, { font: FONT.ui });
+      t.anchor = { x: 0.5, y: 0.5 };
+      if (t.width > chipW - 6) t.scale.x = (chipW - 6) / t.width;
+      t.x = x + chipW / 2; t.y = 10 + chipH / 2;
+      this.turnStrip.addChild(t);
+      x += chipW + gap;
+    });
   }
 
   showPhaseBanner(text, side) {
