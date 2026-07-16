@@ -850,3 +850,47 @@ export function tonedDialogId(id, flags) {
   const tone = toneFromFlags(flags);
   return DIALOG[`${id}_${tone}`] ? `${id}_${tone}` : id;
 }
+
+// --- Playstyle-tone surfacing (V1: make the hidden mercy loop legible) ---
+// The raw mercied/slain tally stays implicit (Undertale-style); we expose a
+// qualitative BAND for the menu panel and a one-time crossing note.
+export const TONE_KR = {
+  merciful: '자비로운 여정',
+  ruthless: '잔혹한 길',
+  mixed: '갈림길에 선 여정',
+};
+// Fired ONCE (via game.showLines) the first time the run commits to a tone, or
+// flips between committed tones. null = no note (e.g. still forming).
+export const TONE_CROSS_MSG = {
+  merciful: '세상이 너의 자비를 눈치채기 시작한다.',
+  ruthless: '네 이름 앞에서 사람들이 숨을 죽인다.',
+  mixed: '너의 행보는 아직 한쪽으로 기울지 않았다.',
+};
+
+// Qualitative descriptor for the 성향 panel. Keeps the raw ratio implicit but
+// gives the player mid-run feedback that their choices are accumulating.
+// lean: -0.5 (fully ruthless) .. +0.5 (fully merciful); 0 before enough data.
+export function toneBand(flags = {}) {
+  const m = flags.mercied || 0;
+  const s = flags.slain || 0;
+  const total = m + s;
+  const tone = toneFromFlags(flags);
+  if (total < 4) return { tone, label: '아직 드러나지 않은 여정', lean: 0, mercied: m, slain: s, formed: false };
+  return { tone, label: TONE_KR[tone], lean: (m / total) - 0.5, mercied: m, slain: s, formed: true };
+}
+
+// PURE: given the previous tone and the current flags, return a one-time
+// crossing note (or null). Only notes when crossing INTO a committed tone
+// (merciful/ruthless) or flipping between committed tones. The caller stores
+// the returned `tone` as the new baseline (runtime._lastTone).
+export function toneCrossNote(prevTone, flags = {}) {
+  const tone = toneFromFlags(flags);
+  if (prevTone === undefined) return { tone, msg: null };   // first observation: seed baseline, no toast
+  if (tone === prevTone) return { tone, msg: null };
+  // Suppress the note when merely returning to the still-forming 'mixed' from
+  // nothing meaningful; but DO note a committed→mixed drift and any commit.
+  const committed = tone === 'merciful' || tone === 'ruthless';
+  const wasCommitted = prevTone === 'merciful' || prevTone === 'ruthless';
+  const msg = (committed || wasCommitted) ? (TONE_CROSS_MSG[tone] || null) : null;
+  return { tone, msg };
+}

@@ -30,7 +30,7 @@ import { getMonster } from './content/monsters.js';
 import { getQuest, isQuestComplete } from './content/quests.js';
 import { advanceQuestlines, recordTalk } from './content/questlines.js';
 import { getMap } from './content/maps/index.js';
-import { getDialog, toneFromFlags, tonedDialogId } from './content/dialog.js';
+import { getDialog, toneFromFlags, tonedDialogId, toneCrossNote } from './content/dialog.js';
 
 // save ↔ runtime 매핑은 data/save.js의 toRuntime/runtimeToSave가 담당 (Gotcha #11
 // 네 지점이 그 파일 하나에 모여 라운드트립 테스트로 보호된다).
@@ -105,18 +105,33 @@ async function main() {
   // (endBattle) — 스케일은 전부 씬/메인 레이어라 리졸버·밸런스 해니스 비접촉.
   game.offerNgPlus = () => {
     const ng = (game.runtime.ngPlus || 0) + 1;
+    const f = game.runtime.flags;
+    const postLeft = !f.magmaDrakeDefeated || !f.voidLordDefeated; // 포스트게임 미클리어
+    const stayLine = postLeft
+      ? '이 세계에 남는다 — 불의 분화구·공허의 균열이 아직 기다린다'
+      : '이 세계에 남는다 (자유 탐험)';
     scenes.push(new DialogScene(game), {
       speaker: '',
       lines: ['여정이 끝났다. 하지만 에녹의 말처럼 — 새로운 균열이 언젠가, 어딘가에서 깨어난다.'],
-      choices: ['자유 탐험 (타이틀로)', `회차+ ${ng} 시작 — 적이 강해진 새 여정 (도감 승계)`],
+      choices: [stayLine, '타이틀로 나가기', `회차+ ${ng} 시작 (도감 승계)`],
       onChoice: (i) => {
-        if (i === 1) {
+        if (i === 2) {
+          // 회차+ (NG+): 도감 승계 + 리더 재선택부터 새 여정.
           game._ngCarry = { ngPlus: ng, seen: [...(game.runtime.seen || [])] };
           while (scenes.depth > 0) scenes.pop();
           game.field = null;
           scenes.push(new CharacterSelectScene(game));
-        } else {
+        } else if (i === 1) {
           game.toTitle();
+        } else {
+          // 이 세계에 남는다 — 엔딩/전투 씬을 걷어내고 필드로 복귀(포스트게임 자유 탐험).
+          game.saveNow();
+          while (game.field && scenes.top !== game.field && scenes.depth > 0) scenes.pop();
+          game.resumeField();
+          // 남은 포스트게임 권역이 있으면 동선을 짚어 준다 (빠른 이동 · 별무덤 너머).
+          if (postLeft) {
+            game.showLines('', ['— 종막 그 후 —', '별무덤 너머 불의 분화구와 공허의 균열이 아직 그대를 기다린다.', '(빠른 이동 · 옥좌의 북쪽 재의 길)']);
+          }
         }
       },
     });

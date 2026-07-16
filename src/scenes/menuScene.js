@@ -16,6 +16,7 @@ import { getMap } from '../content/maps/index.js';
 import { getQuest, questProgress } from '../content/quests.js';
 import { QUESTLINES, questlineState, questlineUnlocked } from '../content/questlines.js';
 import { EMOTION_KR, NEGATIVE_EMOTIONS } from '../systems/bonds.js';
+import { toneBand } from '../content/dialog.js';
 import { EquipScene } from './equipScene.js';
 import { SettingsScene } from './settingsScene.js';
 import { CompendiumScene } from './compendiumScene.js';
@@ -247,10 +248,16 @@ export class MenuScene {
   }
 
   // Read-only bond web: each pair's emotions. Two-pole legend (자비 / 잔혹) below.
+  // A 성향(playstyle-tone) header sits on top — mid-run feedback that the run's
+  // mercy/slaughter choices are accumulating (raw ratio stays implicit unless
+  // the run has committed; see dialog.toneBand).
   bondLines() {
+    const band = toneBand(this.game.runtime.flags || {});
+    const head = [`성향 — ${band.label}`];
+    if (band.formed) head.push(`  자비 ${band.mercied} · 처단 ${band.slain}`);
     const bonds = this.game.runtime.bonds || {};
     const keys = Object.keys(bonds).filter((k) => (bonds[k] || []).length);
-    if (!keys.length) return ['아직 맺어진 유대가 없다', '(함께 생존·부활·위기를 넘어라)'];
+    if (!keys.length) return [...head, '', '아직 맺어진 유대가 없다', '(함께 생존·부활·위기를 넘어라)'];
     const lines = keys.map((k) => {
       const [a, b] = k.split('|');
       const emos = bonds[k].map((e) => {
@@ -261,7 +268,7 @@ export class MenuScene {
     });
     lines.push('자비 존경+공 충성+방 애정위기');
     lines.push('잔혹† 멸시+공 불신+공% 증오사망');
-    return lines;
+    return [...head, '', ...lines];
   }
 
   consumables() {
