@@ -81,7 +81,8 @@ export const MONSTERS = {
     id: 'bog_witch', name: '늪의 마녀', maxHp: 790, atk: 56, def: 16, spd: 13, // 660→790 (2026-07-14: L16 3인 magicScale 화력에 swampBOSS 100%/64%HP 무저항 — deaths 0.4-0.8 밴드 복원)
     xp: 520, gold: 720, ai: 'boss', sprite: 'boss_bog_witch', boss: true,
     // 자비/처단 갈림(C 슬라이스): boss지만 spareable — 약화 시 살려주기/영입 가능.
-    spareable: true, recruitable: true, recruitLine: '늪의 마녀가 지팡이를 거두며 너의 곁에 서기로 한다.',
+    // joinSkill = 전용 원소 스킬(마녀의 저주, 어둠+독) → 영입 시 파티에 암흑 캐스터 추가.
+    spareable: true, recruitable: true, joinSkill: 'witch_hex', recruitLine: '늪의 마녀가 지팡이를 거두며 너의 곁에 서기로 한다.',
     inflict: { status: 'poison', chance: 0.5, turns: 4 },
     // P1: 독 + 저주 압박. P2(격노): 재생으로 장기전 + 저주/독 유지.
     skills: [{ id: 'venomspit', chance: 0.4, cd: 1 }, { id: 'curse', chance: 0.35, cd: 3 }],

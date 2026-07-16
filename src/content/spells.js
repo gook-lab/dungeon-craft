@@ -102,6 +102,8 @@ export const SPELLS = {
   venomcloud: { id: 'venomcloud', name: '독무', mpCost: 8, kind: 'damage', power: 7, target: 'allEnemies', element: 'poison', inflict: 'poison', inflictChance: 0.6, inflictTurns: 3 },
   // darkmist는 마법사 학습셋엔 없지만 dark_acolyte/necromancer 영입기(joinSkill)로 살아있음 — 유지.
   darkmist: { id: 'darkmist', name: '암흑 안개', mpCost: 9, kind: 'damage', power: 10, target: 'allEnemies', element: 'dark', inflict: 'weaken', inflictChance: 0.6, inflictTurns: 2 },
+  // 늪의 마녀 영입 전용 스킬(joinSkill) — 어둠+독 저주. 자비 루트의 '파티 빌드 실변화'.
+  witch_hex: { id: 'witch_hex', name: '마녀의 저주', mpCost: 5, kind: 'damage', power: 14, target: 'one', element: 'dark', inflict: 'poison', inflictChance: 0.6, inflictTurns: 3 },
   quake: { id: 'quake', name: '대지분쇄', mpCost: 9, kind: 'damage', power: 14, target: 'allEnemies', element: 'earth', inflict: 'weaken', inflictChance: 0.4, inflictTurns: 2 },
   lullaby: { id: 'lullaby', name: '자장가', mpCost: 5, kind: 'ailment', status: 'sleep', turns: 3, target: 'one' },
   meteor: { id: 'meteor', name: '메테오', mpCost: 12, kind: 'damage', power: 30, target: 'one', element: 'fire', inflict: 'burn', inflictChance: 0.7, inflictTurns: 3, ult: true },
