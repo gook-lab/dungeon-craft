@@ -289,7 +289,7 @@ export class TitleScene {
       });
       this.renderHint([{ kbd: '↑' }, { kbd: '↓' }, { text: '선택 ·' }, { kbd: 'Z' }, { text: '확인 ·' }, { kbd: 'X' }, { text: '뒤로' }]);
     } else {
-      this.renderHint([{ kbd: '↑' }, { kbd: '↓' }, { text: '슬롯 선택 ·' }, { kbd: 'Z' }, { text: '확인' }]);
+      this.renderHint([{ kbd: '↑' }, { kbd: '↓' }, { text: '슬롯 선택 ·' }, { kbd: 'Z' }, { text: '확인 ·' }, { kbd: 'X' }, { text: '설정' }]);
     }
 
     this.options = this.mode === 'slots' ? this.summaries.map(({ slot }) => `슬롯 ${slot}`) : ACTIONS.map((a) => a.labelKr);
@@ -306,7 +306,10 @@ export class TitleScene {
     const n = this.options.length;
     if (input.pressed('up')) { this.index = (this.index + n - 1) % n; this.render(); }
     if (input.pressed('down')) { this.index = (this.index + 1) % n; this.render(); }
-    if (input.pressed('cancel') && this.mode === 'action') { this.mode = 'slots'; this.index = this.slot - 1; this.render(); return; }
+    if (input.pressed('cancel')) {
+      if (this.mode === 'action') { this.mode = 'slots'; this.index = this.slot - 1; this.render(); return; }
+      this.game.openSettings(); return; // 슬롯 화면에서 X/Esc → 설정
+    }
     if (!input.pressed('confirm')) return;
 
     if (this.mode === 'slots') {
