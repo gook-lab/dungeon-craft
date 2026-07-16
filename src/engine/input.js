@@ -10,7 +10,9 @@ const ACTION_CODES = {
   right: ['ArrowRight', 'KeyD'],
   confirm: ['Enter', 'Space', 'KeyZ'],
   cancel: ['Escape', 'KeyX', 'Backspace'],
-  quest: ['KeyQ'], // open the quest log directly from the field
+  quest: ['KeyQ'],      // open the quest log directly from the field
+  inventory: ['KeyI'],  // open the item/inventory menu directly
+  map: ['KeyM'],        // toggle the enlarged minimap overlay
 };
 
 export function createInput() {

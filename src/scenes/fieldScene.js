@@ -347,7 +347,7 @@ export class FieldScene {
     this.fieldHud = new PIXI.Container();  // party HP/MP + gold (top-left)
     // Ambient control hint at the bottom — auto-hides after the player has
     // walked a few tiles (once per session, tracked on `game`).
-    this.hintLabel = label('방향키 이동 · Z 조사/대화 · X 메뉴', FS.caption, HEX.textMute);
+    this.hintLabel = label('방향키 이동 · Z 조사 · X 메뉴 · I 소지품 · M 지도 · Q 퀘스트', FS.caption, HEX.textMute);
     this.hintLabel.anchor = { x: 0.5, y: 1 };
     this.hud.addChild(this.banner, this.minimap, this.fieldHud, this.hintLabel);
     this.container.addChild(this.hud);
@@ -487,6 +487,40 @@ export class FieldScene {
   // Top-right minimap: walls/floor + portals (cyan), boss (red), chests (gold),
   // NPCs (green), and the player (yellow). Static layer rebuilt per map; the
   // player dot moves every frame.
+  // M 키 — 미니맵을 화면 중앙에 확대 표시(딤 백드롭) / 다시 코너로. 탐사한 곳만
+  // 보이는 건 동일; 큰 화면으로 전체 지도를 훑어보는 용도.
+  toggleBigMap() {
+    this._bigMap = !this._bigMap;
+    this.game.audio?.play(this._bigMap ? 'menu_confirm' : 'menu_cancel');
+    this.applyMinimapView();
+  }
+
+  applyMinimapView() {
+    if (!this.minimap) return;
+    const { w: sw, h: sh } = this.game.renderer.screen;
+    if (!this.mapDim) { this.mapDim = new PIXI.Graphics(); this.hud.addChildAt(this.mapDim, this.hud.getChildIndex(this.minimap)); }
+    if (this._bigMap) {
+      this.mapDim.clear().rect(0, 0, sw, sh).fill({ color: 0x05060f, alpha: 0.6 });
+      this.mapDim.visible = true;
+      const mw = this._mmW || 200, mh = this._mmH || 150;
+      const scale = Math.min((sw * 0.7) / mw, (sh * 0.7) / mh, 4);
+      this.minimap.scale.set(scale);
+      this.minimap.x = (sw - mw * scale) / 2;
+      this.minimap.y = (sh - mh * scale) / 2;
+      if (!this.mapHint) { this.mapHint = label('M · X 닫기', FS.caption, HEX.textMute); this.hud.addChild(this.mapHint); }
+      this.mapHint.visible = true;
+      this.mapHint.x = sw / 2 - this.mapHint.width / 2; this.mapHint.y = (sh + mh * scale) / 2 + 10;
+      if (this.hintLabel) this.hintLabel.visible = false; // 확대 지도 중엔 필드 힌트 숨김 (겹침 방지)
+    } else {
+      this.mapDim.visible = false;
+      if (this.mapHint) this.mapHint.visible = false;
+      if (this.hintLabel) this.hintLabel.visible = !this.game.tutHintDone; // 은퇴 상태면 계속 숨김
+      this.minimap.scale.set(1);
+      this.minimap.x = this._mmX ?? this.minimap.x;
+      this.minimap.y = this._mmY ?? this.minimap.y;
+    }
+  }
+
   buildMinimap() {
     const { w, h } = this.map;
     const { w: sw } = this.game.renderer.screen;
@@ -494,8 +528,10 @@ export class FieldScene {
     this.mmCell = cell;
     const mw = w * cell, mh = h * cell;
     const pad = 6;
+    this._mmW = mw + pad * 2; this._mmH = mh + pad * 2; // 확대 뷰 계산용 크기
     this.minimap.x = sw - mw - pad * 2 - 16;
     this.minimap.y = 16;
+    this._mmX = this.minimap.x; this._mmY = this.minimap.y; // 코너 복귀 좌표
 
     const g = this.mmStatic;
     g.clear();
@@ -535,6 +571,7 @@ export class FieldScene {
       if (col != null) g.rect(o.x * cell, o.y * cell, cell, cell).fill({ color: col });
     }
     this.updateMinimapPlayer();
+    if (this._bigMap) this.applyMinimapView(); // 확대 상태면 재빌드 후에도 유지
   }
 
   // Fog of war: reveal the tiles within `R` of the player (the walked path lights
@@ -1952,9 +1989,13 @@ export class FieldScene {
 
     // Idle: show the interaction prompt for whatever the player faces.
     this.updatePrompt();
+    if (input.pressed('map')) { this.toggleBigMap(); return; }       // M → 미니맵 확대 토글
+    // 확대 지도가 열려 있으면 X/M/Z가 지도를 먼저 닫는다 (메뉴 대신).
+    if (this._bigMap && (input.pressed('cancel') || input.pressed('confirm'))) { this.toggleBigMap(); return; }
     if (input.pressed('confirm')) { this.interact(); return; }
     if (input.pressed('cancel')) { this.busy = true; this.game.openMenu(); return; }
-    if (input.pressed('quest')) { this.busy = true; this.game.openMenu('quests'); return; } // Q → quest log
+    if (input.pressed('quest')) { this.busy = true; this.game.openMenu('quests'); return; }   // Q → 퀘스트 로그
+    if (input.pressed('inventory')) { this.busy = true; this.game.openMenu('item'); return; }  // I → 아이템/인벤토리
 
     const d = input.dir();
     if (d) {
