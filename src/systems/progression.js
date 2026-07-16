@@ -86,6 +86,9 @@ export function buildHeroUnit(memberId, level, opts = {}) {
     // Combat passives from equipped gear (items.equipPassives), read live by the
     // resolver. Caller computes from raw equip (opts.equip here is the stat bonus).
     passives: opts.passives || {},
+    // Weapon element (from items.equipWeaponElement), used to apply affinity to
+    // physical skills when an elemental weapon is equipped.
+    weaponElement: opts.weaponElement || null,
   });
 }
 

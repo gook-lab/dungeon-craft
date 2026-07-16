@@ -87,11 +87,11 @@ export const SPELLS = {
   arcanebolt: { id: 'arcanebolt', name: '비전 화살', mpCost: 3, kind: 'damage', power: 11, target: 'one', element: 'arcane' },
   arcaneblast: { id: 'arcaneblast', name: '비전 작렬', mpCost: 6, kind: 'damage', power: 16, target: 'one', element: 'arcane' },
   manashield: { id: 'manashield', name: '마나 방패', mpCost: 5, kind: 'buff', stat: 'shield', power: 18, target: 'self' },
-  meditate: { id: 'meditate', name: '명상', mpCost: 0, kind: 'mana', power: 14, target: 'self' },
+  meditate: { id: 'meditate', name: '명상', mpCost: 2, kind: 'mana', power: 0.4, target: 'self' },
   haste: { id: 'haste', name: '가속', mpCost: 4, kind: 'buff', stat: 'spd', power: 4, target: 'oneAlly' },
   overcharge: { id: 'overcharge', name: '마력 충전', mpCost: 4, kind: 'state', state: 'charge', target: 'self' },
   masshaste: { id: 'masshaste', name: '신속 강화', mpCost: 9, kind: 'buff', stat: 'spd', power: 4, target: 'allAllies' },
-  cataclysm: { id: 'cataclysm', name: '대재앙', mpCost: 14, kind: 'damage', power: 28, target: 'one', element: 'arcane', ult: true }, // mage ult
+  cataclysm: { id: 'cataclysm', name: '대재앙', mpCost: 14, kind: 'damage', power: 28, target: 'one', element: 'arcane' },
 
   // Elemental spellbook (single-target + AoE) — moved off huntress onto the mage.
   firebolt: { id: 'firebolt', name: '화염 화살', mpCost: 3, kind: 'damage', power: 11, target: 'one', element: 'fire', inflict: 'burn', inflictChance: 0.5, inflictTurns: 3 },

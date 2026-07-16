@@ -33,7 +33,7 @@ export const PARTY_MEMBERS = {
     spells: ['crushblow'],
     // 분노(rage)는 L15 습득 — 늪지(L15)부터 AI/하네스에 반영. crushblow는 L1 주력기.
     // quake(대지가르기) L10 — 지면강타 earth AoE로 중반 빈 레벨을 메움(balance 재측정 완료).
-    learn: { 4: 'warcry', 6: 'sunder', 8: 'taunt', 10: 'quake', 11: 'whirlwind', 13: 'warroar', 15: 'bloodlust', 17: 'berserk', 20: 'meteor' },
+    learn: { 4: 'warcry', 6: 'sunder', 8: 'taunt', 10: 'quake', 11: 'whirlwind', 13: 'warroar', 15: 'bloodlust', 17: 'berserk' },
   },
   huntress: {
     id: 'huntress', name: '사냥꾼', sprite: 'huntress',
@@ -41,8 +41,9 @@ export const PARTY_MEMBERS = {
     growth: { maxHp: 4.0, maxMp: 1.5, atk: 2.0, def: 0.8, spd: 2 },
     spells: ['aimedshot'],
     // 은신(stealth) L6 — 던전 보스(L7)부터 은신→치명 콤보가 AI/하네스에 반영.
-    // venomcloud(독무) L11 — 독 가스 화살 poison AoE+DoT로 중반을 메움(balance 재측정 완료).
-    learn: { 4: 'multishot', 6: 'stealth', 8: 'snaretrap', 10: 'piercingshot', 11: 'venomcloud', 12: 'smokebomb', 14: 'arrowrain', 16: 'assassinate', 18: 'venom_shot', 20: 'starfall' },
+    // Precision ranged / crit / affinity: single high-multiplier shots (aimedshot/piercing),
+    // stealth→assassination combo, ONE AoE (arrowrain). Elemental affinity via weapons.
+    learn: { 4: 'multishot', 6: 'stealth', 8: 'snaretrap', 10: 'piercingshot', 12: 'smokebomb', 14: 'arrowrain', 16: 'assassinate', 18: 'venom_shot', 20: 'starfall' },
   },
 
   // Arcane + elemental caster (the elemental spellbook moved here off the
@@ -61,22 +62,22 @@ export const PARTY_MEMBERS = {
     // All power<24 → still pre-L17, so the post-game nuke ladder + boss tuning hold
     // (mage is non-STARTING, so the 3-hero kill-build harness is untouched regardless).
     learn: {
-      3: 'firebolt', 5: 'ice_lance', 6: 'lullaby', 7: 'arcaneblast', 8: 'sandstorm',
+      3: 'firebolt', 5: 'ice_lance', 6: 'lullaby', 7: 'arcaneblast',
       9: 'thunderclap', 11: 'firestorm', 12: 'quake',
       13: 'manashield', 14: 'haste', 15: 'blizzard', 16: 'overcharge',
-      // Post-game nukes + fan-out (L17+) — past the balance harness ceiling.
-      17: 'meteor', 18: 'masshaste', 19: 'inferno', 20: 'cataclysm',
-      21: 'thunderstorm', 22: 'venomcloud', 23: 'darkmist', 24: 'cyclone', 25: 'divinewrath', 26: 'meditate',
+      // Post-game nukes + elemental coverage (L17+) — past the balance harness ceiling.
+      17: 'meteor', 18: 'masshaste', 20: 'cataclysm',
+      22: 'venomcloud', 25: 'divinewrath', 26: 'meditate',
     },
   },
 
   // 쌍검사 (duelist) — fast glass-cannon gunslinger (총·폭탄·투척). Own kit now
-  // (2026-05-30): multi-hit shooters + bombs that inflict 출혈(bleed)/화상, a 연막
-  // self-buff, and the 풀버스트 ult. High atk/spd, thin def/HP/MP → punished by
-  // single-target focus. NOT in STARTING_PARTY, but reachable: pick as leader in
-  // CharacterSelect OR recruit via the bounty-hunter NPC in town (11,5). Damage is
-  // physical (atk-scaled) — the low maxMp would starve magic; element only drives
-  // affinity + the inflict.
+  // (2026-05-30): multi-hit spray + bombs/bleed-burn burst. Role: melee risk / DoT
+  // stacking. Sprays (quickdraw/rend/shurikenflurry multi-hit + bleed focus), AoEs
+  // (fragbomb/buckshot/fanfire with burn/bleed), finisher (executioner, bonus vs
+  // low-HP). High atk/spd, thin def/HP/MP → punished by tanking. NOT in STARTING_PARTY,
+  // but reachable: pick as leader in CharacterSelect OR recruit via the bounty-hunter
+  // NPC in town (11,5). Damage is physical (atk-scaled); element only drives affinity.
   duelist: {
     id: 'duelist', name: '쌍검사', sprite: 'duelist',
     base: { maxHp: 24, maxMp: 18, atk: 13, def: 4, spd: 13 },

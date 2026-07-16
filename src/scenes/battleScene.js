@@ -19,7 +19,7 @@ import { availableBondStrikes, bondModForCombo } from '../content/bondSkills.js'
 import { getSpell } from '../content/spells.js';
 import { getMonsterSkill } from '../content/monsterSkills.js';
 import { getMonster } from '../content/monsters.js';
-import { getItem, equipBonus as gearBonus, equipPassives as gearPassives, itemSummary, itemKindKR } from '../content/items.js';
+import { getItem, equipBonus as gearBonus, equipPassives as gearPassives, equipWeaponElement, itemSummary, itemKindKR } from '../content/items.js';
 import { statusDesc } from '../content/statusInfo.js';
 import { enemyUrl, heroUrl, heroWalkUrl, heroAttackUrl, structureUrl, ATTACK_FRAMES } from '../util/assets.js';
 import { makeSprite, swapTexture, preload, loadSheet, shadowTexture } from '../engine/renderer.js';
@@ -99,7 +99,7 @@ export class BattleScene {
     for (const refId of active.slice(0, 4)) {
       const p = rt.party.find((m) => m.refId === refId);
       if (p) {
-        this.heroUnits.push(buildHeroUnit(p.refId, p.level, { id: p.refId, hp: p.hp, mp: p.mp, equip: equipBonus(p), passives: gearPassives(p.equip) }));
+        this.heroUnits.push(buildHeroUnit(p.refId, p.level, { id: p.refId, hp: p.hp, mp: p.mp, equip: equipBonus(p), passives: gearPassives(p.equip), weaponElement: equipWeaponElement(p.equip) }));
         continue;
       }
       const a = (rt.allies || []).find((x) => x.refId === refId);
@@ -111,7 +111,7 @@ export class BattleScene {
     // Safety net: never start a battle with an empty hero side (stale active list).
     if (!this.heroUnits.length && rt.party[0]) {
       const p = rt.party[0];
-      this.heroUnits.push(buildHeroUnit(p.refId, p.level, { id: p.refId, hp: p.hp, mp: p.mp, equip: equipBonus(p), passives: gearPassives(p.equip) }));
+      this.heroUnits.push(buildHeroUnit(p.refId, p.level, { id: p.refId, hp: p.hp, mp: p.mp, equip: equipBonus(p), passives: gearPassives(p.equip), weaponElement: equipWeaponElement(p.equip) }));
     }
     // Bonds → max-HP fold: +3% per bond point (cap +15% at str 5). A save-
     // progression buff; the balance harness models it separately. Nerfed

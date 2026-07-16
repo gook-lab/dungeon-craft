@@ -57,6 +57,9 @@ export function physicalDamage(attacker, target, rng, heavyMult = 1) {
 // top of the attacker's atk, so a huntress/warrior skill scales with their
 // STRENGTH (not mana). Honors 분노(rage melee +30%), pierce (ignore def),
 // 약화/위협/동상 debuffs, defending, and elemental affinity. Pure.
+// When spell.element is 'physical', uses the attacker's equipped weapon element
+// (if any) to determine affinity, allowing physical classes to leverage
+// elemental weapons.
 export function skillDamage(spell, attacker, target, rng) {
   const st = attacker.status || {};
   const mult = (st.weaken > 0 ? 0.7 : 1) * (st.atkdown > 0 ? 0.8 : 1) * (st.freeze > 0 ? 0.8 : 1);
@@ -68,7 +71,12 @@ export function skillDamage(spell, attacker, target, rng) {
   let dmg = spell.pierce ? atk * 0.7 : atk * (atk / (atk + effectiveDef(target)));
   dmg *= VARIANCE(rng);
   if (target.defending) dmg *= 0.5;
-  dmg *= elementMultiplier(spell.element, target);
+  // Apply affinity: use spell.element if set; if element is 'physical', use
+  // the attacker's weaponElement (if equipped).
+  const element = spell.element === 'physical' && attacker.weaponElement
+    ? attacker.weaponElement
+    : spell.element;
+  dmg *= elementMultiplier(element, target);
   return Math.max(1, Math.floor(dmg));
 }
 
@@ -581,8 +589,12 @@ export function resolveAction(state, action, rng) {
       // 연막탄: also blinds enemies (atkdown) so they hit softer while the smoke holds.
       if (spell.debuffEnemyAcc) for (const e of living(state, 'enemy')) { applyStatus(e, 'atkdown', 2); events.push({ type: 'inflict', targetId: e.id, status: 'atkdown' }); }
     } else if (spell.kind === 'mana') {
-      // 명상: restore the caster's MP (scales with their mana depth).
-      const restore = Math.floor(spell.power * magicScale(actor) * VARIANCE(rng));
+      // 명상: restore the caster's MP. If power < 1, treat as % of maxMp (flat cap);
+      // otherwise scale with magicScale. This prevents infinite looping on zero-cost
+      // mana restoration (meditate).
+      const restore = spell.power < 1
+        ? Math.floor(actor.maxMp * spell.power)
+        : Math.floor(spell.power * magicScale(actor) * VARIANCE(rng));
       const before = actor.mp; actor.mp = Math.min(actor.maxMp, actor.mp + restore);
       events.push({ type: 'mana', actorId: actor.id, amount: actor.mp - before });
     } else if (spell.kind === 'state') {
