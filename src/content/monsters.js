@@ -7,47 +7,48 @@
 // spd drives turn order. xp/gold awarded on kill (summed for the encounter).
 
 export const MONSTERS = {
-  walker:  { id: 'walker',  name: '해골 병사', maxHp: 26, atk: 8, def: 2, spd: 4,  xp: 5,  gold: 4,  ai: 'attack', sprite: 'walker', family: 'undead', joinSkill: 'crushblow', recruitLine: '해골 병사가 덜그럭거리며 너의 명령을 기다린다.' },
-  goblin:  { id: 'goblin', family: 'beast',  name: '고블린',    maxHp: 22, atk: 9, def: 1, spd: 7,  xp: 6,  gold: 6,  ai: 'attack', sprite: 'goblin', joinSkill: 'crushblow', recruitLine: '고블린이 이를 드러내며 씩 웃는다 — 이제 네 편이다.' },
-  wolf:    { id: 'wolf', family: 'beast',    name: '들개',      maxHp: 24, atk: 10, def: 1, spd: 10, xp: 7,  gold: 3,  ai: 'attack', sprite: 'wolf', skills: [{ id: 'flurry', chance: 0.4, cd: 2 }], joinSkill: 'aimedshot', recruitLine: '들개가 너를 새 우두머리로 인정했다.' },
-  spider:  { id: 'spider', family: 'beast',  name: '독거미',    maxHp: 18, atk: 6, def: 0, spd: 13, xp: 4,  gold: 2,  ai: 'attack', sprite: 'spider', inflict: { status: 'poison', chance: 0.4, turns: 3 }, skills: [{ id: 'venomspit', chance: 0.35, cd: 2 }, { id: 'webshot', chance: 0.35, cd: 2 }], joinSkill: 'venom_shot', recruitLine: '독거미가 네 그림자에 슬그머니 자리를 튼다.' },
-  bat:     { id: 'bat', family: 'aerial',     name: '박쥐',      maxHp: 14, atk: 5, def: 0, spd: 13, xp: 3,  gold: 1,  ai: 'attack', sprite: 'bat', skills: [{ id: 'screech', chance: 0.3, cd: 3 }], joinSkill: 'aimedshot', recruitLine: '박쥐가 파닥이며 네 어깨에 내려앉는다.' },
-  imp:     { id: 'imp',     name: '임프',      maxHp: 24, atk: 11, def: 2, spd: 13, xp: 9,  gold: 8,  ai: 'attack', sprite: 'imp', family: 'fiery', inflict: { status: 'burn', chance: 0.4, turns: 3 }, skills: [{ id: 'firebreath', chance: 0.3, cd: 3 }], joinSkill: 'firebolt', recruitLine: '임프가 키득거리며 불씨 하나를 바친다.' },
-  wisp:    { id: 'wisp',    name: '도깨비불',  maxHp: 30, atk: 9, def: 4, spd: 6,  xp: 10, gold: 5,  ai: 'attack', sprite: 'wisp', family: 'fiery', skills: [{ id: 'monshock', chance: 0.35, cd: 2 }], joinSkill: 'arcanebolt', recruitLine: '도깨비불이 네 곁을 맴돌기 시작한다.' },
-  hornet:  { id: 'hornet', family: 'aerial',  name: '말벌떼',    maxHp: 16, atk: 8, def: 0, spd: 17, xp: 6,  gold: 3,  ai: 'attack', sprite: 'hornet', inflict: { status: 'poison', chance: 0.4, turns: 2 }, skills: [{ id: 'screech', chance: 0.3, cd: 3 }], joinSkill: 'venom_shot', recruitLine: '말벌떼가 윙윙거리며 네 주위를 호위한다.' },
-  brood_mother: { id: 'brood_mother', family: 'beast', name: '독거미 여왕', maxHp: 42, atk: 13, def: 3, spd: 9, xp: 18, gold: 12, ai: 'attack', sprite: 'brood_mother', inflict: { status: 'poison', chance: 0.5, turns: 3 }, skills: [{ id: 'broodspawn', chance: 0.3, cd: 99, max: 1 }, { id: 'venomspit', chance: 0.4, cd: 2 }, { id: 'webshot', chance: 0.35, cd: 2 }], joinSkill: 'venom_shot', recruitLine: '독거미 여왕이 너를 둥지의 주인으로 받아들인다.' },
-  bone_archer: { id: 'bone_archer', name: '해골 궁수', maxHp: 28, atk: 14, def: 2, spd: 11, xp: 14, gold: 8, ai: 'attack', sprite: 'bone_archer', family: 'undead', skills: [{ id: 'monslam', chance: 0.3, cd: 3 }], joinSkill: 'aimedshot', recruitLine: '해골 궁수가 부서진 활을 들어 너를 겨눈다 — 이제 네 편으로.' },
-  powder_skeleton: { id: 'powder_skeleton', name: '분골 해골', maxHp: 24, atk: 12, def: 1, spd: 8, xp: 11, gold: 6, ai: 'attack', sprite: 'powder_skeleton', family: 'undead', joinSkill: 'crushblow', recruitLine: '분골 해골이 흩어진 뼈를 추슬러 일어선다.' },
+  walker:  { id: 'walker',  name: '해골 병사', maxHp: 38, atk: 15, def: 2, spd: 4,  xp: 5,  gold: 4,  ai: 'attack', sprite: 'walker', family: 'undead', joinSkill: 'crushblow', recruitLine: '해골 병사가 덜그럭거리며 너의 명령을 기다린다.' },
+  goblin:  { id: 'goblin', family: 'beast',  name: '고블린',    maxHp: 32, atk: 16, def: 1, spd: 7,  xp: 6,  gold: 6,  ai: 'attack', sprite: 'goblin', joinSkill: 'crushblow', recruitLine: '고블린이 이를 드러내며 씩 웃는다 — 이제 네 편이다.' },
+  wolf:    { id: 'wolf', family: 'beast',    name: '들개',      maxHp: 36, atk: 18, def: 1, spd: 10, xp: 7,  gold: 3,  ai: 'attack', sprite: 'wolf', skills: [{ id: 'flurry', chance: 0.4, cd: 2 }], joinSkill: 'aimedshot', recruitLine: '들개가 너를 새 우두머리로 인정했다.' },
+  spider:  { id: 'spider', family: 'beast',  name: '독거미',    maxHp: 27, atk: 11, def: 0, spd: 13, xp: 4,  gold: 2,  ai: 'attack', sprite: 'spider', inflict: { status: 'poison', chance: 0.4, turns: 3 }, skills: [{ id: 'venomspit', chance: 0.35, cd: 2 }, { id: 'webshot', chance: 0.35, cd: 2 }], joinSkill: 'venom_shot', recruitLine: '독거미가 네 그림자에 슬그머니 자리를 튼다.' },
+  bat:     { id: 'bat', family: 'aerial',     name: '박쥐',      maxHp: 20, atk: 9, def: 0, spd: 13, xp: 3,  gold: 1,  ai: 'attack', sprite: 'bat', skills: [{ id: 'screech', chance: 0.3, cd: 3 }], joinSkill: 'aimedshot', recruitLine: '박쥐가 파닥이며 네 어깨에 내려앉는다.' },
+  imp:     { id: 'imp',     name: '임프',      maxHp: 36, atk: 20, def: 2, spd: 13, xp: 9,  gold: 8,  ai: 'attack', sprite: 'imp', family: 'fiery', inflict: { status: 'burn', chance: 0.4, turns: 3 }, skills: [{ id: 'firebreath', chance: 0.3, cd: 3 }], joinSkill: 'firebolt', recruitLine: '임프가 키득거리며 불씨 하나를 바친다.' },
+  wisp:    { id: 'wisp',    name: '도깨비불',  maxHp: 45, atk: 16, def: 4, spd: 6,  xp: 10, gold: 5,  ai: 'attack', sprite: 'wisp', family: 'fiery', skills: [{ id: 'monshock', chance: 0.35, cd: 2 }], joinSkill: 'arcanebolt', recruitLine: '도깨비불이 네 곁을 맴돌기 시작한다.' },
+  hornet:  { id: 'hornet', family: 'aerial',  name: '말벌떼',    maxHp: 23, atk: 15, def: 0, spd: 17, xp: 6,  gold: 3,  ai: 'attack', sprite: 'hornet', inflict: { status: 'poison', chance: 0.4, turns: 2 }, skills: [{ id: 'screech', chance: 0.3, cd: 3 }], joinSkill: 'venom_shot', recruitLine: '말벌떼가 윙윙거리며 네 주위를 호위한다.' },
+  brood_mother: { id: 'brood_mother', family: 'beast', name: '독거미 여왕', maxHp: 61, atk: 23, def: 3, spd: 9, xp: 18, gold: 12, ai: 'attack', sprite: 'brood_mother', inflict: { status: 'poison', chance: 0.5, turns: 3 }, skills: [{ id: 'broodspawn', chance: 0.3, cd: 99, max: 1 }, { id: 'venomspit', chance: 0.4, cd: 2 }, { id: 'webshot', chance: 0.35, cd: 2 }], joinSkill: 'venom_shot', recruitLine: '독거미 여왕이 너를 둥지의 주인으로 받아들인다.' },
+  bone_archer: { id: 'bone_archer', name: '해골 궁수', maxHp: 41, atk: 24, def: 2, spd: 11, xp: 14, gold: 8, ai: 'attack', sprite: 'bone_archer', family: 'undead', skills: [{ id: 'monslam', chance: 0.3, cd: 3 }], joinSkill: 'aimedshot', recruitLine: '해골 궁수가 부서진 활을 들어 너를 겨눈다 — 이제 네 편으로.' },
+  powder_skeleton: { id: 'powder_skeleton', name: '분골 해골', maxHp: 36, atk: 22, def: 1, spd: 8, xp: 11, gold: 6, ai: 'attack', sprite: 'powder_skeleton', family: 'undead', joinSkill: 'crushblow', recruitLine: '분골 해골이 흩어진 뼈를 추슬러 일어선다.' },
   // Palette-swap variants of the crypt mobs (distinct tint/scale → new identity).
   // 거대 거미: a hulking 독거미 — bigger, tankier, hits the front with venom.
-  giant_spider: { id: 'giant_spider', family: 'beast', name: '거대 거미', maxHp: 60, atk: 18, def: 4, spd: 11, xp: 17, gold: 11, ai: 'attack', sprite: 'spider', spriteScale: 1.55, tint: 0xff9d8a, inflict: { status: 'poison', chance: 0.5, turns: 3 }, skills: [{ id: 'venomspit', chance: 0.4, cd: 2 }], joinSkill: 'venom_shot', recruitLine: '거대 거미가 여덟 다리를 접으며 네 곁에 웅크린다.' },
+  giant_spider: { id: 'giant_spider', family: 'beast', name: '거대 거미', maxHp: 88, atk: 32, def: 4, spd: 11, xp: 17, gold: 11, ai: 'attack', sprite: 'spider', spriteScale: 1.55, tint: 0xff9d8a, inflict: { status: 'poison', chance: 0.5, turns: 3 }, skills: [{ id: 'venomspit', chance: 0.4, cd: 2 }], joinSkill: 'venom_shot', recruitLine: '거대 거미가 여덟 다리를 접으며 네 곁에 웅크린다.' },
   // 정예 흑마도사: a battle-mage acolyte — rallies the line (전열 고무) + shocks.
-  dark_acolyte: { id: 'dark_acolyte', name: '정예 흑마도사', maxHp: 42, atk: 16, def: 5, spd: 12, xp: 18, gold: 14, ai: 'attack', sprite: 'necromancer', spriteScale: 1.1, tint: 0xc9a0ff, family: 'undead', skills: [{ id: 'warcry', chance: 0.4, cd: 3, max: 2 }, { id: 'monshock', chance: 0.3, cd: 2 }], joinSkill: 'darkmist', recruitLine: '정예 흑마도사가 후드를 내리고 너의 술법서가 되기로 한다.' },
+  dark_acolyte: { id: 'dark_acolyte', name: '정예 흑마도사', maxHp: 61, atk: 28, def: 5, spd: 12, xp: 18, gold: 14, ai: 'attack', sprite: 'necromancer', spriteScale: 1.1, tint: 0xc9a0ff, family: 'undead', skills: [{ id: 'warcry', chance: 0.4, cd: 3, max: 2 }, { id: 'monshock', chance: 0.3, cd: 2 }], joinSkill: 'darkmist', recruitLine: '정예 흑마도사가 후드를 내리고 너의 술법서가 되기로 한다.' },
 
   skeleton_king: {
     id: 'skeleton_king', name: '해골 왕', maxHp: 330, atk: 28, def: 10, spd: 6,
     xp: 80, gold: 100, ai: 'boss', sprite: 'boss_skeleton_king', boss: true, family: 'undead',
-    // P1: a heavy bone-smash that cleaves armor. P2(격노): 광폭화 + 더 잦은 강타.
-    skills: [{ id: 'monslam', chance: 0.35, cd: 2 }],
+    // P1: a heavy bone-smash that cleaves armor + 뼈의 룬 보호막(흡수막) — 방어 층이
+    // 있어야 첫 보스도 "때리기만" 으론 안 넘어간다. P2(격노): 광폭화 + 더 잦은 강타.
+    skills: [{ id: 'monslam', chance: 0.35, cd: 2 }, { id: 'barrier', chance: 0.3, cd: 4, max: 2 }],
     // Phase 2 at 50% HP: enrage (stronger, faster, partial heal, heavies more often).
     phase2: {
       at: 0.5, atkMult: 1.5, spdBonus: 4, heal: 0.15, cry: '해골 왕이 분노한다! 뼈가 들끓는다!',
-      skills: [{ id: 'frenzy', chance: 0.7, cd: 0, max: 1 }, { id: 'monslam', chance: 0.4, cd: 2 }],
+      skills: [{ id: 'frenzy', chance: 0.7, cd: 0, max: 1 }, { id: 'monslam', chance: 0.4, cd: 2 }, { id: 'barrier', chance: 0.3, cd: 4, max: 1 }],
     },
   },
 
   // --- Frost region (second area) ---
-  frost_wisp:   { id: 'frost_wisp',   name: '서리 도깨비불', maxHp: 38, atk: 15, def: 5, spd: 8,  xp: 14, gold: 8,  ai: 'attack', sprite: 'frost_wisp', family: 'icy', inflict: { status: 'sleep', chance: 0.35, turns: 3 }, skills: [{ id: 'frostbreath', chance: 0.35, cd: 2 }], joinSkill: 'ice_lance', recruitLine: '서리 도깨비불이 차갑게 빛나며 너를 따른다.' },
-  ice_golem:    { id: 'ice_golem',    name: '얼음 골렘',     maxHp: 58, atk: 19, def: 9, spd: 3,  xp: 22, gold: 14, ai: 'attack', sprite: 'ice_golem', family: 'icy', inflict: { status: 'freeze', chance: 0.45, turns: 2 }, skills: [{ id: 'frostbreath', chance: 0.35, cd: 2 }], joinSkill: 'ice_lance', recruitLine: '얼음 골렘이 묵직하게 몸을 일으켜 네 편에 선다.' },
-  void_walker:  { id: 'void_walker',  name: '공허 보행자',   maxHp: 44, atk: 17, def: 4, spd: 7,  xp: 18, gold: 10, ai: 'attack', sprite: 'void_walker', family: 'undead', inflict: { status: 'weaken', chance: 0.4, turns: 3 }, joinSkill: 'crushblow', recruitLine: '공허 보행자가 텅 빈 눈으로 너를 향한다.' },
-  chimera:      { id: 'chimera', family: 'aerial',      name: '키메라',        maxHp: 50, atk: 20, def: 5, spd: 9,  xp: 24, gold: 16, ai: 'attack', sprite: 'chimera', inflict: { status: 'poison', chance: 0.45, turns: 3 }, skills: [{ id: 'venomspit', chance: 0.4, cd: 2 }], joinSkill: 'venom_shot', recruitLine: '키메라가 세 머리를 조아리며 길들여진다.' },
-  frost_crow:   { id: 'frost_crow',   name: '얼음 까마귀',   maxHp: 30, atk: 16, def: 3, spd: 20, xp: 13, gold: 7,  ai: 'attack', sprite: 'carrion_crow', family: 'icy', skills: [{ id: 'screech', chance: 0.3, cd: 3 }, { id: 'divebomb', chance: 0.35, cd: 2 }], joinSkill: 'aimedshot', recruitLine: '얼음 까마귀가 네 머리 위를 선회하며 따른다.' },
-  yeti:         { id: 'yeti',         name: '예티',          maxHp: 82, atk: 25, def: 8, spd: 6,  xp: 30, gold: 18, ai: 'attack', sprite: 'yeti', family: 'icy', inflict: { status: 'freeze', chance: 0.4, turns: 2 }, skills: [{ id: 'monslam', chance: 0.4, cd: 2 }], joinSkill: 'ice_lance', recruitLine: '예티가 우렁차게 포효하더니 네 뒤를 따른다.' },
+  frost_wisp:   { id: 'frost_wisp',   name: '서리 도깨비불', maxHp: 56, atk: 27, def: 5, spd: 8,  xp: 14, gold: 8,  ai: 'attack', sprite: 'frost_wisp', family: 'icy', inflict: { status: 'sleep', chance: 0.35, turns: 3 }, skills: [{ id: 'frostbreath', chance: 0.35, cd: 2 }], joinSkill: 'ice_lance', recruitLine: '서리 도깨비불이 차갑게 빛나며 너를 따른다.' },
+  ice_golem:    { id: 'ice_golem',    name: '얼음 골렘',     maxHp: 86, atk: 34, def: 9, spd: 3,  xp: 22, gold: 14, ai: 'attack', sprite: 'ice_golem', family: 'icy', inflict: { status: 'freeze', chance: 0.45, turns: 2 }, skills: [{ id: 'frostbreath', chance: 0.35, cd: 2 }], joinSkill: 'ice_lance', recruitLine: '얼음 골렘이 묵직하게 몸을 일으켜 네 편에 선다.' },
+  void_walker:  { id: 'void_walker',  name: '공허 보행자',   maxHp: 65, atk: 30, def: 4, spd: 7,  xp: 18, gold: 10, ai: 'attack', sprite: 'void_walker', family: 'undead', inflict: { status: 'weaken', chance: 0.4, turns: 3 }, joinSkill: 'crushblow', recruitLine: '공허 보행자가 텅 빈 눈으로 너를 향한다.' },
+  chimera:      { id: 'chimera', family: 'aerial',      name: '키메라',        maxHp: 73, atk: 35, def: 5, spd: 9,  xp: 24, gold: 16, ai: 'attack', sprite: 'chimera', inflict: { status: 'poison', chance: 0.45, turns: 3 }, skills: [{ id: 'venomspit', chance: 0.4, cd: 2 }], joinSkill: 'venom_shot', recruitLine: '키메라가 세 머리를 조아리며 길들여진다.' },
+  frost_crow:   { id: 'frost_crow',   name: '얼음 까마귀',   maxHp: 45, atk: 28, def: 3, spd: 20, xp: 13, gold: 7,  ai: 'attack', sprite: 'carrion_crow', family: 'icy', skills: [{ id: 'screech', chance: 0.3, cd: 3 }, { id: 'divebomb', chance: 0.35, cd: 2 }], joinSkill: 'aimedshot', recruitLine: '얼음 까마귀가 네 머리 위를 선회하며 따른다.' },
+  yeti:         { id: 'yeti',         name: '예티',          maxHp: 120, atk: 45, def: 8, spd: 6,  xp: 30, gold: 18, ai: 'attack', sprite: 'yeti', family: 'icy', inflict: { status: 'freeze', chance: 0.4, turns: 2 }, skills: [{ id: 'monslam', chance: 0.4, cd: 2 }], joinSkill: 'ice_lance', recruitLine: '예티가 우렁차게 포효하더니 네 뒤를 따른다.' },
   // 서리 늑대: an icy 들개 palette-swap — a blistering-fast charger that outruns
   // the bruiser heroes (spd 22 > frost-region warrior) and freezes on the bite.
-  frost_wolf:   { id: 'frost_wolf',   name: '서리 늑대', maxHp: 40, atk: 18, def: 3, spd: 22, xp: 16, gold: 9, ai: 'attack', sprite: 'wolf', tint: 0x9fd6ff, family: 'icy', inflict: { status: 'freeze', chance: 0.35, turns: 2 }, joinSkill: 'aimedshot', recruitLine: '서리 늑대가 입김을 내뿜으며 네 곁을 달린다.' },
+  frost_wolf:   { id: 'frost_wolf',   name: '서리 늑대', maxHp: 59, atk: 32, def: 3, spd: 22, xp: 16, gold: 9, ai: 'attack', sprite: 'wolf', tint: 0x9fd6ff, family: 'icy', inflict: { status: 'freeze', chance: 0.35, turns: 2 }, joinSkill: 'aimedshot', recruitLine: '서리 늑대가 입김을 내뿜으며 네 곁을 달린다.' },
   // 얼음 망령: a pale 공허 정찰자 recolour — a frost caster that chills the front.
-  ice_wraith:   { id: 'ice_wraith',   name: '얼음 망령', maxHp: 44, atk: 16, def: 5, spd: 10, xp: 18, gold: 11, ai: 'attack', sprite: 'void_drifter', spriteScale: 1.05, tint: 0xbff0ff, family: 'icy', inflict: { status: 'freeze', chance: 0.45, turns: 2 }, skills: [{ id: 'frostbreath', chance: 0.4, cd: 2 }], joinSkill: 'ice_lance', recruitLine: '얼음 망령이 서릿발을 거두고 네게 깃든다.' },
+  ice_wraith:   { id: 'ice_wraith',   name: '얼음 망령', maxHp: 65, atk: 28, def: 5, spd: 10, xp: 18, gold: 11, ai: 'attack', sprite: 'void_drifter', spriteScale: 1.05, tint: 0xbff0ff, family: 'icy', inflict: { status: 'freeze', chance: 0.45, turns: 2 }, skills: [{ id: 'frostbreath', chance: 0.4, cd: 2 }], joinSkill: 'ice_lance', recruitLine: '얼음 망령이 서릿발을 거두고 네게 깃든다.' },
   // Optional frost MINIBOSS (ai:'boss' but NOT boss:true → spareable; not
   // recruitable — too strong to fold into the party). Gated field encounter.
   frost_queen:  { id: 'frost_queen', name: '서리 여왕', maxHp: 520, atk: 40, def: 13, spd: 14, xp: 280, gold: 360, ai: 'boss', sprite: 'boss_ice_queen', spriteScale: 0.8, family: 'icy', recruitable: false, inflict: { status: 'freeze', chance: 0.45, turns: 2 },
@@ -66,16 +67,16 @@ export const MONSTERS = {
   },
 
   // --- Toxic Swamp (third region) ---
-  mud_crawler: { id: 'mud_crawler', family: 'beast', name: '진흙 포식자', maxHp: 72, atk: 23, def: 8, spd: 4, xp: 30, gold: 18, ai: 'attack', sprite: 'mud_crawler', inflict: { status: 'poison', chance: 0.45, turns: 4 }, skills: [{ id: 'venomspit', chance: 0.4, cd: 2 }], joinSkill: 'venom_shot', recruitLine: '진흙 포식자가 끈적이며 너의 뒤를 따른다.' },
-  bog_brute:   { id: 'bog_brute', family: 'beast',   name: '늪지 괴인',   maxHp: 90, atk: 27, def: 11, spd: 5, xp: 38, gold: 24, ai: 'attack', sprite: 'brute', skills: [{ id: 'monslam', chance: 0.4, cd: 2 }], joinSkill: 'crushblow', recruitLine: '늪지 괴인이 굵은 팔을 늘어뜨리며 복종한다.' },
-  swamp_runner:{ id: 'swamp_runner', family: 'beast',name: '늪 추적자',   maxHp: 54, atk: 22, def: 4, spd: 26, xp: 28, gold: 15, ai: 'attack', sprite: 'runner', skills: [{ id: 'flurry', chance: 0.4, cd: 2 }], joinSkill: 'aimedshot', recruitLine: '늪 추적자가 잽싸게 네 곁에 붙는다.' },
-  giant_frog:  { id: 'giant_frog', family: 'beast',  name: '거대 두꺼비', maxHp: 66, atk: 20, def: 6, spd: 8, xp: 30, gold: 17, ai: 'attack', sprite: 'frog', inflict: { status: 'sleep', chance: 0.35, turns: 3 }, skills: [{ id: 'tonguelash', chance: 0.4, cd: 2 }], joinSkill: 'crushblow', recruitLine: '거대 두꺼비가 긴 혀를 날름이며 너를 따른다.' },
-  medusa_head: { id: 'medusa_head', name: '메두사의 머리', maxHp: 60, atk: 25, def: 6, spd: 12, xp: 34, gold: 20, ai: 'attack', sprite: 'medusa_head', inflict: { status: 'sleep', chance: 0.4, turns: 2 }, skills: [{ id: 'venomspit', chance: 0.35, cd: 2 }, { id: 'petrify', chance: 0.4, cd: 3 }], joinSkill: 'venom_shot', recruitLine: '메두사의 머리가 너를 돌로 만들기를 멈추고 따른다.' },
+  mud_crawler: { id: 'mud_crawler', family: 'beast', name: '진흙 포식자', maxHp: 106, atk: 41, def: 8, spd: 4, xp: 30, gold: 18, ai: 'attack', sprite: 'mud_crawler', inflict: { status: 'poison', chance: 0.45, turns: 4 }, skills: [{ id: 'venomspit', chance: 0.4, cd: 2 }], joinSkill: 'venom_shot', recruitLine: '진흙 포식자가 끈적이며 너의 뒤를 따른다.' },
+  bog_brute:   { id: 'bog_brute', family: 'beast',   name: '늪지 괴인',   maxHp: 132, atk: 49, def: 11, spd: 5, xp: 38, gold: 24, ai: 'attack', sprite: 'brute', skills: [{ id: 'monslam', chance: 0.4, cd: 2 }], joinSkill: 'crushblow', recruitLine: '늪지 괴인이 굵은 팔을 늘어뜨리며 복종한다.' },
+  swamp_runner:{ id: 'swamp_runner', family: 'beast',name: '늪 추적자',   maxHp: 79, atk: 39, def: 4, spd: 26, xp: 28, gold: 15, ai: 'attack', sprite: 'runner', skills: [{ id: 'flurry', chance: 0.4, cd: 2 }], joinSkill: 'aimedshot', recruitLine: '늪 추적자가 잽싸게 네 곁에 붙는다.' },
+  giant_frog:  { id: 'giant_frog', family: 'beast',  name: '거대 두꺼비', maxHp: 97, atk: 35, def: 6, spd: 8, xp: 30, gold: 17, ai: 'attack', sprite: 'frog', inflict: { status: 'sleep', chance: 0.35, turns: 3 }, skills: [{ id: 'tonguelash', chance: 0.4, cd: 2 }], joinSkill: 'crushblow', recruitLine: '거대 두꺼비가 긴 혀를 날름이며 너를 따른다.' },
+  medusa_head: { id: 'medusa_head', name: '메두사의 머리', maxHp: 88, atk: 45, def: 6, spd: 12, xp: 34, gold: 20, ai: 'attack', sprite: 'medusa_head', inflict: { status: 'sleep', chance: 0.4, turns: 2 }, skills: [{ id: 'venomspit', chance: 0.35, cd: 2 }, { id: 'petrify', chance: 0.4, cd: 3 }], joinSkill: 'venom_shot', recruitLine: '메두사의 머리가 너를 돌로 만들기를 멈추고 따른다.' },
   // 늪 좀비: a bloated 해골 병사 recolour — lumbering, but it can 자폭(kamikaze)
   // once per fight, trading itself for a line-wide blast. Recruit it before it pops.
-  bog_zombie:  { id: 'bog_zombie',  name: '늪 좀비',   maxHp: 74, atk: 22, def: 7, spd: 5,  xp: 32, gold: 16, ai: 'attack', sprite: 'walker', spriteScale: 1.12, tint: 0x9fcf7a, family: 'undead', skills: [{ id: 'kamikaze', chance: 0.22, cd: 99, max: 1 }], joinSkill: 'crushblow', recruitLine: '늪 좀비가 터지기 직전 멈춰 서서 너를 새 주인으로 섬긴다.' },
+  bog_zombie:  { id: 'bog_zombie',  name: '늪 좀비',   maxHp: 109, atk: 39, def: 7, spd: 5,  xp: 32, gold: 16, ai: 'attack', sprite: 'walker', spriteScale: 1.12, tint: 0x9fcf7a, family: 'undead', skills: [{ id: 'kamikaze', chance: 0.22, cd: 99, max: 1 }], joinSkill: 'crushblow', recruitLine: '늪 좀비가 터지기 직전 멈춰 서서 너를 새 주인으로 섬긴다.' },
   // 늪 거머리: a small dark 식인꽃 recolour — a nimble bloodsucker (영혼 흡수 drain).
-  bog_leech:   { id: 'bog_leech', family: 'beast',   name: '늪 거머리', maxHp: 50, atk: 21, def: 4, spd: 14, xp: 30, gold: 15, ai: 'attack', sprite: 'carnivore_plant', spriteScale: 0.82, tint: 0x8a3b3b, inflict: { status: 'poison', chance: 0.4, turns: 3 }, skills: [{ id: 'lifedrain', chance: 0.4, cd: 2 }], joinSkill: 'venom_shot', recruitLine: '늪 거머리가 흡혈을 멈추고 네 피붙이가 된다.' },
+  bog_leech:   { id: 'bog_leech', family: 'beast',   name: '늪 거머리', maxHp: 73, atk: 38, def: 4, spd: 14, xp: 30, gold: 15, ai: 'attack', sprite: 'carnivore_plant', spriteScale: 0.82, tint: 0x8a3b3b, inflict: { status: 'poison', chance: 0.4, turns: 3 }, skills: [{ id: 'lifedrain', chance: 0.4, cd: 2 }], joinSkill: 'venom_shot', recruitLine: '늪 거머리가 흡혈을 멈추고 네 피붙이가 된다.' },
 
   bog_witch: {
     id: 'bog_witch', name: '늪의 마녀', maxHp: 790, atk: 56, def: 16, spd: 13, // 660→790 (2026-07-14: L16 3인 magicScale 화력에 swampBOSS 100%/64%HP 무저항 — deaths 0.4-0.8 밴드 복원)
@@ -95,16 +96,16 @@ export const MONSTERS = {
   // --- Fallen Empire (fourth region, post-swamp — the toughest area; the
   // throne of the 타락한 황제 is the new final boss). Theme = RESPECT axis:
   // these were the empire's soldiers, kept as people you can spare or crush. ---
-  rusty_soldier: { id: 'rusty_soldier', name: '녹슨 병사', maxHp: 80, atk: 27, def: 9,  spd: 7,  xp: 38, gold: 22, ai: 'attack', sprite: 'rusty_soldier', family: 'metal', joinSkill: 'crushblow', recruitLine: '녹슨 병사가 삐걱이는 경례로 충성을 맹세한다.' },
-  spirit_guard:  { id: 'spirit_guard',  name: '유령 위병', maxHp: 72, atk: 28, def: 6,  spd: 24, xp: 40, gold: 20, ai: 'attack', sprite: 'spirit_guard', family: 'undead', inflict: { status: 'weaken', chance: 0.4, turns: 3 }, skills: [{ id: 'monshock', chance: 0.35, cd: 2 }], joinSkill: 'aimedshot', recruitLine: '유령 위병이 창을 거두고 네 곁을 지킨다.' },
-  stone_gargoyle:{ id: 'stone_gargoyle', family: 'rocky',name: '석상 가고일', maxHp: 100, atk: 26, def: 14, spd: 4,  xp: 46, gold: 28, ai: 'attack', sprite: 'stone_gargoyle', recruitable: false, skills: [{ id: 'monslam', chance: 0.4, cd: 2 }, { id: 'stoneskin', chance: 0.4, cd: 4, max: 2 }] },
-  rune_guardian: { id: 'rune_guardian', family: 'rocky', name: '룬 수호상', maxHp: 124, atk: 26, def: 18, spd: 5, xp: 50, gold: 30, ai: 'attack', sprite: 'rune_guardian', skills: [{ id: 'monslam', chance: 0.4, cd: 2 }, { id: 'stoneskin', chance: 0.4, cd: 4, max: 2 }], joinSkill: 'crushblow', recruitLine: '룬 수호상이 새겨진 문양을 빛내며 새 주인을 맞는다.' },
-  war_drummer:   { id: 'war_drummer',  name: '전쟁 고수', maxHp: 70, atk: 25, def: 8, spd: 11, xp: 42, gold: 24, ai: 'attack', sprite: 'war_drummer', family: 'undead', skills: [{ id: 'wardrum', chance: 0.5, cd: 3, max: 2 }], joinSkill: 'aimedshot', recruitLine: '전쟁 고수가 북을 울리며 너의 진군에 합류한다.' },
+  rusty_soldier: { id: 'rusty_soldier', name: '녹슨 병사', maxHp: 118, atk: 49, def: 9,  spd: 7,  xp: 38, gold: 22, ai: 'attack', sprite: 'rusty_soldier', family: 'metal', joinSkill: 'crushblow', recruitLine: '녹슨 병사가 삐걱이는 경례로 충성을 맹세한다.' },
+  spirit_guard:  { id: 'spirit_guard',  name: '유령 위병', maxHp: 106, atk: 50, def: 6,  spd: 24, xp: 40, gold: 20, ai: 'attack', sprite: 'spirit_guard', family: 'undead', inflict: { status: 'weaken', chance: 0.4, turns: 3 }, skills: [{ id: 'monshock', chance: 0.35, cd: 2 }], joinSkill: 'aimedshot', recruitLine: '유령 위병이 창을 거두고 네 곁을 지킨다.' },
+  stone_gargoyle:{ id: 'stone_gargoyle', family: 'rocky',name: '석상 가고일', maxHp: 147, atk: 46, def: 14, spd: 4,  xp: 46, gold: 28, ai: 'attack', sprite: 'stone_gargoyle', recruitable: false, skills: [{ id: 'monslam', chance: 0.4, cd: 2 }, { id: 'stoneskin', chance: 0.4, cd: 4, max: 2 }] },
+  rune_guardian: { id: 'rune_guardian', family: 'rocky', name: '룬 수호상', maxHp: 183, atk: 46, def: 18, spd: 5, xp: 50, gold: 30, ai: 'attack', sprite: 'rune_guardian', skills: [{ id: 'monslam', chance: 0.4, cd: 2 }, { id: 'stoneskin', chance: 0.4, cd: 4, max: 2 }], joinSkill: 'crushblow', recruitLine: '룬 수호상이 새겨진 문양을 빛내며 새 주인을 맞는다.' },
+  war_drummer:   { id: 'war_drummer',  name: '전쟁 고수', maxHp: 104, atk: 45, def: 8, spd: 11, xp: 42, gold: 24, ai: 'attack', sprite: 'war_drummer', family: 'undead', skills: [{ id: 'wardrum', chance: 0.5, cd: 3, max: 2 }], joinSkill: 'aimedshot', recruitLine: '전쟁 고수가 북을 울리며 너의 진군에 합류한다.' },
   // Empire palette-swap variants (same army, different rank → distinct tint/scale).
   // 제국 근위병: a gilded 녹슨 병사 elite — a captain that rallies the line (전열 고무).
-  imperial_guard: { id: 'imperial_guard', name: '제국 근위병', maxHp: 120, atk: 30, def: 14, spd: 8, xp: 52, gold: 34, ai: 'attack', sprite: 'rusty_soldier', spriteScale: 1.18, tint: 0xd9c27a, family: 'metal', skills: [{ id: 'warcry', chance: 0.4, cd: 3, max: 2 }, { id: 'monslam', chance: 0.3, cd: 2 }], joinSkill: 'crushblow', recruitLine: '제국 근위병이 금빛 갑주를 울리며 새 황제에게 경례한다.' },
+  imperial_guard: { id: 'imperial_guard', name: '제국 근위병', maxHp: 177, atk: 54, def: 14, spd: 8, xp: 52, gold: 34, ai: 'attack', sprite: 'rusty_soldier', spriteScale: 1.18, tint: 0xd9c27a, family: 'metal', skills: [{ id: 'warcry', chance: 0.4, cd: 3, max: 2 }, { id: 'monslam', chance: 0.3, cd: 2 }], joinSkill: 'crushblow', recruitLine: '제국 근위병이 금빛 갑주를 울리며 새 황제에게 경례한다.' },
   // 원혼 위병: a spectral-violet 유령 위병 recolour — a fast curse-caster.
-  wraith_sentinel: { id: 'wraith_sentinel', name: '원혼 위병', maxHp: 84, atk: 31, def: 7, spd: 26, xp: 48, gold: 26, ai: 'attack', sprite: 'spirit_guard', tint: 0xc4b8ff, family: 'undead', inflict: { status: 'weaken', chance: 0.45, turns: 3 }, skills: [{ id: 'curse', chance: 0.3, cd: 3 }, { id: 'monshock', chance: 0.35, cd: 2 }], joinSkill: 'aimedshot', recruitLine: '원혼 위병이 원한을 거두고 너의 곁을 지킨다.' },
+  wraith_sentinel: { id: 'wraith_sentinel', name: '원혼 위병', maxHp: 124, atk: 55, def: 7, spd: 26, xp: 48, gold: 26, ai: 'attack', sprite: 'spirit_guard', tint: 0xc4b8ff, family: 'undead', inflict: { status: 'weaken', chance: 0.45, turns: 3 }, skills: [{ id: 'curse', chance: 0.3, cd: 3 }, { id: 'monshock', chance: 0.35, cd: 2 }], joinSkill: 'aimedshot', recruitLine: '원혼 위병이 원한을 거두고 너의 곁을 지킨다.' },
   // 처단 루트 전용 미니보스(원혼의 늪) — 벤 마녀의 원한이 뭉친 망령. spirit_guard 암보라 리컬러.
   bog_revenant: { id: 'bog_revenant', name: '늪의 원혼', maxHp: 380, atk: 42, def: 11, spd: 20, xp: 240, gold: 180, ai: 'boss', sprite: 'spirit_guard', tint: 0x7a5cc4, spriteScale: 1.35, boss: true, family: 'undead',
     inflict: { status: 'weaken', chance: 0.4, turns: 3 },
@@ -128,9 +129,9 @@ export const MONSTERS = {
 
   // ─── 별무덤 (3막 스토리 리전, L20 밴드 — 황제와 분화구 사이) ───
   // 별의 허물 — 떨어진 별의 껍데기에 부패가 깃든 것. revenant 잿빛 스왑.
-  star_husk: { id: 'star_husk', name: '별의 허물', maxHp: 125, atk: 31, def: 12, spd: 7, xp: 78, gold: 44, ai: 'attack', sprite: 'revenant', tint: 0xbfc9d8, family: 'void', skills: [{ id: 'lifedrain', chance: 0.4, cd: 2 }], joinSkill: 'crushblow', recruitLine: '별의 허물이 희미하게 빛나며 너의 뒤를 떠돈다.' },
+  star_husk: { id: 'star_husk', name: '별의 허물', maxHp: 184, atk: 55, def: 12, spd: 7, xp: 78, gold: 44, ai: 'attack', sprite: 'revenant', tint: 0xbfc9d8, family: 'void', skills: [{ id: 'lifedrain', chance: 0.4, cd: 2 }], joinSkill: 'crushblow', recruitLine: '별의 허물이 희미하게 빛나며 너의 뒤를 떠돈다.' },
   // 별빛 나방 — 잔광에 꼬인 빠른 유격수 (interleaving: 브루저 히어로보다 먼저 친다).
-  star_moth: { id: 'star_moth', name: '별빛 나방', maxHp: 78, atk: 30, def: 4, spd: 28, xp: 66, gold: 36, ai: 'attack', sprite: 'fire_bat', tint: 0x9fd8ff, family: 'void', skills: [{ id: 'screech', chance: 0.35, cd: 3 }], joinSkill: 'venom_shot', recruitLine: '별빛 나방이 네 어깨 위에 내려앉는다.' },
+  star_moth: { id: 'star_moth', name: '별빛 나방', maxHp: 115, atk: 54, def: 4, spd: 28, xp: 66, gold: 36, ai: 'attack', sprite: 'fire_bat', tint: 0x9fd8ff, family: 'void', skills: [{ id: 'screech', chance: 0.35, cd: 3 }], joinSkill: 'venom_shot', recruitLine: '별빛 나방이 네 어깨 위에 내려앉는다.' },
   // 떨어진 별 (별무덤 리전 보스) — 균열의 밤에 떨어져 부패에 붙들린 별의 잔해.
   // NOT boss:true → 자비로 '해방'(스페어)·영입 가능. frost_wisp 금빛 스왑 대형.
   fallen_star: {
@@ -181,10 +182,10 @@ export const MONSTERS = {
     xp: 900, gold: 1200, ai: 'boss', sprite: 'fallen_emperor', boss: true, family: 'undead',
     // P1: 제국의 위압(전체 약화 저주) + 제왕의 일격(관통). P2(격노): 광폭화 +
     // 영혼 흡수(자가 회복)로 처형 페이즈 — 최종전다운 2페이즈 압박.
-    skills: [{ id: 'curse', chance: 0.35, cd: 3 }, { id: 'monslam', chance: 0.4, cd: 2 }],
+    skills: [{ id: 'curse', chance: 0.35, cd: 3 }, { id: 'monslam', chance: 0.4, cd: 2 }, { id: 'barrier', chance: 0.3, cd: 4, max: 2 }],
     phase2: {
       at: 0.5, atkMult: 1.6, spdBonus: 8, heal: 0.18, cry: '타락한 황제가 옥좌에서 일어선다! 제국의 원한이 끓는다!',
-      skills: [{ id: 'frenzy', chance: 0.7, cd: 0, max: 1 }, { id: 'lifedrain', chance: 0.45, cd: 2 }, { id: 'curse', chance: 0.4, cd: 3 }],
+      skills: [{ id: 'frenzy', chance: 0.7, cd: 0, max: 1 }, { id: 'lifedrain', chance: 0.45, cd: 2 }, { id: 'curse', chance: 0.4, cd: 3 }, { id: 'barrier', chance: 0.3, cd: 4, max: 1 }],
     },
   },
 
@@ -195,12 +196,12 @@ export const MONSTERS = {
   // joinSkill: the signature spell a recruited monster brings to the party (a
   // spells.js id — recruited allies are menu-controlled, so it shows in their
   // command panel). recruitLine: bespoke flavor shown when it joins in battle.
-  magma_golem: { id: 'magma_golem', name: '마그마 골렘', maxHp: 95, atk: 26, def: 16, spd: 4, xp: 60, gold: 40, ai: 'attack', sprite: 'magma_golem', family: 'fire', skills: [{ id: 'monslam', chance: 0.4, cd: 2 }, { id: 'eruption', chance: 0.4, cd: 3 }], joinSkill: 'crushblow', recruitLine: '마그마 골렘이 천천히 고개를 끄덕인다… 너의 길을 함께 부수겠다.' },
-  fire_bat:    { id: 'fire_bat',    name: '화염 박쥐',  maxHp: 55, atk: 24, def: 6,  spd: 18, xp: 50, gold: 30, ai: 'attack', sprite: 'fire_bat', family: 'fire', inflict: { status: 'burn', chance: 0.45, turns: 3 }, skills: [{ id: 'firebreath', chance: 0.3, cd: 3 }, { id: 'divebomb', chance: 0.35, cd: 2 }], joinSkill: 'firebolt', recruitLine: '화염 박쥐가 어깨 위로 내려앉는다. 불씨가 함께한다.' },
-  ember_hound: { id: 'ember_hound', name: '잿불 사냥개', maxHp: 62, atk: 27, def: 8,  spd: 14, xp: 55, gold: 32, ai: 'attack', sprite: 'ember_hound', family: 'fire', inflict: { status: 'burn', chance: 0.4, turns: 3 }, joinSkill: 'firebolt', recruitLine: '잿불 사냥개가 너를 새 주인으로 따른다.' },
+  magma_golem: { id: 'magma_golem', name: '마그마 골렘', maxHp: 140, atk: 46, def: 16, spd: 4, xp: 60, gold: 40, ai: 'attack', sprite: 'magma_golem', family: 'fire', skills: [{ id: 'monslam', chance: 0.4, cd: 2 }, { id: 'eruption', chance: 0.4, cd: 3 }], joinSkill: 'crushblow', recruitLine: '마그마 골렘이 천천히 고개를 끄덕인다… 너의 길을 함께 부수겠다.' },
+  fire_bat:    { id: 'fire_bat',    name: '화염 박쥐',  maxHp: 81, atk: 43, def: 6,  spd: 18, xp: 50, gold: 30, ai: 'attack', sprite: 'fire_bat', family: 'fire', inflict: { status: 'burn', chance: 0.45, turns: 3 }, skills: [{ id: 'firebreath', chance: 0.3, cd: 3 }, { id: 'divebomb', chance: 0.35, cd: 2 }], joinSkill: 'firebolt', recruitLine: '화염 박쥐가 어깨 위로 내려앉는다. 불씨가 함께한다.' },
+  ember_hound: { id: 'ember_hound', name: '잿불 사냥개', maxHp: 91, atk: 49, def: 8,  spd: 14, xp: 55, gold: 32, ai: 'attack', sprite: 'ember_hound', family: 'fire', inflict: { status: 'burn', chance: 0.4, turns: 3 }, joinSkill: 'firebolt', recruitLine: '잿불 사냥개가 너를 새 주인으로 따른다.' },
   // 용암 민달팽이: a molten 마그마 골렘 recolour — a slow, armoured tank that
   // 자폭(kamikaze)s in a magma burst when pressed. Bright-orange palette.
-  lava_slug:   { id: 'lava_slug',   name: '용암 민달팽이', maxHp: 86, atk: 24, def: 13, spd: 3, xp: 58, gold: 36, ai: 'attack', sprite: 'magma_golem', spriteScale: 0.82, tint: 0xffb060, family: 'fire', inflict: { status: 'burn', chance: 0.4, turns: 3 }, skills: [{ id: 'kamikaze', chance: 0.28, cd: 99, max: 1 }], joinSkill: 'crushblow', recruitLine: '용암 민달팽이가 끓는 몸을 식히고 너를 따른다.' },
+  lava_slug:   { id: 'lava_slug',   name: '용암 민달팽이', maxHp: 127, atk: 43, def: 13, spd: 3, xp: 58, gold: 36, ai: 'attack', sprite: 'magma_golem', spriteScale: 0.82, tint: 0xffb060, family: 'fire', inflict: { status: 'burn', chance: 0.4, turns: 3 }, skills: [{ id: 'kamikaze', chance: 0.28, cd: 99, max: 1 }], joinSkill: 'crushblow', recruitLine: '용암 민달팽이가 끓는 몸을 식히고 너를 따른다.' },
 
   // Endgame superboss (NOT final — magma_drake map object has no `final` flag).
   magma_drake: {
@@ -218,10 +219,10 @@ export const MONSTERS = {
   // --- The Void Rift (공허의 균열) — DEEPEST post-game region (warp-only, opens
   // after the magma drake falls). Abyssal horrors; the void lord is the toughest
   // foe in the game. Off the harness ladder. Not final (emperor = story finale). ---
-  reaper:      { id: 'reaper',      name: '사신',     maxHp: 70,  atk: 32, def: 8,  spd: 17, xp: 70, gold: 40, ai: 'attack', sprite: 'reaper', family: 'void', inflict: { status: 'weaken', chance: 0.45, turns: 3 }, skills: [{ id: 'lifedrain', chance: 0.45, cd: 2 }, { id: 'voidblast', chance: 0.3, cd: 3 }], joinSkill: 'venom_shot', recruitLine: '사신이 낫을 거두고 너의 그림자에 깃든다.' },
-  revenant:    { id: 'revenant',    name: '망령',     maxHp: 110, atk: 30, def: 14, spd: 6,  xp: 75, gold: 45, ai: 'attack', sprite: 'revenant', family: 'void', skills: [{ id: 'lifedrain', chance: 0.4, cd: 2 }, { id: 'voidblast', chance: 0.3, cd: 3 }], joinSkill: 'crushblow', recruitLine: '망령이 안식 대신 너의 곁을 택했다.' },
+  reaper:      { id: 'reaper',      name: '사신',     maxHp: 104,  atk: 57, def: 8,  spd: 17, xp: 70, gold: 40, ai: 'attack', sprite: 'reaper', family: 'void', inflict: { status: 'weaken', chance: 0.45, turns: 3 }, skills: [{ id: 'lifedrain', chance: 0.45, cd: 2 }, { id: 'voidblast', chance: 0.3, cd: 3 }], joinSkill: 'venom_shot', recruitLine: '사신이 낫을 거두고 너의 그림자에 깃든다.' },
+  revenant:    { id: 'revenant',    name: '망령',     maxHp: 161, atk: 54, def: 14, spd: 6,  xp: 75, gold: 45, ai: 'attack', sprite: 'revenant', family: 'void', skills: [{ id: 'lifedrain', chance: 0.4, cd: 2 }, { id: 'voidblast', chance: 0.3, cd: 3 }], joinSkill: 'crushblow', recruitLine: '망령이 안식 대신 너의 곁을 택했다.' },
   // 강령술사: 1차엔 영혼 흡수만. 사령 소환(summon)은 spoils/렌더러 invariant 묶어 2차.
-  necromancer: { id: 'necromancer', name: '강령술사', maxHp: 80,  atk: 28, def: 10, spd: 11, xp: 80, gold: 50, ai: 'attack', sprite: 'necromancer', family: 'void', inflict: { status: 'poison', chance: 0.5, turns: 4 }, skills: [{ id: 'summon', chance: 0.35, cd: 99, max: 1 }, { id: 'lifedrain', chance: 0.4, cd: 2 }, { id: 'shadowbolt', chance: 0.4, cd: 2 }], joinSkill: 'darkmist', recruitLine: '강령술사가 어둠의 술법을 네게 빌려주기로 한다.' },
+  necromancer: { id: 'necromancer', name: '강령술사', maxHp: 118,  atk: 50, def: 10, spd: 11, xp: 80, gold: 50, ai: 'attack', sprite: 'necromancer', family: 'void', inflict: { status: 'poison', chance: 0.5, turns: 4 }, skills: [{ id: 'summon', chance: 0.35, cd: 99, max: 1 }, { id: 'lifedrain', chance: 0.4, cd: 2 }, { id: 'shadowbolt', chance: 0.4, cd: 2 }], joinSkill: 'darkmist', recruitLine: '강령술사가 어둠의 술법을 네게 빌려주기로 한다.' },
 
   // Optional VOID miniboss (망령 리치) — uses the new boss_idle sprite. ai:'boss'
   // (heavy strikes, NOT boss:true → spareable; recruitable:false, too strong to

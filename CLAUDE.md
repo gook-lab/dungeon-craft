@@ -582,7 +582,21 @@ the previewed number stays equal to the dealt number.
 1v3 speed bumps. Maps spawn 2-5 mobs (`encounters.min/max` per map; wild gentler at
 2-3), with trimmed `rate` so bigger fights don't grind. Trash HP/atk were bumped ~1.4x
 so a group survives round 1 and lands real counter-hits, and so the 자비/recruit window
-(hp ≤ 30%) is reachable on regular mobs + AoE spells have multiple targets. Turn order is
+(hp ≤ 30%) is reachable on regular mobs + AoE spells have multiple targets.
+
+**Trash attrition pass (2026-07-16)** — player power kept accreting (아티팩트 / 유대 /
+무기속성 상성 / 4인 편성 / 강화) while trash stayed static, so trash had drifted to a
+NON-EVENT: `BASIC_ONLY=1` (skills forbidden) still cleared **every** region L2→L26 at
+100% win / 0.00 deaths / ~90% HP. The 44 true trash mobs (encounter-pool only — the 17
+map-boss/miniboss refs are EXCLUDED, they're separately tuned as harness scenarios) were
+bumped **atk ×1.78, maxHp ×1.47** cumulative, via a deterministic script (never hand-edit
+44 rows). **Key lesson: atk alone did almost nothing** (+32% atk moved HP-remaining only
+90%→86%) because trash died in ~2 rounds and never got to act — **HP is what buys them
+turns, atk is what makes those turns hurt; you need both.** Result: mid-game trash
+71-82% HP-remaining at 2.4-3.3 rounds (attrition, NOT grind) with deaths appearing even
+under optimal AI; early game (L2-6) deliberately left gentle. Boss scenarios are
+unaffected (they don't draw from the trash pool) — verify that in the table after any
+trash change. Turn order is
 INTERLEAVED by spd (not side-phased) — fast skirmishers (spider/imp 13, frost_crow 20,
 swamp_runner 26, spirit_guard 24) are tuned to OUTSPEED the bruiser heroes (knight/warrior,
 ~level+6 spd) so they strike BEFORE being culled; huntress stays fastest. Bump a fast mob's
