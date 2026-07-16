@@ -57,6 +57,9 @@ export function physicalDamage(attacker, target, rng, heavyMult = 1) {
 // top of the attacker's atk, so a huntress/warrior skill scales with their
 // STRENGTH (not mana). Honors 분노(rage melee +30%), pierce (ignore def),
 // 약화/위협/동상 debuffs, defending, and elemental affinity. Pure.
+// When spell.element is 'physical', uses the attacker's equipped weapon element
+// (if any) to determine affinity, allowing physical classes to leverage
+// elemental weapons.
 export function skillDamage(spell, attacker, target, rng) {
   const st = attacker.status || {};
   const mult = (st.weaken > 0 ? 0.7 : 1) * (st.atkdown > 0 ? 0.8 : 1) * (st.freeze > 0 ? 0.8 : 1);
@@ -68,7 +71,12 @@ export function skillDamage(spell, attacker, target, rng) {
   let dmg = spell.pierce ? atk * 0.7 : atk * (atk / (atk + effectiveDef(target)));
   dmg *= VARIANCE(rng);
   if (target.defending) dmg *= 0.5;
-  dmg *= elementMultiplier(spell.element, target);
+  // Apply affinity: use spell.element if set; if element is 'physical', use
+  // the attacker's weaponElement (if equipped).
+  const element = spell.element === 'physical' && attacker.weaponElement
+    ? attacker.weaponElement
+    : spell.element;
+  dmg *= elementMultiplier(element, target);
   return Math.max(1, Math.floor(dmg));
 }
 

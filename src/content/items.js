@@ -14,8 +14,8 @@ export const ITEMS = {
   hunters_bow: { id: 'hunters_bow', name: '사냥꾼의 활', kind: 'weapon', atk: 7, spd: 2, price: 120, sprite: 'pickup_rune' },
   oak_staff: { id: 'oak_staff', name: '참나무 지팡이', kind: 'weapon', atk: 5, maxMp: 6, price: 0, sprite: 'pickup_rune' },
   silver_sword: { id: 'silver_sword', name: '은빛 검', kind: 'weapon', atk: 9, price: 0, sprite: 'pickup_rune' },
-  frost_blade: { id: 'frost_blade', name: '서리검', kind: 'weapon', atk: 13, spd: 1, price: 0, sprite: 'pickup_rune' },
-  flame_brand: { id: 'flame_brand', name: '화염낙인검', kind: 'weapon', atk: 17, price: 0, sprite: 'pickup_rune' },
+  frost_blade: { id: 'frost_blade', name: '서리검', kind: 'weapon', atk: 13, spd: 1, element: 'ice', price: 0, sprite: 'pickup_rune' },
+  flame_brand: { id: 'flame_brand', name: '화염낙인검', kind: 'weapon', atk: 17, element: 'fire', price: 0, sprite: 'pickup_rune' },
   // Passive-effect weapons (특수효과 무기). Not class-LOCKED (finite pool, any hero),
   // but each passive leans into a class identity — equip to lean a build that way.
   assassin_dagger: { id: 'assassin_dagger', name: '암살자의 단검', kind: 'weapon', atk: 8, spd: 2, price: 180, sprite: 'pickup_rune', passive: { crit: 0.15 } },         // 사냥꾼 暗殺/치명
@@ -26,7 +26,7 @@ export const ITEMS = {
   marksman_longbow: { id: 'marksman_longbow', name: '명궁의 장궁', kind: 'weapon', atk: 15, spd: 2, price: 340, sprite: 'pickup_rune', passive: { crit: 0.2 } },            // 사냥꾼 고티어 치명
   iron_dagger: { id: 'iron_dagger', name: '무쇠 단검', kind: 'weapon', atk: 5, spd: 3, price: 50, sprite: 'pickup_rune' },                                                 // 초반 경량
   battle_spear: { id: 'battle_spear', name: '전투 창', kind: 'weapon', atk: 12, price: 150, sprite: 'pickup_rune' },                                                       // 중반 일반
-  runeblade: { id: 'runeblade', name: '룬검', kind: 'weapon', atk: 14, maxMp: 6, price: 280, sprite: 'pickup_rune' },                                                      // 마검 하이브리드
+  runeblade: { id: 'runeblade', name: '룬검', kind: 'weapon', atk: 14, maxMp: 6, element: 'arcane', price: 280, sprite: 'pickup_rune' },                                  // 마검 하이브리드
   venom_fang: { id: 'venom_fang', name: '독아 단검', kind: 'weapon', atk: 9, spd: 2, price: 200, sprite: 'pickup_rune', passive: { resist: { poison: 0.5 } } },             // 독 면역 로그
   warlords_axe: { id: 'warlords_axe', name: '군주의 도끼', kind: 'weapon', atk: 16, price: 360, sprite: 'pickup_rune', passive: { counter: 0.2 } },                        // 고티어 전사 반격
   archmage_staff: { id: 'archmage_staff', name: '대마법사 지팡이', kind: 'weapon', atk: 9, maxMp: 16, price: 360, sprite: 'pickup_rune', passive: { crit: 0.15 } },        // 고티어 마법사 주문크리
@@ -199,6 +199,15 @@ export function equipPassives(equip) {
   out.crit = Math.min(0.75, out.crit);
   out.dmgReduce = Math.min(0.4, out.dmgReduce);
   return out;
+}
+
+// Equipped weapon element (if any). Yields the element string from the equipped
+// weapon (e.g. 'fire', 'ice', 'arcane'), or null if the weapon has no element.
+// This allows physical classes to inherit elemental affinity from their weapon.
+export function equipWeaponElement(equip) {
+  if (!equip) return null;
+  const weapon = getItem(equip.weapon);
+  return weapon && weapon.element ? weapon.element : null;
 }
 
 // --- Battle loot (drops on victory) ---------------------------------------
