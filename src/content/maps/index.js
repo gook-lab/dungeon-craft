@@ -5,6 +5,7 @@ import dungeon from './dungeon.js';
 import frost from './frost.js';
 import swamp from './swamp.js';
 import witchs_hut from './witchs_hut.js';
+import wraith_bog from './wraith_bog.js';
 import empire_gate from './empire/empire_gate.js';
 import empire_camp from './empire/empire_camp.js';
 import empire_city from './empire/empire_city.js';
@@ -26,5 +27,5 @@ import grand_citadel from './grand_citadel.js';
 import lava_keep from './lava_keep.js';
 import wild_cave from './wild_cave.js';
 
-export const MAPS = { town, wild, wild_cave, darkforest, dungeon, frost, swamp, witchs_hut, empire_gate, empire_camp, empire_city, empire_throne, empire_bridge, ruins_below, starfall, starfall_crater, lava_gate, lava_core, void_gate, void_core, lake_town, waterway, switchback, overworld, port_city, grand_citadel, lava_keep };
+export const MAPS = { town, wild, wild_cave, darkforest, dungeon, frost, swamp, witchs_hut, wraith_bog, empire_gate, empire_camp, empire_city, empire_throne, empire_bridge, ruins_below, starfall, starfall_crater, lava_gate, lava_core, void_gate, void_core, lake_town, waterway, switchback, overworld, port_city, grand_citadel, lava_keep };
 export function getMap(id) { return MAPS[id] || null; }

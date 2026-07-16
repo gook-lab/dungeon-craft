@@ -476,6 +476,15 @@ export const DIALOG = {
     speaker: '',
     lines: ['늪의 마녀가 저주를 내뱉으며 스러졌다. "가라... 동쪽의 황제도 너희처럼 멈추지 않았다..."', '독무가 걷힌다 — 무너진 제국으로 가는 길이 열렸다.'],
   },
+  // 처단 루트 전용 서브맵(원혼의 늪) 보스.
+  wraith_bog_intro: {
+    speaker: '늪의 원혼',
+    lines: ['너희가 벤 마녀의 원한이... 이 늪에 고여 나를 빚었다.', '살(肉)의 온기가 그립구나 — 이리 와, 그 온기를 내게 다오.'],
+  },
+  wraith_bog_win: {
+    speaker: '',
+    lines: ['늪의 원혼이 마지막 저주를 흩뿌리며 흩어졌다.', '원한이 응결된 자리에 검은 성물이 남았다.'],
+  },
 
   // --- Fallen Empire (fourth region). Theme = RESPECT (존경/멸시): a fallen
   // knight who tests whether you honor a worthy foe, and the emperor whose end

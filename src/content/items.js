@@ -45,6 +45,8 @@ export const ITEMS = {
   storm_crossbow: { id: 'storm_crossbow', name: '뇌명 석궁', kind: 'weapon', atk: 12, spd: 2, element: 'thunder', price: 260, sprite: 'pickup_rune', passive: { crit: 0.12 } }, // 사냥꾼 석궁
   blessed_flail: { id: 'blessed_flail', name: '축성 철퇴', kind: 'weapon', atk: 11, def: 1, element: 'holy', price: 270, sprite: 'pickup_rune', passive: { regenHp: 0.04 } }, // 나이트 성물(언데드 특효)
   umbral_dagger: { id: 'umbral_dagger', name: '흑요 단검', kind: 'weapon', atk: 12, spd: 3, element: 'dark', price: 260, sprite: 'pickup_rune', passive: { crit: 0.15 } },    // 쌍검사/사냥꾼(공허 특효)
+  // 처단 루트 전용 (원혼의 늪에서만 획득 — 상점/일반 loot 미등록). 마녀를 벤 자의 보상.
+  hex_reliquary: { id: 'hex_reliquary', name: '저주의 성물', kind: 'accessory', atk: 6, spd: 4, price: 0, sprite: 'pickup_rune', passive: { crit: 0.12, resist: { poison: 0.6 } } },
   gale_bow: { id: 'gale_bow', name: '질풍궁', kind: 'weapon', atk: 13, spd: 3, element: 'wind', price: 280, sprite: 'pickup_rune', passive: { crit: 0.1 } },                 // 사냥꾼 경량(eva 미구현→crit)
   titan_greataxe: { id: 'titan_greataxe', name: '거인의 도끼', kind: 'weapon', atk: 19, element: 'earth', price: 0, sprite: 'pickup_rune', passive: { counter: 0.15 } },      // 고티어 대지 보상
 
