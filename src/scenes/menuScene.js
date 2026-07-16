@@ -15,8 +15,9 @@ import { getMonster } from '../content/monsters.js';
 import { getMap } from '../content/maps/index.js';
 import { getQuest, questProgress } from '../content/quests.js';
 import { QUESTLINES, questlineState, questlineUnlocked } from '../content/questlines.js';
-import { EMOTION_KR, NEGATIVE_EMOTIONS } from '../systems/bonds.js';
+import { EMOTION_KR, NEGATIVE_EMOTIONS, bondStrength, emotionCount, pairsFor } from '../systems/bonds.js';
 import { toneBand } from '../content/dialog.js';
+import { ALLY_COMBOS } from '../content/bondSkills.js';
 import { EquipScene } from './equipScene.js';
 import { SettingsScene } from './settingsScene.js';
 import { CompendiumScene } from './compendiumScene.js';
@@ -266,9 +267,37 @@ export class MenuScene {
       });
       return `${memberName(a)}↔${memberName(b)}: ${emos.join('·')}`;
     });
+    // V2b: make the silent bond stat-fold legible — per-hero CURRENT combat
+    // bonus, computed with the same formulas battleScene.enter folds at battle
+    // start (positive: +3%HP/pt cap15 · loyalty+2방 · admiration+2공;
+    // negative glass-cannon: contempt+3공 · mistrust+6%공, NO HP).
+    const effect = this.bondEffectLines(bonds);
     lines.push('자비 존경+공 충성+방 애정위기');
     lines.push('잔혹† 멸시+공 불신+공% 증오사망');
-    return [...head, '', ...lines];
+    return [...head, '', ...lines, ...(effect.length ? ['', '─ 현재 전투 보정 ─', ...effect] : [])];
+  }
+
+  // Per-hero folded bond bonus (mirrors battleScene.enter). Skips heroes with
+  // no bonds. Positive poles stack HP/def/atk; negative poles are offense-only.
+  bondEffectLines(bonds) {
+    const out = [];
+    for (const p of (this.game.runtime.party || [])) {
+      const rid = p.refId;
+      if (!pairsFor(bonds, rid).length) continue;
+      const posStr = Math.min(bondStrength(bonds, rid), 5);
+      const parts = [];
+      if (posStr > 0) parts.push(`HP+${3 * posStr}%`);
+      const def = 2 * emotionCount(bonds, rid, 'loyalty');
+      if (def) parts.push(`방+${def}`);
+      const atk = 2 * emotionCount(bonds, rid, 'admiration') + 3 * emotionCount(bonds, rid, 'contempt');
+      if (atk) parts.push(`공+${atk}`);
+      const mis = emotionCount(bonds, rid, 'mistrust');
+      if (mis) parts.push(`공+${6 * mis}%`);
+      if (emotionCount(bonds, rid, 'affection')) parts.push('위기분기');
+      if (emotionCount(bonds, rid, 'hatred')) parts.push('사망격노');
+      if (parts.length) out.push(`  ${memberName(rid)}: ${parts.join(' ')}`);
+    }
+    return out;
   }
 
   consumables() {
@@ -290,8 +319,15 @@ export class MenuScene {
   rosterLabels() {
     const active = this.game.runtime.active || [];
     return this.rosterMembers().map((mb) => {
-      const tag = mb.kind === 'ally' ? ' (몬스터)' : '';
       const mark = active.includes(mb.refId) ? '  ◀ 출전중' : '  · 벤치';
+      // V2a: make the recruit→build payoff legible. A recruited ally either
+      // carries a species-specific 인연공격 (the 5 setpiece allies, ★) or the
+      // generic 공생 연격 — surfaced here so players hunt the special ones.
+      let tag = '';
+      if (mb.kind === 'ally') {
+        const combo = ALLY_COMBOS[mb.refId];
+        tag = combo ? ` ★${combo.name}` : ' 공생 연격';
+      }
       return `${mb.name} Lv.${mb.level}${tag}${mark}`;
     });
   }
