@@ -503,16 +503,22 @@ all of `STATUS_TYPES`; consumables cure one named status (antidote→poison etc.
 
 **Elemental affinity (`elementMultiplier`, battle.js)**: a damage spell's `element`
 (spells.js: fire/ice/thunder/holy/poison/wind/dark/earth/physical) vs the target's
-`family` tag (monsters.js: `undead`/`icy`/`fiery`; heroes + untagged enemies neutral).
-DELIBERATELY MILD — STRONG ×1.25, RESIST ×0.8, else ×1 (not classic ×2/×0.5, so it
-nudges spell choice without trivializing or hard-walling). Rules: 신성(holy)→undead
-×1.25; 화염(fire)↔냉기(ice) cross ×1.25, same-element ×0.8. Applied wherever a damage
-fn carries an `element`: `magicDamage` (spells), `skillDamage` (physical hero skills),
-and `monsterSkillDamage` (enemy skills) — plain basic attacks are unaffected. `family`
-carries through `buildEnemyUnit`. Balance-invisible (harness AI picks highest-power
-spell, rarely the affinity one) — a player-facing optimization layer, not a ladder
-lever. Re-run balance only if you change the multipliers or tag a boss the harness-AI's
-go-to spell matches.
+`family` tag (monsters.js: elemental `undead`/`icy`/`fiery`/`fire`/`void` +
+physical-activation `rocky`(석·구조물)/`metal`(기갑)/`aerial`(공중)/`beast`(야수);
+heroes + untagged enemies neutral). DELIBERATELY MILD — STRONG ×1.25, RESIST ×0.8,
+else ×1 (not classic ×2/×0.5, so it nudges spell choice without trivializing or
+hard-walling). Rules: 신성(holy)→undead/void; 암흑(dark)→void; 화염(fire)↔냉기(ice)
+cross ×1.25 same-element ×0.8; **뇌전(thunder)→metal/aerial, 대지(earth)→rocky (▼aerial),
+바람(wind)→beast (▼rocky)** — the physical-element layer so 원소 무기가 실제 약점을
+노린다(2026-07-16). Applied wherever a damage fn carries an `element`: `magicDamage`
+(spells), `skillDamage` (physical hero skills), `monsterSkillDamage` (enemy skills),
+AND **basic attacks (`physicalDamage`) now inherit the attacker's `weaponElement`**
+(2026-07-16 — 물리 클래스가 원소 무기로 통상공격까지 상성). `family` carries through
+`buildEnemyUnit`. Story bosses (bog_witch/dark_warden) stay UNTAGGED so no weapon
+trivializes them. Balance-invisible (harness uses ice/non-elemental weapons vs
+untagged/non-interacting bosses) — a player-facing optimization layer, not a ladder
+lever. Re-run balance only if you change the multipliers or tag a boss the harness's
+equipped weapon element matches.
 
 **Affinity module (`src/systems/affinity.js`, PURE, 2026-05-30 refactor)**: the table +
 multipliers were extracted out of battle.js into a shared module so the resolver and the
