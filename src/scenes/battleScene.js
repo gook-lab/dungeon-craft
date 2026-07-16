@@ -146,7 +146,11 @@ export class BattleScene {
     // 영웅 성장 상한은 회차마다 고정인데 적만 계속 벌어져 NG+2부터 스토리 보스가
     // 최적플레이로도 사실상 클리어 불가(늪 1%)가 됐다 — 체감곡선으로 NG+2를
     // 어렵지만 가능한 대역(늪 7%·황제 78%)으로 되돌린다. 해니스와 동일 공식.
-    const ng = this.game.runtime.ngPlus || 0;
+    // 유효 회차는 NG+2에서 상한 고정(NG_SCALE_CAP) — 체감곡선도 무한 상승형이라
+    // 캡이 없으면 NG+3부터 늪마녀(17라운드 소모전 스펀지)가 다시 1%로 무너진다.
+    // NG+3+는 NG+2 난이도로 유지(모든 회차 클리어 가능), 도감 배지 회차는 계속 오름.
+    const NG_SCALE_CAP = 2;
+    const ng = Math.min(this.game.runtime.ngPlus || 0, NG_SCALE_CAP);
     if (ng > 0) {
       let hpAdd = 0, atkAdd = 0;
       for (let i = 1; i <= ng; i++) { const f = 1 / (1 + (i - 1) * 0.8); hpAdd += 0.25 * f; atkAdd += 0.15 * f; }

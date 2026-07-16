@@ -173,7 +173,7 @@ function runBattle(sc, rng, opts = {}) {
   const enemies = monsters.map((m) => buildEnemyUnit(m));
   // 회차+(NG+) 미리보기 — env NG=1|2. battleScene.enter의 회차 폴드를 그대로 모델링
   // (HP +25%/회차, atk +15%/회차). 기본(NG 미설정)은 1회차 그대로.
-  const NG = Number(process.env.NG || 0);
+  const NG = Math.min(Number(process.env.NG || 0), 2); // 유효 회차 NG+2 상한 (battleScene NG_SCALE_CAP와 동일)
   if (NG > 0) {
     let hpAdd = 0, atkAdd = 0;
     for (let i = 1; i <= NG; i++) { const f = 1 / (1 + (i - 1) * 0.8); hpAdd += 0.25 * f; atkAdd += 0.15 * f; }
