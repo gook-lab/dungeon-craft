@@ -2052,8 +2052,8 @@ export const DEFS = {
 // Spells whose visual reads as "AoE" (the engine doesn't need this, but the scene
 // uses it to decide whether to pass all targets or just the primary).
 export const FX_ALL_TARGET = new Set([
-  'firestorm', 'thunderclap', 'quake', 'arrowrain', 'thunderstorm', 'blizzard',
-  'inferno', 'venomcloud', 'sandstorm', 'cyclone', 'darkmist', 'divinewrath',
+  'firestorm', 'thunderclap', 'quake', 'arrowrain', 'blizzard',
+  'venomcloud', 'darkmist', 'divinewrath',
   'warroar', 'whirlwind', 'smokebomb', 'masshaste', 'masheal', 'masscleanse', 'masbarrier',
   // Monster AoE skills (firebreath sprays the party; curse marks all heroes;
   // kamikaze detonates across the front).

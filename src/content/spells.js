@@ -99,11 +99,8 @@ export const SPELLS = {
   firestorm: { id: 'firestorm', name: '화염 폭풍', mpCost: 7, kind: 'damage', power: 9, target: 'allEnemies', element: 'fire', inflict: 'burn', inflictChance: 0.35, inflictTurns: 3 },
   thunderclap: { id: 'thunderclap', name: '뇌격', mpCost: 8, kind: 'damage', power: 12, target: 'allEnemies', element: 'thunder', inflict: 'shock', inflictChance: 0.35, inflictTurns: 3 },
   blizzard: { id: 'blizzard', name: '눈보라', mpCost: 9, kind: 'damage', power: 11, target: 'allEnemies', element: 'ice', inflict: 'freeze', inflictChance: 0.6, inflictTurns: 2 },
-  inferno: { id: 'inferno', name: '화염폭풍', mpCost: 9, kind: 'damage', power: 12, target: 'allEnemies', element: 'fire', inflict: 'burn', inflictChance: 0.45, inflictTurns: 3 },
-  thunderstorm: { id: 'thunderstorm', name: '천둥폭풍', mpCost: 10, kind: 'damage', power: 13, target: 'allEnemies', element: 'thunder', inflict: 'shock', inflictChance: 0.4, inflictTurns: 3 },
   venomcloud: { id: 'venomcloud', name: '독무', mpCost: 8, kind: 'damage', power: 7, target: 'allEnemies', element: 'poison', inflict: 'poison', inflictChance: 0.6, inflictTurns: 3 },
-  sandstorm: { id: 'sandstorm', name: '모래폭풍', mpCost: 8, kind: 'damage', power: 8, target: 'allEnemies', element: 'earth', inflict: 'weaken', inflictChance: 0.5, inflictTurns: 2 },
-  cyclone: { id: 'cyclone', name: '태풍', mpCost: 9, kind: 'damage', power: 11, target: 'allEnemies', element: 'wind', inflict: 'weaken', inflictChance: 0.4, inflictTurns: 2 },
+  // darkmist는 마법사 학습셋엔 없지만 dark_acolyte/necromancer 영입기(joinSkill)로 살아있음 — 유지.
   darkmist: { id: 'darkmist', name: '암흑 안개', mpCost: 9, kind: 'damage', power: 10, target: 'allEnemies', element: 'dark', inflict: 'weaken', inflictChance: 0.6, inflictTurns: 2 },
   quake: { id: 'quake', name: '대지분쇄', mpCost: 9, kind: 'damage', power: 14, target: 'allEnemies', element: 'earth', inflict: 'weaken', inflictChance: 0.4, inflictTurns: 2 },
   lullaby: { id: 'lullaby', name: '자장가', mpCost: 5, kind: 'ailment', status: 'sleep', turns: 3, target: 'one' },
