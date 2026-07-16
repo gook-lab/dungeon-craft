@@ -436,6 +436,7 @@ export class FieldScene {
     this.buildEdgeFade();
     this.buildBackdrop();
     this.buildWalls();
+    this.buildDoors();
     this.buildObjects();
     this.buildLights();
     // 로머 밀도는 맵 면적 비례(roamerCount) — loadMap마다 재스폰이라 맵을
@@ -1144,6 +1145,32 @@ export class FieldScene {
       sp.x = cx + TILE / 2; sp.y = cy + TILE / 2;
       sp.scale.set(TILE / 192);
       this.walls.addChild(sp);
+    }
+  }
+
+  // 스위치/열쇠 문 시각화 — toggleWalls의 아직 닫힌 셀에 목재 문 + 룬 자물쇠를
+  // 그린다 (그냥 벽이던 것에 '문' 정체성 부여). 스위치가 열면 collision이 0이 되고
+  // 재구축 시 문이 사라진다. walls 유무와 무관하게 loadMap이 buildWalls 뒤에 호출.
+  buildDoors() {
+    if (!this.map.toggleWalls) return;
+    const { w } = this.map;
+    const col = this.structCollision || this.map.collision;
+    for (const cells of Object.values(this.map.toggleWalls)) {
+      for (const c of cells) {
+        const idx = c.y * w + c.x;
+        if (col[idx] === 0) continue; // 이미 열림 → 문 없음
+        const cx = c.x * TILE, cy = c.y * TILE;
+        const g = new PIXI.Graphics();
+        // 문틀 + 목재 판자 + 좌우 철제 밴드 + 중앙 룬 자물쇠.
+        g.rect(cx + 1, cy + 1, TILE - 2, TILE - 2).fill({ color: 0x2a1c12 });
+        g.rect(cx + 4, cy + 3, TILE - 8, TILE - 5).fill({ color: 0x6b4a2c });
+        for (let px = cx + 6; px < cx + TILE - 6; px += 6) g.rect(px, cy + 3, 1, TILE - 5).fill({ color: 0x4a3018, alpha: 0.7 });
+        g.rect(cx + 4, cy + 8, TILE - 8, 2).fill({ color: 0x3a2818 });
+        g.rect(cx + 4, cy + TILE - 10, TILE - 8, 2).fill({ color: 0x3a2818 });
+        g.circle(cx + TILE / 2, cy + TILE / 2, 3.5).fill({ color: 0xc98b2c }); // goldDeep 룬 자물쇠
+        g.circle(cx + TILE / 2, cy + TILE / 2, 1.5).fill({ color: 0x2a1c12 });
+        this.walls.addChild(g);
+      }
     }
   }
 
@@ -2017,6 +2044,7 @@ export class FieldScene {
         this.structCollision[k] = 0;    // rendering (buildWalls/minimap read this)
       }
       this.buildWalls();
+      this.buildDoors();
       this.buildMinimap();
       this.game.audio?.play('buy');
       if (eff.msg) { this.busy = true; this.game.showLines('', [eff.msg], () => this.game.resumeField()); }
