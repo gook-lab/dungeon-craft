@@ -83,9 +83,20 @@ go through `makeUnit`. progression.js imports `makeUnit` from battle.js — a cl
 one-way edge (battle.js does NOT import progression). Don't reverse it.
 
 ### 3. Mercy mechanic (fight / spare / recruit)
-A weakened enemy (`hp ≤ maxHp · mercyThreshold`, default 0.3, bosses excluded)
-can be **spared** or **recruited**. Pure predicates `canMercy(t)` / `canRecruit(t)`
-gate the UI. `resolveAction({type:'mercy', mode:'spare'|'recruit'})`:
+A weakened enemy (`hp ≤ maxHp · mercyThreshold`, default 0.3, bosses excluded
+**by default**) can be **spared** or **recruited**. Pure predicates `canMercy(t)` /
+`canRecruit(t)` gate the UI.
+
+**Boss mercy opt-in (`spareable`, 2026-07-16)** — a STORY boss can opt INTO mercy while
+staying `boss:true` (keeping enrage / boss music / region gating): set `spareable: true`
+in monsters.js. The gate reads `(!target.boss || target.spareable)`, so only flagged
+bosses become spare/recruitable. `recruitable` honors an EXPLICIT override
+(`m.recruitable != null ? m.recruitable : !m.boss`), so a spareable boss can also join.
+Reference: `bog_witch` (늪의 마녀 자비/처단 갈림 — the C-slice consequence gate).
+**Gotcha**: setting only `branchFlag` on the map object does NOT make a boss spareable —
+without `spareable`, canMercy still returns false and the 자비 menu never appears.
+
+`resolveAction({type:'mercy', mode:'spare'|'recruit'})`:
 - spare → enemy leaves (`alive=false`, `resolved='spared'`), `state.mercied++`
 - recruit → roll `1 - hp/maxHp`; success → `resolved='recruited'` + emit
   `{type:'recruit', refId}`; fail → `recruitFail`, turn consumed.
@@ -311,6 +322,13 @@ every portal/boss/chest. A wall or prop that seals a region passes the portal-gr
 check but fails BFS. Maze maps use `combMaze` (`_builder.js`) — a guaranteed-
 connected serpentine; left/right open zones hold entrance/boss/exit.
 
+**Sprite-ref integrity guard (2026-07-16)** — a third guard (`map sprite-ref integrity`)
+mirrors fieldScene.buildObjects' URL rules and asserts every NPC/boss object's art ref
+resolves to a REAL file: `art:'enemy'`→`/enemies/<ref>_east.png`, `art:'hero'`→
+`/heroes/<ref>_<dir>.png`, plain npc→`/npcs/<ref>_<dir>.png`, boss→
+`/enemies/<getMonster(ref).sprite>_east.png`. Catches the invisible-NPC class of bug
+(a stray ref renders nothing, with NO error) — the reason it exists.
+
 **HD-2D elevation (2026-05-30)** — maps may carry an optional `elev[]` (row-major,
 like collision) + `stairs:[{x,y}]` bridges + `drops:[{x,y}]` one-way ledges (`_builder.js
 raiseRect(elev,collision,W,x0,y0,x1,y1,level)` raises only walkable cells). It's BOTH
@@ -420,8 +438,12 @@ deferred (see TODOS.md).
 
 **Caged-monster rescue (자비 셋피스, C단계 2026-05-30)** — a free-it-in-the-overworld
 beat embodying 자비=파워. Pure DATA on the trigger kit: a `kind:'npc'` with
-`art:'enemy'` (renders the monster's BATTLE sprite via `enemyUrl`, parallel to
-`art:'hero'`) + `recruitAlly:'<refId>'` + a persistent `flag`, placed behind a
+`art:'enemy'` (renders the monster's BATTLE sprite via `enemyUrl(o.ref)` — the ref is
+used **DIRECTLY as the sprite key**, unlike a `kind:'boss'` object which resolves
+`getMonster(ref).sprite` via `getMapBossSprite`. **Gotcha**: an `art:'enemy'` ref with no
+`/enemies/<ref>_east.png` file renders INVISIBLE with no error — e.g. the witch NPC's old
+`bog_witch_npc` (the sprite is `boss_bog_witch`). content.test's sprite-ref integrity guard
+now catches this) + `recruitAlly:'<refId>'` + a persistent `flag`, placed behind a
 switch-gated cage (`toggleWalls` cell opened by a `switch` trigger). On dialog close
 `main.openDialog` fires `game.recruitAlly(refId, flag)` (mirrors `recruitHero` but
 pushes to `runtime.allies` — the same bench battle-recruit feeds; idempotent via the
@@ -771,6 +793,17 @@ cosmetic/save, no resolver changes:
     `validateSave(runtimeToSave(toRuntime(seeded))) === seeded` round-trip assertion.
     Add the new field to all four save.js sites + that round-trip test's seed.
     `flags.*` are still the whitelist-only case (no mapping edit — they spread whole).
+12. **NPC actions come from the DIALOG ENTRY, not the map object (2026-07-16)** —
+    `action:'shop'|'inn'|'heal'|'warp'` (+ `shop:'<key>'`) must live on the **dialog.js
+    entry**, NOT on the map object. `DialogScene.enter` reads `d.action`/`d.shop` from
+    `getDialog(dialogId)` and dispatches on close (`dialogScene.js` ~156-159 →
+    `game.openShop/tryInn/healSpring/openFastTravel`); `openDialog` only passes
+    `{dialogId, afterClose}`, so a map object's `action` field is **INERT**. The failure
+    is silent: you talk to the merchant, the lines play, and no shop opens (exactly how
+    the witch's hut shop shipped broken). Reference: `shop_smith`/`witchs_hut_greeting`
+    carry `action:'shop'` in dialog.js. Any object with `obj.talk` is interactable, so a
+    **prop** can carry `talk:'<id>'` to become an interaction point (the hut's 약솥 →
+    `witch_spring` → `action:'heal'` → free full heal).
 
 ## Run Workflow
 `npx vitest run && npm run build && $B goto http://localhost:9153/ && $B screenshot`
