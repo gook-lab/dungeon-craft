@@ -592,16 +592,17 @@ export class FieldScene {
       const col = struct[i] === 1 ? NUM.ink900 : mixInk(TILE_COLOR[this.map.ground[i]] ?? NUM.ink600);
       g.rect(cx, cy, cell, cell).fill({ color: col });
     }
+    // POI 마커는 안개와 무관하게 항상 표시(목표 마커) — 어두운 던전에서도 상자·포탈·
+    // 보스 위치가 보여 "어디로 갈지"가 생겨 탐험하는 재미가 산다. 지형(위 타일 루프)은
+    // 여전히 탐험으로 밝혀진다(맵이 채워지는 재미 유지). 숨은 상자(o.hidden)만 예외로 비밀.
     // Portals → `?` (info/cyan, gated dimmer) so the player can spot exits.
     for (const p of this.map.portals || []) {
-      if (!seen(p.y * w + p.x)) continue;
       const open = !p.requires || this.game.runtime.flags[p.requires];
       this.mmGlyph(g, p.x, p.y, cell, '?', open ? NUM.info : 0x2a6a86, open ? 1 : 0.55);
     }
     // Object markers: boss=red dot, chest=`?`(gold), quest NPC=`!`(gold),
     // recruit/plain NPC=green dot. Recruited companions (flag set) drop out.
     for (const o of this.map.objects || []) {
-      if (!seen(o.y * w + o.x)) continue;
       if (o.kind === 'boss') { if (this.game.runtime.flags[o.flag || 'bossDefeated']) continue; g.rect(o.x * cell, o.y * cell, cell, cell).fill({ color: NUM.danger }); }
       else if (o.kind === 'chest') { if (o.hidden || this.game.runtime.openedChests.includes(this.chestId(o))) continue; this.mmGlyph(g, o.x, o.y, cell, '?', NUM.gold); }
       else if (o.kind === 'npc') {
@@ -618,7 +619,8 @@ export class FieldScene {
       }
     }
     // 룬게이트 빠른이동 포인트 — 골드(월드맵 hub 색과 통일). 활성=밝은 골드, 미활성=흐림.
-    if (this.runeGate && seen(this.runeGate.y * w + this.runeGate.x)) {
+    // 이것도 목표 마커라 안개 무관 항상 표시.
+    if (this.runeGate) {
       g.rect(this.runeGate.x * cell, this.runeGate.y * cell, cell, cell)
         .fill({ color: NUM.gold, alpha: this.runeGate.active ? 1 : 0.5 });
     }
