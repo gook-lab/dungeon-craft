@@ -86,7 +86,7 @@ export const PARTY_MEMBERS = {
     // 팬파이어/처형탄 L19/L23 — post-game growth parity with the other classes
     // (별무덤 L21 ~ 공허 L35 구간). Off the harness ladder (duelist non-sim).
     // headshot(단일 정밀 저격)는 사냥꾼 정체성으로 이관 — 쌍검사는 다단·탄막·출혈에 집중.
-    learn: { 3: 'rend', 5: 'shurikenflurry', 7: 'smokegrenade', 9: 'fragbomb', 11: 'buckshot', 13: 'fanfire', 16: 'fullburst', 19: 'executioner', 23: 'venomcloud' },
+    learn: { 3: 'rend', 5: 'shurikenflurry', 7: 'smokegrenade', 9: 'fragbomb', 11: 'buckshot', 16: 'fullburst', 19: 'fanfire', 23: 'executioner' },
   },
 };
 
