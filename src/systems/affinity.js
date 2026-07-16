@@ -13,17 +13,20 @@ export const AFFINITY_STRONG = 1.25;
 export const AFFINITY_RESIST = 0.8;
 
 // Per-element: families it hits HARD (strong → more dmg) and families that shrug
-// it off (resist → less dmg). Untagged / neutral elements (thunder/earth/wind/
-// arcane/physical) and untagged targets are ×1.
+// it off (resist → less dmg). `arcane`/`physical` stay neutral (×1); untagged
+// targets are ×1. Families (monsters.js): undead/icy/fiery/fire/void (elemental)
+// + rocky(석·구조물)/metal(기갑)/aerial(공중)/beast(야수) — the physical-element
+// activation layer so 대지/뇌전/바람 무기가 실제 약점을 노린다(shared with mage
+// 원소 주문). 스토리 보스(bog_witch/dark_warden 등)는 무태깅=중립 유지.
 export const AFFINITY = {
   fire: { strong: ['icy'], resist: ['fiery', 'fire'] },          // 화염: 얼음 특효, 불 계열 반감
   ice: { strong: ['fiery', 'fire'], resist: ['icy'] },           // 냉기: 불 특효, 얼음 반감
   holy: { strong: ['undead', 'void'], resist: [] },              // 신성: 언데드·공허 특효
   poison: { strong: [], resist: ['undead', 'void'] },            // 독: 언데드·공허에 잘 안 먹힘
   dark: { strong: ['void'], resist: [] },                        // 암흑: 공허 특효
-  thunder: { strong: [], resist: [] },
-  earth: { strong: [], resist: [] },
-  wind: { strong: [], resist: [] },
+  thunder: { strong: ['metal', 'aerial'], resist: [] },          // 뇌전: 금속갑·공중(낙뢰) 특효
+  earth: { strong: ['rocky'], resist: ['aerial'] },              // 대지: 석·구조물 특효, 공중은 회피(반감)
+  wind: { strong: ['beast'], resist: ['rocky'] },                // 바람: 야수 특효, 석·구조물엔 반감
   arcane: { strong: [], resist: [] },
   physical: { strong: [], resist: [] },
 };
