@@ -6,6 +6,10 @@
 
 import * as PIXI from 'pixi.js';
 import { HEX, NUM, FS, FONT } from './tokens.js';
+import { getSettings } from '../data/settings.js';
+
+// 색맹 모드 여부 (설정) — HP 바 구간 해칭 등에서 참조. 설정 미로드/헤드리스여도 안전.
+function colorblindOn() { try { return !!getSettings().colorblind; } catch { return false; } }
 
 // --- Text ---------------------------------------------------------------
 export function textStyle(size = FS.label, fill = HEX.text, opts = {}) {
@@ -77,29 +81,48 @@ export function divider(w, color = NUM.frameShadow) {
 // Pixel-tick vital bar matching .hpbar in ui.css: dark track, coloured fill,
 // 1px frame, faint vertical tick overlay. Returns a Container; call its
 // setFrac(f) to animate-free update the width.
-export function bar(frac, { w = 110, h = 13, color = NUM.hpHigh, tick = 9 } = {}) {
+export function bar(frac, { w = 110, h = 13, color = NUM.hpHigh, tick = 9, hp = false } = {}) {
   const c = new PIXI.Container();
   const track = new PIXI.Graphics();
   track.rect(0, 0, w, h).fill({ color: NUM.black, alpha: 0.7 });
   track.rect(0, 0, w, h).stroke({ color: NUM.frame, width: 1.5, alignment: 0 });
   const fill = new PIXI.Graphics();
+  const pat = new PIXI.Graphics();   // 색맹 패턴(HP 구간별 사선 해칭) — 명도/무늬로도 구분
   const ticks = new PIXI.Graphics();
   for (let x = tick; x < w; x += tick + 1) ticks.rect(x, 0, 1, h).fill({ color: NUM.black, alpha: 0.28 });
-  c.addChild(track, fill, ticks);
+  c.addChild(track, fill, pat, ticks);
   c.setFrac = (f, col) => {
     const ff = Math.max(0, Math.min(1, f));
-    fill.clear();
-    if (ff > 0) fill.rect(1, 1, (w - 2) * ff, h - 2).fill({ color: col != null ? col : color });
+    fill.clear(); pat.clear();
+    if (ff <= 0) return;
+    // hp 모드: 색을 fraction에서 자동 도출(호출자의 col 무시) + 색맹이면 구간 해칭.
+    let fillCol = col != null ? col : color;
+    let zone = 0; // 0 high · 1 mid · 2 low
+    if (hp) {
+      zone = ff > 0.5 ? 0 : ff > 0.25 ? 1 : 2;
+      fillCol = zone === 0 ? NUM.hpHigh : zone === 1 ? NUM.hpMid : NUM.hpLow;
+    }
+    const fw = (w - 2) * ff;
+    fill.rect(1, 1, fw, h - 2).fill({ color: fillCol });
+    if (hp && zone > 0 && colorblindOn()) {
+      // 중간=성긴 45° 사선 / 위험=촘촘한 사선 (밝은 오버레이). 채워진 폭 안에만
+      // 온전히 들어가는 세그먼트만 그린다(오버플로 없음).
+      const step = zone === 1 ? 7 : 4, dh = h - 3;
+      for (let x = 2; x + dh <= fw; x += step) pat.moveTo(1 + x, h - 2).lineTo(1 + x + dh, 1);
+      pat.stroke({ color: 0xffffff, width: 1, alpha: 0.5 });
+      // 위험 구간엔 좌측 경고 노치(수직 굵은 선) — 극저 HP를 무늬로도 각인.
+      if (zone === 2) pat.rect(1, 1, 2, h - 2).fill({ color: 0xffffff, alpha: 0.85 });
+    }
   };
-  c.setFrac(frac, color);
+  c.setFrac(frac, hp ? undefined : color);
   c.barWidth = w; c.barHeight = h;
   return c;
 }
 
 // Convenience: an HP bar whose colour follows the high/mid/low thresholds.
+// hp:true → setFrac 재호출마다 색을 자동 도출 + 색맹 모드면 구간 해칭.
 export function hpbar(frac, opts = {}) {
-  const col = frac > 0.5 ? NUM.hpHigh : frac > 0.25 ? NUM.hpMid : NUM.hpLow;
-  return bar(frac, { ...opts, color: col });
+  return bar(frac, { ...opts, hp: true });
 }
 
 // --- Menu list ----------------------------------------------------------
