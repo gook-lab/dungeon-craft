@@ -376,18 +376,10 @@ function snowField(S, dt, o) {
   const n = Math.round((o.rate || 46) * dt);
   for (let i = 0; i < n; i++) S.p({ x: rnd(-4, S.W), y: rnd(-6, 2), vx: rnd(-14, 14), vy: rnd(34, 74), life: 2.2, max: 2.2, size: (rnd(1, 3) | 0) || 1, color: Math.random() < 0.5 ? o.color : o.color2, fade: false });
 }
-function emberField(S, dt, o) {
-  const n = Math.round((o.rate || 30) * dt);
-  for (let i = 0; i < n; i++) S.p({ x: rnd(0, S.W), y: rnd(S.H * 0.7, S.H + 6), vx: rnd(-8, 8), vy: -rnd(26, 64), life: rnd(0.8, 1.6), max: 1.6, size: (rnd(1, 3) | 0) || 1, color: [o.c1, o.c2, o.c3][i % 3], additive: true, shrink: true });
-}
 function fogField(S, dt, o) {
   const n = Math.round((o.rate || 16) * dt);
   for (let i = 0; i < n; i++) S.p({ x: rnd(0, S.W), y: rnd(S.H * 0.4, S.H), vx: rnd(-10, 10), vy: -rnd(3, 12), life: rnd(0.7, 1.4), max: 1.4, size: (rnd(3, 6) | 0), color: Math.random() < 0.5 ? o.color : o.color2, additive: true, shrink: true });
   if (Math.random() < 0.5) S.p({ x: rnd(0, S.W), y: rnd(S.H * 0.6, S.H), vy: -rnd(10, 22), life: rnd(0.6, 1.1), max: 1.1, size: 2, color: o.color, additive: true, shrink: true });
-}
-function sandField(S, dt, o) {
-  const n = Math.round((o.rate || 60) * dt);
-  for (let i = 0; i < n; i++) S.p({ x: rnd(-10, 0), y: rnd(S.H * 0.2, S.groundY + 4), vx: rnd(180, 320), vy: rnd(-12, 12), life: 0.7, max: 0.7, size: (rnd(1, 3) | 0) || 1, color: [o.c1, o.c2, o.c3][i % 3], streak: rnd(5, 11), fade: false });
 }
 
 // Shared AoE skeleton: ambient field + per-target staggered strikes.
@@ -735,19 +727,6 @@ export const DEFS = {
         s.p({ x: e.x + rnd(-6, 6), y: e.y - rnd(4, 16), vx: -30, vy: 220, life: 0.12, max: 0.12, size: 1, color: '#cfd8ec', streak: 8, head: true, headColor: '#fff0b8', fade: false }); },
     });
   },
-  thunderstorm(S) {
-    return aoe(S, {
-      dur: 1.9, gap: [0.2, 0.45], tint: { c: '#0b1024', a: 0.3 },
-      field: (s, dt) => rainField(s, dt, { rate: 55, vx: -22, vy: 300, size: 1, streak: 8, color: 'rgba(150,170,210,1)' }),
-      ambient: (s) => { if (Math.random() < 0.06) s.doFlash('#aab6e0', 0.12); },
-      strike: (s, e) => {
-        s.beam({ x1: e.x + rnd(-3, 3), y1: -2, x2: e.x, y2: e.y - 6, color: PAL.thunder, width: 2, jag: 6, life: 0.16, max: 0.16 });
-        s.beam({ x1: e.x, y1: -2, x2: e.x, y2: e.y - 6, color: PAL.thunderP, width: 4, jag: 8, life: 0.12, max: 0.12 });
-        s.doFlash('#dfe6ff', 0.5); s.doShake(3.5); e.flinch = 4; e.tint = 0.85;
-        burst(s, e.x, e.y - 6, [PAL.thunder, PAL.thunderB, PAL.thunderP], 16, 110, { up: 18, additive: true });
-      },
-    });
-  },
   blizzard(S) {
     return aoe(S, {
       dur: 2.0, gap: [0.22, 0.46], tint: { c: '#bfe6ff', a: 0.12 },
@@ -755,18 +734,6 @@ export const DEFS = {
       strike: (s, e) => {
         for (let i = 0; i < 12; i++) { const a = -Math.PI / 2 + rnd(-1.2, 1.2), sp = rnd(40, 120); s.p({ x: e.x, y: e.y - 8, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 160, drag: 0.96, life: rnd(0.3, 0.6), max: 0.6, size: (rnd(1, 3) | 0) || 2, color: [PAL.iceW, PAL.iceP, PAL.ice][i % 3] }); }
         s.doFlash(PAL.iceW, 0.28); s.doShake(2); e.flinch = 3; e.tint = 0.7;
-      },
-    });
-  },
-  inferno(S) {
-    return aoe(S, {
-      dur: 1.9, gap: [0.16, 0.34], tint: { c: PAL.fireDeep, a: 0.28 },
-      field: (s, dt) => emberField(s, dt, { rate: 40, c1: PAL.fireY, c2: PAL.fireR, c3: PAL.fireW }),
-      ambient: (s) => { if (Math.random() < 0.35) s.doFlash(PAL.fireY, 0.1); },
-      strike: (s, e) => {
-        for (let k = 0; k < 6; k++) s.p({ x: e.x + rnd(-3, 3), y: e.y - 50 - k * 5, vy: 260, life: 0.2, max: 0.2, size: 3, color: [PAL.fireY, PAL.fireR, PAL.fireW][k % 3], shrink: true, additive: true });
-        s.schedule(0.17, () => { burst(s, e.x, e.y - 6, [PAL.fireW, PAL.fireY, PAL.fireR, PAL.fireDeep], 16, 100, { up: 26, g: 40, additive: true }); s.doShake(2.5); });
-        e.tint = 0.7; e.flinch = 3;
       },
     });
   },
@@ -781,30 +748,7 @@ export const DEFS = {
       },
     });
   },
-  sandstorm(S) {
-    return aoe(S, {
-      dur: 1.8, gap: [0.18, 0.4], tint: { c: '#3a2c14', a: 0.3 },
-      field: (s, dt) => sandField(s, dt, { rate: 80, c1: PAL.earth, c2: PAL.dust, c3: PAL.earthD }),
-      ambient: (s) => { if (Math.random() < 0.5) s.doShake(1.2); },
-      strike: (s, e) => {
-        for (let i = 0; i < 8; i++) s.p({ x: e.x - 8, y: e.y - rnd(2, 18), vx: rnd(120, 240), vy: rnd(-20, 20), life: rnd(0.25, 0.5), max: 0.5, size: (rnd(1, 3) | 0) || 1, color: [PAL.earth, PAL.dust, PAL.earthD][i % 3], streak: rnd(4, 8), fade: false });
-        e.flinch = 2; e.tint = 0.35;
-      },
-    });
-  },
-
   /* --- Extended (new elements + boss nuke) -------------------------------- */
-  cyclone(S) {
-    return aoe(S, {
-      dur: 1.8, gap: [0.16, 0.36], tint: { c: '#16241c', a: 0.16 },
-      field: (s, dt) => {
-        const n = Math.round(72 * dt);
-        for (let i = 0; i < n; i++) { const y = rnd(0, s.groundY); s.p({ x: rnd(-12, 0), y, vx: rnd(230, 380), vy: Math.sin(y * 0.4) * 26, life: 0.6, max: 0.6, size: 1, color: Math.random() < 0.5 ? PAL.wind1 : PAL.wind2, streak: rnd(8, 14), additive: true, fade: false }); }
-        if (Math.random() < 0.7) s.p({ x: rnd(-6, 0), y: rnd(0, s.groundY), vx: rnd(170, 280), vy: rnd(-26, 26), g: 28, life: rnd(0.6, 1.1), max: 1.1, size: 2, color: [PAL.leaf1, PAL.leaf2, PAL.leaf3][(rnd(0, 3) | 0)] });
-      },
-      strike: (s, e) => { burst(s, e.x, e.y - 8, [PAL.wind1, PAL.wind2, PAL.leaf3], 10, 90, { up: 6, additive: true }); e.flinch = 3; e.tint = 0.35; },
-    });
-  },
   darkmist(S) {
     return aoe(S, {
       dur: 2.0, gap: [0.26, 0.5], tint: { c: '#0a0612', a: 0.46 },

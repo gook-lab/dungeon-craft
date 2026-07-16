@@ -54,7 +54,7 @@ export const SPELLS = {
   // ===== Huntress — physical ranged / assassination =====
   stealth: { id: 'stealth', name: '은신', mpCost: 3, kind: 'state', state: 'stealth', target: 'self' },
   aimedshot: { id: 'aimedshot', name: '정조준', mpCost: 3, kind: 'damage', power: 16, target: 'one', element: 'physical', physical: true, critBonus: 0.5 },
-  multishot: { id: 'multishot', name: '연사', mpCost: 4, kind: 'damage', power: 4, hits: 5, atkScale: 0.4, target: 'one', element: 'physical', physical: true },
+  multishot: { id: 'multishot', name: '연사', mpCost: 4, kind: 'damage', power: 4, hits: 5, atkScale: 0.4, target: 'one', element: 'physical', physical: true, critBonus: 0.3 }, // 사냥꾼 다단 = 크리 연동(정밀 정체성)
   piercingshot: { id: 'piercingshot', name: '관통 사격', mpCost: 5, kind: 'damage', power: 18, target: 'one', element: 'physical', physical: true, pierce: true },
   // 그림자 일격 — only usable from 은신(stealth): the assassination finisher lands
   // the stealth crit (×1.8). requiresStealth gates it in the resolver + battle UI
@@ -69,7 +69,7 @@ export const SPELLS = {
   // ===== Duelist — fast glass-cannon gunslinger (총·폭탄·투척; physical, atk-scaled).
   // Multi-hit shooters carry atkScale so N hits ≈ one strong shot (like 연사). 출혈
   // (bleed) is the duelist's signature physical DoT; fragbomb spreads 화상(burn). =====
-  quickdraw: { id: 'quickdraw', name: '쾌속 사격', mpCost: 3, kind: 'damage', power: 7, hits: 4, atkScale: 0.5, target: 'one', element: 'physical', physical: true },
+  quickdraw: { id: 'quickdraw', name: '쾌속 사격', mpCost: 3, kind: 'damage', power: 7, hits: 4, atkScale: 0.5, target: 'one', element: 'physical', physical: true, inflict: 'bleed', inflictChance: 0.4, inflictTurns: 2 }, // 쌍검사 다단 = 출혈 스택(근접 리스크 정체성)
   rend: { id: 'rend', name: '난자', mpCost: 4, kind: 'damage', power: 9, hits: 3, atkScale: 0.5, target: 'one', element: 'physical', physical: true, inflict: 'bleed', inflictChance: 0.8, inflictTurns: 3 },
   shurikenflurry: { id: 'shurikenflurry', name: '표창 난사', mpCost: 4, kind: 'damage', power: 6, hits: 5, atkScale: 0.4, target: 'one', element: 'physical', physical: true },
   smokegrenade: { id: 'smokegrenade', name: '연막 수류탄', mpCost: 3, kind: 'buff', stat: 'eva', power: 0.4, target: 'self', debuffEnemyAcc: true },

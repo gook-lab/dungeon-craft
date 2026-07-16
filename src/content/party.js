@@ -43,7 +43,7 @@ export const PARTY_MEMBERS = {
     // 은신(stealth) L6 — 던전 보스(L7)부터 은신→치명 콤보가 AI/하네스에 반영.
     // Precision ranged / crit / affinity: single high-multiplier shots (aimedshot/piercing),
     // stealth→assassination combo, ONE AoE (arrowrain). Elemental affinity via weapons.
-    learn: { 4: 'multishot', 6: 'stealth', 8: 'snaretrap', 10: 'piercingshot', 12: 'smokebomb', 14: 'arrowrain', 16: 'assassinate', 18: 'venom_shot', 20: 'starfall' },
+    learn: { 4: 'multishot', 6: 'stealth', 8: 'snaretrap', 10: 'piercingshot', 12: 'smokebomb', 14: 'arrowrain', 16: 'assassinate', 17: 'headshot', 18: 'venom_shot', 20: 'starfall' },
   },
 
   // Arcane + elemental caster (the elemental spellbook moved here off the
@@ -57,7 +57,7 @@ export const PARTY_MEMBERS = {
     base: { maxHp: 26, maxMp: 22, atk: 8, def: 4, spd: 9 },
     growth: { maxHp: 3.2, maxMp: 3, atk: 1.2, def: 0.8, spd: 1.5 },
     spells: ['arcanebolt'],
-    // Elemental coverage completed (2026-06-01): 대지(earth) sandstorm/quake fill the
+    // Elemental coverage completed (2026-06-01): 대지(earth) quake fills the
     // last missing element, and 자장가(lullaby) gives an early single-target sleep CC.
     // All power<24 → still pre-L17, so the post-game nuke ladder + boss tuning hold
     // (mage is non-STARTING, so the 3-hero kill-build harness is untouched regardless).
@@ -85,7 +85,8 @@ export const PARTY_MEMBERS = {
     spells: ['quickdraw'],
     // 팬파이어/처형탄 L19/L23 — post-game growth parity with the other classes
     // (별무덤 L21 ~ 공허 L35 구간). Off the harness ladder (duelist non-sim).
-    learn: { 3: 'rend', 5: 'shurikenflurry', 7: 'smokegrenade', 9: 'fragbomb', 11: 'buckshot', 13: 'headshot', 16: 'fullburst', 19: 'fanfire', 23: 'executioner' },
+    // headshot(단일 정밀 저격)는 사냥꾼 정체성으로 이관 — 쌍검사는 다단·탄막·출혈에 집중.
+    learn: { 3: 'rend', 5: 'shurikenflurry', 7: 'smokegrenade', 9: 'fragbomb', 11: 'buckshot', 13: 'fanfire', 16: 'fullburst', 19: 'executioner', 23: 'venomcloud' },
   },
 };
 
