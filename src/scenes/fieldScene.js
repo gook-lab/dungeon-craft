@@ -4,7 +4,7 @@
 // scene is the Pixi presentation + input layer.
 
 import * as PIXI from 'pixi.js';
-import { TILE, WORLD_SCALE, HERO_SCALE, PROP_SCALE, NPC_SCALE, TILESET_META, TILE_COLOR, MOVE_TIME, REPEAT_DELAY, REGION_MOOD, FOG_FADE, ELEV_STEP, FAR_BLUR, BACKDROP, TILT } from '../config.js';
+import { TILE, WORLD_SCALE, HERO_SCALE, PROP_SCALE, NPC_SCALE, TILESET_META, TILE_COLOR, MOVE_TIME, REPEAT_DELAY, REGION_MOOD, FOG_FADE, ELEV_STEP, FAR_BLUR, BACKDROP, TILT, ENC_GRACE } from '../config.js';
 import { tryMove, objectAt, resolveTrigger, elevAt, isStair, capEncounter } from '../systems/field.js';
 import { createRng } from '../util/rng.js';
 import { spawnRoamers, stepRoamers, roamerAt, roamerGroup, roamerCount } from '../systems/roamers.js';
@@ -13,6 +13,7 @@ import { getMonster } from '../content/monsters.js';
 import { heroUrl, heroWalkUrl, npcUrl, structureUrl, enemyUrl, pickupUrl } from '../util/assets.js';
 import { getItem } from '../content/items.js';
 import { recordVisit, isTalkTarget } from '../content/questlines.js';
+import { getQuest, isQuestComplete } from '../content/quests.js';
 import { worldNode } from '../content/worldmap.js';
 import { statsAtLevel, xpToReach } from '../systems/progression.js';
 import { loadSheet, makeSprite, swapTexture, shadowTexture } from '../engine/renderer.js';
@@ -358,8 +359,16 @@ export class FieldScene {
     this.container.addChild(this.hud);
     // Interaction prompt ("Z") that floats over a faced interactable. Lives on
     // `world` (not props) so buildObjects' clear doesn't remove it.
-    this.prompt = label('▶ Z', 13, HEX.gold);
-    this.prompt.anchor = { x: 0.5, y: 1 };
+    // ▶Z 프롬프트 — 반투명 캡슐 배경을 깔아 어디에 떠도 'UI'로 읽히게(허공 프롬프트
+    // 고립감 해소). 컨테이너 원점(0,0) = 텍스트 하단 중앙 → updatePrompt가 대상 시각
+    // 상단 위로 올림.
+    this.prompt = new PIXI.Container();
+    const promptText = label('▶ Z', 13, HEX.gold, { font: FONT.ui });
+    promptText.anchor = { x: 0.5, y: 1 };
+    const ptw = promptText.width + 10, pth = promptText.height + 6;
+    const promptBg = new PIXI.Graphics();
+    promptBg.roundRect(-ptw / 2, -promptText.height - 3, ptw, pth, 4).fill({ color: 0x0a0a12, alpha: 0.6 });
+    this.prompt.addChild(promptBg, promptText);
     this.prompt.visible = false;
     this.world.addChild(this.prompt);
 
@@ -404,6 +413,7 @@ export class FieldScene {
   }
 
   loadMap(mapId, x, y, dir) {
+    this._stepsSinceEnc = 0; // 맵 진입 직후 몇 걸음은 조우 유예 (ENC_GRACE)
     // Bake object tiles (npc/prop/sign) into a collision copy so the player
     // can't walk through them and instead talks by facing. Boss tiles stay
     // walkable — stepping onto one triggers the fight.
@@ -582,20 +592,30 @@ export class FieldScene {
       const col = struct[i] === 1 ? NUM.ink900 : mixInk(TILE_COLOR[this.map.ground[i]] ?? NUM.ink600);
       g.rect(cx, cy, cell, cell).fill({ color: col });
     }
-    // Portals (info/cyan), gated portals slightly dimmer.
+    // Portals → `?` (info/cyan, gated dimmer) so the player can spot exits.
     for (const p of this.map.portals || []) {
       if (!seen(p.y * w + p.x)) continue;
       const open = !p.requires || this.game.runtime.flags[p.requires];
-      g.rect(p.x * cell, p.y * cell, cell, cell).fill({ color: open ? NUM.info : 0x2a6a86 });
+      this.mmGlyph(g, p.x, p.y, cell, '?', open ? NUM.info : 0x2a6a86, open ? 1 : 0.55);
     }
-    // Object markers: boss=danger, chest=gold, npc=hpHigh (only once discovered).
+    // Object markers: boss=red dot, chest=`?`(gold), quest NPC=`!`(gold),
+    // recruit/plain NPC=green dot. Recruited companions (flag set) drop out.
     for (const o of this.map.objects || []) {
       if (!seen(o.y * w + o.x)) continue;
-      let col = null;
-      if (o.kind === 'boss') { if (this.game.runtime.flags[o.flag || 'bossDefeated']) continue; col = NUM.danger; }
-      else if (o.kind === 'chest') { if (o.hidden || this.game.runtime.openedChests.includes(this.chestId(o))) continue; col = NUM.gold; }
-      else if (o.kind === 'npc') { if (o.flag && this.game.runtime.flags[o.flag]) continue; col = NUM.hpHigh; }
-      if (col != null) g.rect(o.x * cell, o.y * cell, cell, cell).fill({ color: col });
+      if (o.kind === 'boss') { if (this.game.runtime.flags[o.flag || 'bossDefeated']) continue; g.rect(o.x * cell, o.y * cell, cell, cell).fill({ color: NUM.danger }); }
+      else if (o.kind === 'chest') { if (o.hidden || this.game.runtime.openedChests.includes(this.chestId(o))) continue; this.mmGlyph(g, o.x, o.y, cell, '?', NUM.gold); }
+      else if (o.kind === 'npc') {
+        if (o.flag && this.game.runtime.flags[o.flag]) continue;   // 영입 완료 → 지도에서 사라짐
+        if (o.quest) {
+          const qs = this.game.runtime.quests[o.quest];
+          if (qs === 'done') continue;                             // 완료 퀘스트 → 마크 제거
+          const q = getQuest(o.quest);
+          const ready = qs == null || (q && isQuestComplete(q, this.game.runtime)); // 수락/제출 가능
+          this.mmGlyph(g, o.x, o.y, cell, '!', NUM.gold, ready ? 1 : 0.5);
+          continue;
+        }
+        g.rect(o.x * cell, o.y * cell, cell, cell).fill({ color: NUM.hpHigh });   // 영입 가능/일반 NPC
+      }
     }
     // 룬게이트 빠른이동 포인트 — 골드(월드맵 hub 색과 통일). 활성=밝은 골드, 미활성=흐림.
     if (this.runeGate && seen(this.runeGate.y * w + this.runeGate.x)) {
@@ -604,6 +624,28 @@ export class FieldScene {
     }
     this.updateMinimapPlayer();
     if (this._bigMap) this.applyMinimapView(); // 확대 상태면 재빌드 후에도 유지
+  }
+
+  // Minimap point-of-interest glyph on tile (tx,ty): '!' (quest) or '?' (chest/
+  // portal). Cells are tiny (3-7px) so glyphs are chunky hints in the corner view
+  // and read clearly in the enlarged big-map (M). A faint locator cell keeps the
+  // tile findable; the mark's SHAPE (!/?) + COLOR (gold quest·gold chest·cyan
+  // portal) tell them apart. Drawn into mmStatic so it scales with the minimap.
+  mmGlyph(g, tx, ty, cell, type, color, alpha = 1) {
+    const cx = tx * cell + cell / 2, cy = ty * cell + cell / 2;
+    const s = Math.max(3.6, cell * 1.55);      // glyph nominal height
+    const t = Math.max(1, s * 0.24);           // bar / stroke thickness
+    g.rect(tx * cell, ty * cell, cell, cell).fill({ color, alpha: alpha * 0.3 }); // 위치 셀
+    if (type === '!') {
+      g.roundRect(cx - t / 2, cy - s * 0.55, t, s * 0.66, t * 0.4).fill({ color, alpha });
+      g.roundRect(cx - t / 2, cy + s * 0.42, t, t, t * 0.3).fill({ color, alpha });
+    } else { // '?'
+      g.moveTo(cx - s * 0.3, cy - s * 0.16);
+      g.arc(cx, cy - s * 0.18, s * 0.32, Math.PI * 0.9, Math.PI * 2.1, false); // 상단 갈고리
+      g.lineTo(cx, cy + s * 0.06);                                             // 중앙으로 내려오는 꼬리
+      g.stroke({ color, width: t, alpha, cap: 'round', join: 'round' });
+      g.roundRect(cx - t / 2, cy + s * 0.42, t, t, t * 0.3).fill({ color, alpha });
+    }
   }
 
   // Fog of war: reveal the tiles within `R` of the player (the walked path lights
@@ -715,7 +757,18 @@ export class FieldScene {
       const standGate = this.runeGate && this.runeGate.x === this.player.x && this.runeGate.y === this.player.y;
       const tx = standGate && !obj ? this.player.x : fx, ty = standGate && !obj ? this.player.y : fy;
       this.prompt.x = (tx + 0.5) * TILE;
-      this.prompt.y = (ty + 0.2) * TILE;
+      // Raise the prompt above the faced thing's VISUAL top so it never overlaps a
+      // nameplate (NPC/보스) nor floats over empty ground (표지판). 상자/게이트/맨 타일은
+      // 기존 타일-상단 앵커 유지.
+      let py = (ty + 0.2) * TILE;
+      if (obj && (obj.kind === 'npc' || obj.kind === 'boss')) {
+        const footAy = (obj.y + 0.9) * TILE - elevAt(this.map, obj.x, obj.y) * ELEV_STEP;
+        const headTop = footAy - 68 * NPC_SCALE * 0.62;               // 머리 위 (이름표 앵커와 동일 식)
+        py = (obj.kind === 'npc' && obj.label ? headTop - 15 : headTop) - 4; // 이름표 있으면 그 위로
+      } else if (obj && obj.kind === 'sign') {
+        py = (obj.y + 0.9) * TILE - elevAt(this.map, obj.x, obj.y) * ELEV_STEP - 21; // 표지판 판때기 위
+      }
+      this.prompt.y = py;
     }
   }
 
@@ -1377,9 +1430,15 @@ export class FieldScene {
       // Built as ONE container (bg + text) so it billboards as a unit above the head.
       if (o.kind === 'npc' && o.label) {
         const lc = new PIXI.Container();
-        // 퀘스트라인의 현재 talk 타겟이면 ! 마커 (퀘스트 기버 라벨 관례와 통일).
-        const labelText = (o.npcId && isTalkTarget(this.game.runtime, o.npcId))
-          ? `! ${o.label.replace(/^[?!]\s*/, '')}` : o.label;
+        // 라벨 앞 ! 마커: 퀘스트 기버는 미완료 시에만(완료하면 ! 제거), 퀘스트라인
+        // talk 타겟이면 유지. 그 외엔 맵 라벨 그대로. (미니맵 ! 규칙과 통일.)
+        const bareLabel = o.label.replace(/^[?!]\s*/, '');
+        let labelText = o.label;
+        if (o.quest) {
+          labelText = this.game.runtime.quests[o.quest] === 'done' ? bareLabel : `! ${bareLabel}`;
+        } else if (o.npcId && isTalkTarget(this.game.runtime, o.npcId)) {
+          labelText = `! ${bareLabel}`;
+        }
         const t = label(labelText, 11, HEX.gold, { font: FONT.ui });
         t.anchor = { x: 0.5, y: 1 };
         t.x = 0; t.y = 0;
@@ -2146,10 +2205,16 @@ export class FieldScene {
       }
     }
     // Random step-encounters only on maps without symbol (roamer) encounters.
+    // ENC_GRACE: 전투/맵진입 직후 몇 걸음은 조우를 걸러 back-to-back 전투 방지
+    // (per-step rate는 유지 — 던전/동굴이 "너무 빨리" 조우하던 군집만 제거).
     // capEncounter: 랜덤 조우는 파티 수+1 마리까지 (초반 솔로/듀오 완화).
-    if (res && res.encounter && !this.map.symbolEncounters) {
-      this.busy = true;
-      this.game.startBattle(capEncounter(res.encounter, this.activePartySize()), this.map.tileset);
+    if (res && !this.map.symbolEncounters) {
+      this._stepsSinceEnc = (this._stepsSinceEnc || 0) + 1;
+      if (res.encounter && this._stepsSinceEnc >= ENC_GRACE) {
+        this._stepsSinceEnc = 0;
+        this.busy = true;
+        this.game.startBattle(capEncounter(res.encounter, this.activePartySize()), this.map.tileset);
+      }
     }
   }
 

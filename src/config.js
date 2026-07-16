@@ -73,6 +73,11 @@ export const FOG_FADE = 1.4;
 // top-down grid. Tiles/sprites offset by elev*ELEV_STEP; the cliff face fills the gap.
 export const ELEV_STEP = 26;
 
+// 랜덤 조우 유예: 전투 직후(또는 맵 진입 후) 이 걸음 수 동안은 step-encounter를
+// 걸러 back-to-back 전투를 막는다. 던전/동굴류가 "너무 빨리" 조우하던 체감 완화
+// (per-step rate는 유지, 군집만 제거). 심볼(로머) 맵에는 영향 없음.
+export const ENC_GRACE = 5;
+
 // Tilt-shift depth-of-field: the top `bandFrac` of the screen is re-rendered through
 // a blur (a RenderTexture copy of the world's far band), feathered into the sharp
 // midground by a gradient mask. `enabled:false` falls back to fog-only depth (zero
