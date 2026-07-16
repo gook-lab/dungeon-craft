@@ -110,6 +110,12 @@ function chooseHeroAction(state, actor, herbs) {
     // self critical → herb
     if (actor.hp / actor.maxHp < 0.3 && herbs.count > 0) { herbs.count--; return { type: '_herb', actorId: actor.id, targetId: actor.id }; }
   }
+  // 플레이테스트 A: BASIC_ONLY=1 → 공격 스킬/상태기 무시, 통상공격만(+생존 힐/허브
+  // 위 블록 유지). "스킬 없이도 이기는가"를 실측하기 위한 토글.
+  if (process.env.BASIC_ONLY) {
+    const t = enemies.slice().sort((a, b) => a.hp - b.hp)[0];
+    return { type: 'attack', actorId: actor.id, targetId: t.id };
+  }
   // Set up a combat state when it pays off (warrior 분노 / huntress 은신).
   const stateAct = chooseStateAction(state, actor);
   if (stateAct) return stateAct;
