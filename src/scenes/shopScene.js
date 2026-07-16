@@ -28,6 +28,7 @@ export const SHOPS = {
       'assassin_dagger', 'crystal_staff', 'venom_fang', 'berserker_axe', 'paladin_mace',
       'runeblade', 'guardian_greatsword', 'marksman_longbow', 'warlords_axe', 'archmage_staff',
       'twin_fang_pistols', 'duelist_gunblade', 'hollowpoint_revolver',
+      'stone_maul', 'storm_crossbow', 'blessed_flail', 'umbral_dagger', 'gale_bow', // 원소 무기(물리 상성)
       'leather_armor', 'padded_vest', 'studded_leather', 'scale_mail', 'mage_robe', 'chain_armor',
       'spiked_armor', 'plate_armor', 'warded_plate', 'knight_plate', 'phoenix_mail', 'dragon_scale',
     ],

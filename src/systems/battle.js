@@ -49,6 +49,9 @@ export function physicalDamage(attacker, target, rng, heavyMult = 1) {
   let dmg = atk * (atk / (atk + effectiveDef(target)));
   dmg *= VARIANCE(rng);
   if (target.defending) dmg *= 0.5;
+  // 기본 공격도 장착 무기 속성의 상성을 탄다 (물리 클래스가 원소 무기로 약점을
+  // 노릴 수 있게). weaponElement 없는 유닛(적·비무장)은 elementMultiplier(null)=×1.
+  dmg *= elementMultiplier(attacker.weaponElement, target);
   return Math.max(1, Math.floor(dmg));
 }
 

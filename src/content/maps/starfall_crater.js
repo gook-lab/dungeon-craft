@@ -137,7 +137,7 @@ export default {
     { x: 3, y: 14, kind: "sign", talk: "starfall_tomb_sign" },
     { x: 21, y: 15, kind: "boss", ref: "fallen_star", talk: "fallen_star_intro", flag: "fallenStarDefeated", win: "fallen_star_win" },
     { x: 23, y: 12, kind: "chest", loot: { item: "sage_amulet" } },
-    { x: 23, y: 18, kind: "chest", loot: { gold: 800 } },
+    { x: 23, y: 18, kind: "chest", loot: { item: "titan_greataxe" } },
     { x: 12, y: 9, kind: "prop", ref: "prop_black_singularity", tiles: 2.2, walkable: true },
     { x: 12, y: 21, kind: "prop", ref: "prop_broken_brazier", tiles: 1.6, walkable: true },
   ],

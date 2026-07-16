@@ -36,6 +36,17 @@ export const ITEMS = {
   duelist_gunblade: { id: 'duelist_gunblade', name: '결투의 건블레이드', kind: 'weapon', atk: 15, spd: 2, price: 300, sprite: 'pickup_rune', passive: { counter: 0.2 } },   // 쌍검사 반격 칼·총
   hollowpoint_revolver: { id: 'hollowpoint_revolver', name: '할로우포인트 리볼버', kind: 'weapon', atk: 18, spd: 3, price: 400, sprite: 'pickup_rune', passive: { crit: 0.22 } }, // 고티어 쌍검사 치명
   dragon_slayer: { id: 'dragon_slayer', name: '용살검', kind: 'weapon', atk: 20, price: 0, sprite: 'pickup_rune' },                                                        // 최상위(보상)
+  // --- 원소 무기 확장 (물리 클래스가 무기로 모든 속성 상성을 공략) ---
+  // atk는 동티어 일반 무기와 비슷하게 — 상성(약점 ▲/반감 ▼)으로 차별화하고
+  // 순수 atk 우위로 필수화하지 않는다. 상성은 weaponElement→physical/basic 공격에 상속.
+  // NOTE: holy/dark는 즉시 유효(undead/void 몹 다수). earth/thunder/wind는 현재 AFFINITY
+  // 테이블이 비어 있어(강점 family 없음) ×1 — 향후 rocky/metal/aerial family 태깅 시 활성.
+  stone_maul: { id: 'stone_maul', name: '대지 망치', kind: 'weapon', atk: 13, element: 'earth', price: 250, sprite: 'pickup_rune', passive: { dmgReduce: 0.06 } },          // 전사/나이트 중량
+  storm_crossbow: { id: 'storm_crossbow', name: '뇌명 석궁', kind: 'weapon', atk: 12, spd: 2, element: 'thunder', price: 260, sprite: 'pickup_rune', passive: { crit: 0.12 } }, // 사냥꾼 석궁
+  blessed_flail: { id: 'blessed_flail', name: '축성 철퇴', kind: 'weapon', atk: 11, def: 1, element: 'holy', price: 270, sprite: 'pickup_rune', passive: { regenHp: 0.04 } }, // 나이트 성물(언데드 특효)
+  umbral_dagger: { id: 'umbral_dagger', name: '흑요 단검', kind: 'weapon', atk: 12, spd: 3, element: 'dark', price: 260, sprite: 'pickup_rune', passive: { crit: 0.15 } },    // 쌍검사/사냥꾼(공허 특효)
+  gale_bow: { id: 'gale_bow', name: '질풍궁', kind: 'weapon', atk: 13, spd: 3, element: 'wind', price: 280, sprite: 'pickup_rune', passive: { crit: 0.1 } },                 // 사냥꾼 경량(eva 미구현→crit)
+  titan_greataxe: { id: 'titan_greataxe', name: '거인의 도끼', kind: 'weapon', atk: 19, element: 'earth', price: 0, sprite: 'pickup_rune', passive: { counter: 0.15 } },      // 고티어 대지 보상
 
   // --- Armor (def, sometimes +maxHp; cloth trades def for caster MP) ---
   cloth_robe: { id: 'cloth_robe', name: '천 로브', kind: 'armor', def: 1, maxMp: 8, price: 28, sprite: 'pickup_scroll' },      // caster early
@@ -217,8 +228,8 @@ export function equipWeaponElement(equip) {
 const DROP_CONSUMABLES = ['herb', 'herb', 'herb', 'mana_drop', 'mana_drop', 'antidote', 'awakening'];
 const DROP_GEAR = {
   low: ['bronze_sword', 'iron_dagger', 'leather_armor', 'padded_vest', 'studded_leather', 'power_ring', 'cloth_robe'],
-  mid: ['iron_sword', 'hunters_bow', 'battle_spear', 'chain_armor', 'scale_mail', 'mage_robe', 'swift_boots', 'sage_amulet', 'ward_amulet', 'assassin_dagger', 'crystal_staff', 'venom_fang', 'berserker_axe', 'paladin_mace', 'focus_band', 'berserker_ring', 'twin_fang_pistols'],
-  high: ['silver_sword', 'frost_blade', 'runeblade', 'plate_armor', 'knight_plate', 'spiked_armor', 'warded_plate', 'phoenix_mail', 'guardian_shield', 'vitality_charm', 'guard_brooch', 'guardian_greatsword', 'marksman_longbow', 'warlords_axe', 'archmage_staff', 'iron_brooch', 'phoenix_charm', 'duelist_gunblade', 'hollowpoint_revolver'],
+  mid: ['iron_sword', 'hunters_bow', 'battle_spear', 'chain_armor', 'scale_mail', 'mage_robe', 'swift_boots', 'sage_amulet', 'ward_amulet', 'assassin_dagger', 'crystal_staff', 'venom_fang', 'berserker_axe', 'paladin_mace', 'focus_band', 'berserker_ring', 'twin_fang_pistols', 'blessed_flail', 'storm_crossbow'],
+  high: ['silver_sword', 'frost_blade', 'runeblade', 'plate_armor', 'knight_plate', 'spiked_armor', 'warded_plate', 'phoenix_mail', 'guardian_shield', 'vitality_charm', 'guard_brooch', 'guardian_greatsword', 'marksman_longbow', 'warlords_axe', 'archmage_staff', 'iron_brooch', 'phoenix_charm', 'duelist_gunblade', 'hollowpoint_revolver', 'stone_maul', 'umbral_dagger', 'gale_bow'],
 };
 export function rollDrops(enemies, rng) {
   const next = () => (rng ? rng.next() : 0.5);

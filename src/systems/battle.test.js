@@ -38,6 +38,23 @@ describe('damage formulas', () => {
     expect(physicalDamage(buffed, t, null)).toBeGreaterThan(physicalDamage(base, t, null));
   });
 
+  it('basic attack inherits weapon element affinity (holy weapon ▲ vs undead)', () => {
+    const holyKnight = { atk: 20, atkBuff: 0, weaponElement: 'holy' };
+    const plainKnight = { atk: 20, atkBuff: 0 };
+    const undead = { def: 5, defending: false, family: 'undead' };
+    const neutral = { def: 5, defending: false };
+    // holy weapon beats undead (×1.25); vs a neutral target it's the same as no element.
+    expect(physicalDamage(holyKnight, undead, null)).toBeGreaterThan(physicalDamage(plainKnight, undead, null));
+    expect(physicalDamage(holyKnight, neutral, null)).toBe(physicalDamage(plainKnight, neutral, null));
+  });
+
+  it('basic attack: no weaponElement (enemies/unarmed) stays neutral ×1', () => {
+    const enemy = { atk: 20, atkBuff: 0 }; // no weaponElement field
+    const undead = { def: 5, defending: false, family: 'undead' };
+    const plain = { def: 5, defending: false };
+    expect(physicalDamage(enemy, undead, null)).toBe(physicalDamage(enemy, plain, null));
+  });
+
   it('magic damage ignores def', () => {
     const spell = { power: 12 };
     const t1 = { def: 0, defending: false };

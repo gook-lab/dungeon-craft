@@ -568,10 +568,12 @@ export class BattleScene {
     const lo = Math.max(1, Math.floor(dmg * 0.9)), hi = Math.ceil(dmg * 1.1);
     // 색맹 모드: 속성 상성을 기호로 앞에 덧붙여 색이 아닌 문자로도 읽히게.
     let pre = '';
-    if (getSettings().colorblind && spell && target.family) {
-      // 물리 스킬은 시전자 무기 속성으로 상성 판정 (툴팁·리졸버와 동일).
-      const effEl = (spell.element === 'physical' && this.actor && this.actor.weaponElement)
-        ? this.actor.weaponElement : spell.element;
+    if (getSettings().colorblind && target.family) {
+      // 물리 스킬은 시전자 무기 속성으로, 기본 공격은 시전자 무기 속성 그대로 상성 판정
+      // (툴팁·리졸버와 동일 — 기본 공격도 무기 속성을 탄다).
+      const effEl = spell
+        ? (spell.element === 'physical' && this.actor && this.actor.weaponElement ? this.actor.weaponElement : spell.element)
+        : (this.actor && this.actor.weaponElement);
       if (effEl && effEl !== 'physical') {
         const k = affinityKind(effEl, target.family);
         pre = k === 'strong' ? '▲' : k === 'resist' ? '▼' : '';
