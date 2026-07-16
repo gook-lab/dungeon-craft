@@ -16,7 +16,6 @@ import { BattleScene } from './scenes/battleScene.js';
 import { DialogScene } from './scenes/dialogScene.js';
 import { MenuScene } from './scenes/menuScene.js';
 import { ShopScene } from './scenes/shopScene.js';
-import { WarpScene } from './scenes/warpScene.js';
 import { FastTravelScene } from './scenes/fastTravelScene.js';
 import { SettingsScene } from './scenes/settingsScene.js';
 import { loadSettings, applyAudioSettings, getSettings } from './data/settings.js';
@@ -360,8 +359,7 @@ async function main() {
 
   game.openMenu = (mode) => scenes.push(new MenuScene(game), { mode });
   game.openShop = (shop) => scenes.push(new ShopScene(game), { shop });
-  game.openWarp = () => scenes.push(new WarpScene(game));
-  // 룬게이트 월드맵 빠른 이동 (WarpScene 대체 — 발견한 지역으로 이동).
+  // 룬게이트 월드맵 빠른 이동 (구 WarpScene 대체 — 발견·활성한 지역으로 이동).
   game.openFastTravel = () => scenes.push(new FastTravelScene(game));
   game.openSettings = () => scenes.push(new SettingsScene(game));
 
