@@ -24,7 +24,7 @@ export const AFFINITY = {
   holy: { strong: ['undead', 'void'], resist: [] },              // 신성: 언데드·공허 특효
   poison: { strong: [], resist: ['undead', 'void'] },            // 독: 언데드·공허에 잘 안 먹힘
   dark: { strong: ['void'], resist: [] },                        // 암흑: 공허 특효
-  thunder: { strong: ['metal', 'aerial'], resist: [] },          // 뇌전: 금속갑·공중(낙뢰) 특효
+  thunder: { strong: ['metal', 'aerial'], resist: ['rocky'] },   // 뇌전: 금속갑·공중(낙뢰) 특효, 바위/구조물엔 접지 반감
   earth: { strong: ['rocky'], resist: ['aerial'] },              // 대지: 석·구조물 특효, 공중은 회피(반감)
   wind: { strong: ['beast'], resist: ['rocky'] },                // 바람: 야수 특효, 석·구조물엔 반감
   arcane: { strong: [], resist: [] },
