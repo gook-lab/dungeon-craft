@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { PARTY_MEMBERS, STARTING_PARTY } from './party.js';
 import { MONSTERS } from './monsters.js';
 import { SPELLS } from './spells.js';
@@ -320,5 +322,32 @@ describe('map connectivity (completable playthrough)', () => {
     const m = dropFwd(); m.spawn = { x: 3, y: 0 };
     expect(floodReach(m, 0, 0)).toBe(false);          // low → high is impossible
     expect(floodReach(m, 2, 0)).toBe(true);           // but the low side itself is fine
+  });
+});
+
+// Every NPC/boss art ref must resolve to an actual sprite file — mirrors the exact
+// URL each renders in fieldScene.buildObjects (art:'enemy'→/enemies/ref_east.png,
+// art:'hero'→/heroes/ref_dir.png, plain npc→/npcs/ref_dir.png, boss→/enemies/
+// <monster.sprite>_east.png). Catches a stray ref like the witch NPC's old
+// 'bog_witch_npc' (no such file → invisible NPC) before it ships. 2026-07-16.
+describe('map sprite-ref integrity', () => {
+  const pub = (...p) => join(process.cwd(), 'public', ...p);
+  it('every NPC/boss object renders from an existing sprite file', () => {
+    const missing = [];
+    for (const [id, map] of Object.entries(MAPS)) {
+      for (const o of (map.objects || [])) {
+        let file = null;
+        if (o.kind === 'npc') {
+          if (o.art === 'enemy') file = pub('enemies', `${o.ref}_east.png`);
+          else if (o.art === 'hero') file = pub('heroes', `${o.ref}_${o.dir || 'south'}.png`);
+          else if (o.ref) file = pub('npcs', `${o.ref}_${o.dir || 'south'}.png`);
+        } else if (o.kind === 'boss') {
+          const sprite = MONSTERS[o.ref]?.sprite || o.ref;
+          file = pub('enemies', `${sprite}_east.png`);
+        }
+        if (file && !existsSync(file)) missing.push(`${id}:(${o.x},${o.y}) ${o.kind} ref='${o.ref}' → ${file.split('/public/')[1]}`);
+      }
+    }
+    expect(missing, `missing sprite files:\n${missing.join('\n')}`).toEqual([]);
   });
 });

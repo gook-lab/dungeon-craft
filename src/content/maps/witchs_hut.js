@@ -27,7 +27,9 @@ export default {
     // Portal back to swamp
     { x: 10, y: 13, kind: 'portal', to: 'swamp', tx: 53, ty: 20, label: '나가기' },
     // Witch shopkeeper NPC (merged shop+inn+quest into one friendly NPC)
-    { x: 10, y: 5, kind: 'npc', name: '살려 주신 마녀', art: 'enemy', ref: 'bog_witch_npc', action: 'shop', shop: 'witchs_hut_shop', talk: 'witchs_hut_greeting', npcId: 'witchs_hut_witch' },
+    // art:'enemy' → enemyUrl(ref) 직접 사용이라 ref는 실존 스프라이트 키여야 함
+    // (bog_witch_npc는 파일 없음 → boss_bog_witch_east.png 사용).
+    { x: 10, y: 5, kind: 'npc', name: '살려 주신 마녀', art: 'enemy', ref: 'boss_bog_witch', action: 'shop', shop: 'witchs_hut_shop', talk: 'witchs_hut_greeting', npcId: 'witchs_hut_witch' },
     // Cauldron — 치유샘(무료 전체 회복). talk가 있으면 상호작용 가능(프롭이라 solid).
     { x: 8, y: 7, kind: 'prop', ref: 'prop_witch_cauldron', tiles: 1.4, talk: 'witch_spring' },
     // Decorative mushrooms
