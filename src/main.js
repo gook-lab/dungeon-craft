@@ -428,6 +428,15 @@ async function main() {
     game.showLines(q.giver, msgs);
   };
 
+  // 마녀의 치유샘 (자비 루트 오두막) — 무료 전체 회복. tryInn과 달리 골드 없음.
+  game.healSpring = () => {
+    for (const p of game.runtime.party) {
+      const st = statsAtLevel(p.refId, p.level).stats;
+      p.hp = st.maxHp; p.mp = st.maxMp;
+    }
+    game.saveNow();
+  };
+
   game.tryInn = () => {
     if (game.runtime.gold >= 10) {
       game.runtime.gold -= 10;

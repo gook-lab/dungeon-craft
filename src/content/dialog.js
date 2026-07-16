@@ -836,7 +836,14 @@ export const DIALOG = {
   // 마녀의 오두막 — mercy route exclusive
   witchs_hut_greeting: {
     speaker: '살려 주신 마녀',
-    lines: ['후후... 그 고귀한 자비가 널 이곳으로 이끌었구나.', '내 호의는 검은 마술이 아닌 다른 것으로 돌려주겠지.', '떨어진 별의 응축액과 구하는 마법사의 지팡이 — 네 여행에 부족한 것들이 여기 있다.'],
+    lines: ['후후... 그 고귀한 자비가 널 이곳으로 이끌었구나.', '내 호의는 검은 마술이 아닌 다른 것으로 돌려주겠지.', '독아와 주술의 물건들 — 네 여행에 부족한 것들이 여기 있다.'],
+    action: 'shop', shop: 'witchs_hut_shop',
+  },
+  // 마녀의 치유샘 (오두막 약솥) — 자비 루트 무료 전체 회복.
+  witch_spring: {
+    speaker: '끓는 약솥',
+    lines: ['약솥에서 김이 오른다 — 마녀의 약탕이 상처를 어루만진다.', 'HP와 MP가 모두 회복되었다.'],
+    action: 'heal',
   },
   // Empire camp NPC greeting — karma-branched (mercy vs execute playstyle)
   empire_camp_greeting_merciful: {
