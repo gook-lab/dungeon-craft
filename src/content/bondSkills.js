@@ -181,6 +181,12 @@ export const ALLY_COMBOS = {
     base: { physical: true, target: 'one', power: 24, hits: 2, atkScale: 0.65, element: 'fire', inflict: 'burn', inflictChance: 0.7, inflictTurns: 3 },
     fx: 'ally_emberdash',
   },
+  // 자비로 살려낸 마녀 — 어둠의 저주를 퍼붓는 주술: 전체 암흑 폭발 + 약화.
+  bog_witch: {
+    id: 'ally_hexstorm', name: '저주의 폭풍', cost: BOND_STRIKE_COST,
+    base: { physical: true, target: 'all', power: 20, element: 'dark', inflict: 'weaken', inflictChance: 0.6, inflictTurns: 2 },
+    fx: 'ally_hexstorm',
+  },
 };
 
 // Compose the rider `mod` from a pair's bond emotions. PURE — battleScene calls this

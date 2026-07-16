@@ -46,6 +46,14 @@ export const SHOPS = {
     title: '연금술사',
     stock: ['herb', 'mana_drop', 'antidote', 'awakening', 'return_scroll', 'cloth_robe'],
   },
+  witchs_hut_shop: { // 마녀의 오두막 — mercy route exclusive shop
+    title: '마녀의 선물',
+    stock: [
+      'herb', 'mana_drop', 'antidote', 'return_scroll',
+      'crystal_staff', 'archmage_staff', 'mage_robe', 'warded_plate',
+      'sage_amulet', 'regen_ring', 'lucky_charm',
+    ],
+  },
 };
 
 export class ShopScene {

@@ -824,6 +824,11 @@ export const DIALOG = {
   seneschal_win_merciful: { speaker: '', lines: ['집사가 열쇠 꾸러미를 공손히 내려놓았다. "격식을 아는 손님은... 오랜만입니다."', '성채의 문이란 문이 일제히 열렸다.'] },
   seneschal_win_ruthless: { speaker: '', lines: ['금빛 갑주가 바닥에 흩어졌다. 수백 년의 격식이 먼지가 되었다.', '성채의 문이 삐걱이며 열렸다.'] },
   // 용암 요새 미니보스 — 화염 파수장.
+  // 마녀의 오두막 — mercy route exclusive
+  witchs_hut_greeting: {
+    speaker: '살려 주신 마녀',
+    lines: ['후후... 그 고귀한 자비가 널 이곳으로 이끌었구나.', '내 호의는 검은 마술이 아닌 다른 것으로 돌려주겠지.', '떨어진 별의 응축액과 구하는 마법사의 지팡이 — 네 여행에 부족한 것들이 여기 있다.'],
+  },
   flamewarden_intro: {
     speaker: '화염 파수장',
     lines: ['요새의 왕좌 앞, 백열하는 거체가 천천히 일어선다.', '"드레이크님의... 영역이다. 재가 되어 나가라."'],

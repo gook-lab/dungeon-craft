@@ -244,7 +244,8 @@ export default {
         "ref": "bog_witch",
         "talk": "swamp_boss_intro",
         "flag": "swampBossDefeated",
-        "win": "swamp_boss_win"
+        "win": "swamp_boss_win",
+        "branchFlag": "swampBoss"
       },
       {
         "x": 50,
