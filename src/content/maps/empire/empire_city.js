@@ -280,7 +280,7 @@ export default {
     { x: 68, y: 23, kind: "prop", ref: "prop_mossy_shrine" },
     { x: 3, y: 23, kind: "sign", talk: "empire_city_sign" },
     { x: 74, y: 20, kind: "sign", talk: "empire_gate_choice" },
-    { x: 6, y: 5, kind: "chest", loot: { item: "umbral_dagger" } },
+    { x: 6, y: 5, kind: "chest", loot: { item: "warlords_axe" } },
     { x: 74, y: 38, kind: "chest", loot: { item: "elixir" } },
     { x: 5, y: 52, kind: "chest", loot: { item: "sage_amulet" }, hidden: true },
     { x: 6, y: 28, kind: "trigger", effect: "encounter", once: true, group: ["imperial_guard", "rusty_soldier", "wraith_sentinel"], fireMsg: "제국 순찰대다 — 근위병이 전열을 세운다!" },

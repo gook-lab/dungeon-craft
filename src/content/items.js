@@ -44,7 +44,7 @@ export const ITEMS = {
   stone_maul: { id: 'stone_maul', name: '대지 망치', kind: 'weapon', atk: 13, element: 'earth', price: 250, sprite: 'pickup_rune', passive: { dmgReduce: 0.06 } },          // 전사/나이트 중량
   storm_crossbow: { id: 'storm_crossbow', name: '뇌명 석궁', kind: 'weapon', atk: 12, spd: 2, element: 'thunder', price: 260, sprite: 'pickup_rune', passive: { crit: 0.12 } }, // 사냥꾼 석궁
   blessed_flail: { id: 'blessed_flail', name: '축성 철퇴', kind: 'weapon', atk: 11, def: 1, element: 'holy', price: 270, sprite: 'pickup_rune', passive: { regenHp: 0.04 } }, // 나이트 성물(언데드 특효)
-  umbral_dagger: { id: 'umbral_dagger', name: '흑요 단검', kind: 'weapon', atk: 12, spd: 3, element: 'dark', price: 260, sprite: 'pickup_rune', passive: { crit: 0.15 } },    // 쌍검사/사냥꾼(공허 특효)
+  umbral_dagger: { id: 'umbral_dagger', name: '흑요 단검', kind: 'weapon', atk: 12, spd: 3, element: 'dark', price: 260, sprite: 'pickup_rune', passive: { crit: 0.15 } },    // 쌍검사/사냥꾼(공허 특효) — 처단 루트 전용 드랍(bog_witch 처단, main.js). 상점/loot 미등록.
   // 처단 루트 전용 (원혼의 늪에서만 획득 — 상점/일반 loot 미등록). 마녀를 벤 자의 보상.
   hex_reliquary: { id: 'hex_reliquary', name: '저주의 성물', kind: 'accessory', atk: 6, spd: 4, price: 0, sprite: 'pickup_rune', passive: { crit: 0.12, resist: { poison: 0.6 } } },
   gale_bow: { id: 'gale_bow', name: '질풍궁', kind: 'weapon', atk: 13, spd: 3, element: 'wind', price: 280, sprite: 'pickup_rune', passive: { crit: 0.1 } },                 // 사냥꾼 경량(eva 미구현→crit)
@@ -244,7 +244,7 @@ const DROP_CONSUMABLES = ['herb', 'herb', 'herb', 'mana_drop', 'mana_drop', 'ant
 const DROP_GEAR = {
   low: ['bronze_sword', 'iron_dagger', 'leather_armor', 'padded_vest', 'studded_leather', 'power_ring', 'cloth_robe'],
   mid: ['iron_sword', 'hunters_bow', 'battle_spear', 'chain_armor', 'scale_mail', 'mage_robe', 'swift_boots', 'sage_amulet', 'ward_amulet', 'assassin_dagger', 'crystal_staff', 'venom_fang', 'berserker_axe', 'paladin_mace', 'focus_band', 'berserker_ring', 'twin_fang_pistols', 'blessed_flail', 'storm_crossbow'],
-  high: ['silver_sword', 'frost_blade', 'runeblade', 'plate_armor', 'knight_plate', 'spiked_armor', 'warded_plate', 'phoenix_mail', 'guardian_shield', 'vitality_charm', 'guard_brooch', 'guardian_greatsword', 'marksman_longbow', 'warlords_axe', 'archmage_staff', 'iron_brooch', 'phoenix_charm', 'duelist_gunblade', 'hollowpoint_revolver', 'stone_maul', 'umbral_dagger', 'gale_bow', 'vampiric_blade', 'thornmail', 'executioner_axe'],
+  high: ['silver_sword', 'frost_blade', 'runeblade', 'plate_armor', 'knight_plate', 'spiked_armor', 'warded_plate', 'phoenix_mail', 'guardian_shield', 'vitality_charm', 'guard_brooch', 'guardian_greatsword', 'marksman_longbow', 'warlords_axe', 'archmage_staff', 'iron_brooch', 'phoenix_charm', 'duelist_gunblade', 'hollowpoint_revolver', 'stone_maul', 'gale_bow', 'vampiric_blade', 'thornmail', 'executioner_axe'],
 };
 export function rollDrops(enemies, rng) {
   const next = () => (rng ? rng.next() : 0.5);
