@@ -1,0 +1,124 @@
+/* ============================================================
+   리터치 보드 — 페이지 레이아웃 / 내비 / 카드
+   ============================================================ */
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--c-ink-900);
+  background-image:
+    radial-gradient(1200px 700px at 80% -10%, rgba(43,49,96,.5), transparent 60%),
+    radial-gradient(900px 600px at 0% 110%, rgba(40,30,60,.4), transparent 60%);
+  background-attachment: fixed;
+  color: var(--c-text);
+  font-family: var(--f-ui);
+  -webkit-font-smoothing: none;
+}
+
+/* 레이아웃: 사이드 내비 + 본문 */
+.shell { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+
+.nav {
+  position: sticky; top: 0; align-self: start; height: 100vh;
+  padding: 26px 16px; border-right: 1px solid var(--c-frame-shadow);
+  background: rgba(10,11,22,.7); backdrop-filter: blur(4px);
+  overflow-y: auto;
+}
+.nav .brand { font-family: var(--f-display); font-size: 22px; color: var(--c-gold);
+  line-height: 1.3; margin-bottom: 4px; }
+.nav .brand small { display:block; font-family: var(--f-small); font-size: 16px;
+  color: var(--c-text-mute); letter-spacing: 0; margin-top: 6px; }
+.nav ul { list-style: none; margin: 22px 0 0; padding: 0; }
+.nav li a {
+  display: block; padding: 7px 12px; margin-bottom: 2px; border-radius: 5px;
+  color: var(--c-text-soft); text-decoration: none; font-size: 18px;
+  border-left: 3px solid transparent;
+}
+.nav li a:hover { color: var(--c-text); background: rgba(255,255,255,.04); }
+.nav li a.active { color: var(--c-gold); background: rgba(255,215,102,.08);
+  border-left-color: var(--c-gold); }
+.nav .grp { font-family: var(--f-small); font-size: 15px; color: var(--c-text-mute);
+  text-transform: uppercase; letter-spacing: 1px; margin: 18px 12px 6px; }
+
+.main { padding: 0; max-width: 1180px; }
+section.block { padding: 56px 56px 24px; scroll-margin-top: 0;
+  border-bottom: 1px solid rgba(57,64,110,.4); }
+.eyebrow { font-family: var(--f-small); font-size: 16px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--c-gold-deep); margin-bottom: 10px; }
+h1.title { font-family: var(--f-display); font-size: 40px; margin: 0 0 8px;
+  color: var(--c-text); line-height: 1.2; }
+h2.title { font-family: var(--f-display); font-size: 30px; margin: 0 0 8px;
+  color: var(--c-text); }
+.lede { font-size: 20px; color: var(--c-text-soft); max-width: 70ch; line-height: 1.7; }
+.lede strong { color: var(--c-gold); }
+p.note { font-size: 18px; color: var(--c-text-mute); max-width: 72ch; line-height: 1.7; }
+
+/* 데모 스테이지 — 게임 캔버스 느낌의 다크 배경 */
+.stage {
+  position: relative; border-radius: 8px; overflow: hidden;
+  background: linear-gradient(180deg, #1a2438 0%, #243349 58%, #2c3d2e 58%, #25331f 100%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), 0 10px 30px rgba(0,0,0,.4);
+  border: 1px solid var(--c-frame-shadow);
+}
+.stage.night { background: linear-gradient(180deg, #0e1228 0%, #1a2042 60%, #20283f 100%); }
+.stage.dungeon { background: linear-gradient(180deg, #23232f 0%, #34344a 56%, #2a2a38 56%, #222230 100%); }
+
+/* 변형 비교 그리드 */
+.variants { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 22px; margin-top: 28px; }
+.variant { }
+.variant .vh { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+.variant .vlabel { font-family: var(--f-display); font-size: 20px; color: var(--c-text); }
+.variant .vtag { font-family: var(--f-small); font-size: 15px; color: var(--c-gold-deep);
+  border: 1px solid var(--c-gold-deep); border-radius: 3px; padding: 1px 6px; }
+.variant .vnote { font-size: 17px; color: var(--c-text-mute); margin-top: 12px; line-height: 1.6; }
+.vstage { padding: 28px 22px; border-radius: 8px;
+  background: linear-gradient(180deg, #161b30, #0e1122);
+  border: 1px solid var(--c-frame-shadow); display: flex;
+  align-items: center; justify-content: center; min-height: 168px; }
+.vstage.field { background:
+  linear-gradient(180deg,#2a3a52 0%,#3e5474 46%,#4c6038 46%,#3a4a2a 100%); }
+
+/* 색상 토큰 스와치 */
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px,1fr));
+  gap: 12px; margin-top: 22px; }
+.swatch { border-radius: 7px; overflow: hidden; border: 1px solid var(--c-frame-shadow);
+  background: var(--c-ink-800); }
+.swatch .chip { height: 64px; display:flex; align-items:flex-end; padding:8px; }
+.swatch .meta { padding: 9px 11px; }
+.swatch .nm { font-size: 17px; color: var(--c-text); }
+.swatch .hex { font-family: var(--f-mono); font-size: 15px; color: var(--c-text-mute);
+  margin-top: 3px; display:flex; justify-content: space-between; gap: 6px; }
+.swatch .hex .pixi { color: var(--c-gold-deep); }
+.sw-group { font-family: var(--f-display); font-size: 19px; color: var(--c-text-soft);
+  margin: 30px 0 4px; }
+.sw-group:first-of-type { margin-top: 10px; }
+
+/* 타입 견본 행 */
+.type-row { display: grid; grid-template-columns: 150px 1fr; gap: 20px;
+  align-items: baseline; padding: 16px 0; border-bottom: 1px solid rgba(57,64,110,.3); }
+.type-row .tk { font-family: var(--f-mono); font-size: 16px; color: var(--c-gold-deep); }
+.type-row .tk b { display:block; color: var(--c-text-soft); font-family: var(--f-ui);
+  font-weight: normal; font-size: 16px; margin-top: 4px; }
+.type-row .tk small { color: var(--c-text-mute); font-size: 14px; }
+
+/* 가정/추론 카드 */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+  gap: 16px; margin-top: 24px; }
+.card { background: rgba(27,32,70,.4); border: 1px solid var(--c-frame-shadow);
+  border-radius: 8px; padding: 18px 18px; }
+.card h4 { margin: 0 0 8px; font-family: var(--f-display); font-size: 18px; color: var(--c-gold); }
+.card p { margin: 0; font-size: 17px; color: var(--c-text-soft); line-height: 1.6; }
+
+/* 컨트롤 (변형 전환 등) */
+.controls { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 6px; align-items:center; }
+.btn { font-family: var(--f-ui); font-size: 17px; color: var(--c-text-soft);
+  background: var(--c-ink-700); border: 1px solid var(--c-frame-shadow);
+  border-radius: 6px; padding: 7px 14px; cursor: pointer; }
+.btn:hover { color: var(--c-text); border-color: var(--c-frame-dim); }
+.btn.on { color: var(--c-ink-900); background: var(--c-gold); border-color: var(--c-gold); }
+.ctl-label { font-size: 16px; color: var(--c-text-mute); margin-right: 4px; }
+
+.kbd { font-family: var(--f-mono); font-size: 15px; color: var(--c-text);
+  background: var(--c-ink-700); border: 1px solid var(--c-frame-shadow);
+  border-bottom-width: 3px; border-radius: 4px; padding: 1px 7px; }
+
+footer.foot { padding: 40px 56px 80px; color: var(--c-text-mute); font-size: 16px; }

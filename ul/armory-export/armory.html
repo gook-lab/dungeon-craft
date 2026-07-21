@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>던전크래프트 — 상점 · 장비 · 아티팩트</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/board.css">
+<link rel="stylesheet" href="css/ui.css">
+<style>
+  a { color: var(--c-gold); } a:hover { color: var(--c-gold-glow); }
+  .demo-wrap { display:flex; justify-content:center; padding: 26px 20px;
+    background: linear-gradient(180deg,#161b30,#0e1122); border:1px solid var(--c-frame-shadow);
+    border-radius: 8px; margin-top: 16px; }
+
+  /* ---- 공통 아이템 행/카드 ---- */
+  .rarity-common { --rc: #a7b0d8; } .rarity-rare { --rc: #56a8e8; } .rarity-legend { --rc: #ffd766; }
+  .item-ico { image-rendering: pixelated; flex: none; }
+
+  /* ---- 상점 UI ---- */
+  .shop { width: 720px; max-width: 100%; }
+  .shop-head { display:flex; align-items:center; gap:12px; padding: 4px 4px 14px; }
+  .shop-head .keeper { width:46px; height:46px; background:var(--c-ink-700);
+    box-shadow: inset 0 0 0 3px var(--c-frame); display:flex; align-items:center; justify-content:center;
+    border-radius:5px; overflow:hidden; }
+  .shop-head h3 { font-family: var(--f-display); font-size: 22px; color: var(--c-gold); margin: 0; }
+  .shop-head .line { font-size: 15px; color: var(--c-text-soft); margin-top: 3px; }
+  .shop-head .gold { margin-left:auto; font-family: var(--f-mono); font-size: 20px; color: var(--c-gold);
+    display:flex; align-items:center; gap:6px; }
+  .shop-tabs { display:flex; gap:4px; margin-bottom: 10px; }
+  .shop-tabs .t { font-family: var(--f-ui); font-size: 17px; padding: 6px 18px; cursor:pointer;
+    color: var(--c-text-soft); background: var(--c-ink-700); border:1px solid var(--c-frame-shadow); }
+  .shop-tabs .t.on { color: var(--c-ink-900); background: var(--c-gold); border-color: var(--c-gold); }
+  .shop-body { display:grid; grid-template-columns: 1fr 268px; gap: 0; }
+  .shop-list { max-height: 340px; overflow-y:auto; padding-right: 4px; }
+  .srow { display:flex; align-items:center; gap:10px; padding:9px 10px; cursor:pointer; border-radius:5px; }
+  .srow:hover { background: rgba(255,255,255,.04); }
+  .srow.sel { background: rgba(255,215,102,.1); box-shadow: inset 2px 0 0 var(--c-gold); }
+  .srow .nm { flex:1; font-size: 18px; color: var(--c-text); }
+  .srow.sel .nm { color: var(--c-gold); }
+  .srow .nm small { display:block; font-size:13px; color:var(--rc,#a7b0d8); }
+  .srow .price { font-family: var(--f-mono); font-size: 16px; color: var(--c-gold); }
+  .srow .price.cant { color: var(--c-text-off); }
+  .srow.owned .own { font-size:13px; color:var(--c-hp-high); }
+  .shop-detail { border-left: 1px solid var(--c-frame-shadow); padding: 6px 0 6px 18px; }
+  .shop-detail h4 { font-family:var(--f-display); font-size:19px; margin:0 0 2px; color:var(--c-text); }
+  .shop-detail .kd { font-size:14px; color:var(--rc,#a7b0d8); margin-bottom:10px; }
+  .shop-detail .eff { font-size:15px; color:var(--c-text-soft); line-height:1.6; min-height: 48px; }
+  .cmp { margin: 12px 0; padding: 10px 0; border-top:1px solid rgba(57,64,110,.4); border-bottom:1px solid rgba(57,64,110,.4); }
+  .cmp .r { display:flex; justify-content:space-between; font-size:15px; padding: 3px 0; }
+  .cmp .r .k { color: var(--c-text-mute); }
+  .cmp .r .v { font-family: var(--f-mono); color: var(--c-text); }
+  .cmp .r .up { color: var(--c-hp-high); } .cmp .r .down { color: var(--c-hp-low); }
+  .buy { width:100%; font-family:var(--f-ui); font-size:19px; padding:11px; cursor:pointer;
+    color:var(--c-ink-900); background:var(--c-gold); border:0; box-shadow:0 3px 0 var(--c-gold-deep); }
+  .buy:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--c-gold-deep); }
+  .buy.cant { background: var(--c-ink-600); color: var(--c-text-off); box-shadow:0 3px 0 #0a0b16; cursor:not-allowed; }
+  .buy .c { font-size: 14px; opacity:.8; }
+  /* 강화 게이지 */
+  .enh { display:flex; gap:3px; margin: 8px 0; }
+  .enh .pip { flex:1; height:10px; background:var(--c-ink-600); }
+  .enh .pip.on { background: var(--c-gold); }
+  .enh .pip.max { background: var(--c-gold-glow); }
+
+  /* ---- 카탈로그 그리드 ---- */
+  .cat-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(232px,1fr)); gap:12px; margin-top:18px; }
+  .gcard { background: rgba(27,32,70,.4); border:1px solid var(--c-frame-shadow); border-radius:8px;
+    padding: 14px; display:flex; flex-direction:column; gap:8px; position:relative; }
+  .gcard .top { display:flex; align-items:center; gap:10px; }
+  .gcard .nm { font-family:var(--f-display); font-size:17px; color: var(--c-text); }
+  .gcard .slot { font-size:13px; color:var(--c-text-mute); }
+  .gcard .eff { font-size:14px; color:var(--c-text-soft); line-height:1.55; }
+  .gcard .eff b { color: var(--c-gold); }
+  .gcard .tags { display:flex; gap:5px; flex-wrap:wrap; margin-top:auto; }
+  .gcard .chip { font-family:var(--f-small); font-size:12px; padding:1px 7px; border-radius:3px;
+    color:var(--rc); box-shadow: inset 0 0 0 1px var(--rc); }
+  .gcard .el { font-size:12px; padding:1px 7px; border-radius:3px; }
+  .gcard.new::after { content:'NEW'; position:absolute; top:-6px; right:-6px; font-family:var(--f-small);
+    font-size:11px; background:var(--c-hp-high); color:var(--c-ink-900); padding:1px 6px; border-radius:3px; }
+
+  /* ---- 아티팩트 캐릭터 패널 ---- */
+  .art-panel { width: 760px; max-width:100%; display:grid; grid-template-columns: 300px 1fr; gap:0; }
+  .art-left { padding: 4px 20px 4px 4px; border-right:1px solid var(--c-frame-shadow); }
+  .char-head { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+  .char-head .por { width:48px; height:48px; background:var(--c-ink-700); box-shadow: inset 0 0 0 3px var(--c-frame);
+    border-radius:5px; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+  .char-head .nm { font-family:var(--f-display); font-size:20px; color:var(--c-gold); }
+  .char-head .cls { font-size:14px; color:var(--c-text-mute); }
+  .char-tabs { display:flex; gap:4px; margin-bottom: 14px; flex-wrap:wrap; }
+  .char-tabs .ct { font-size:14px; padding:4px 10px; cursor:pointer; color:var(--c-text-soft);
+    background:var(--c-ink-700); border:1px solid var(--c-frame-shadow); border-radius:4px; }
+  .char-tabs .ct.on { color:var(--c-gold); border-color:var(--c-gold); background:rgba(255,215,102,.08); }
+  .slots { display:flex; flex-direction:column; gap:10px; }
+  .slot-row { display:flex; align-items:center; gap:12px; padding:10px; border-radius:6px;
+    background: rgba(10,11,22,.5); box-shadow: inset 0 0 0 1px var(--c-frame-shadow); cursor:pointer; }
+  .slot-row.filled { box-shadow: inset 0 0 0 1px var(--rc); }
+  .slot-row .gem { width:34px; height:34px; transform: rotate(45deg); flex:none;
+    background: var(--c-ink-800); box-shadow: inset 0 0 0 2px var(--c-frame-shadow); }
+  .slot-row.filled .gem { background: var(--rc); box-shadow: inset 0 0 0 2px rgba(0,0,0,.4), 0 0 10px var(--rc); }
+  .slot-row .si { flex:1; }
+  .slot-row .si .t { font-size:16px; color:var(--c-text); }
+  .slot-row.empty .si .t { color:var(--c-text-off); }
+  .slot-row .si .e { font-size:13px; color:var(--c-text-soft); margin-top:3px; line-height:1.45; }
+  .slot-row .rm { font-size:14px; color:var(--c-text-mute); padding:0 4px; }
+  .setbonus { margin-top:14px; padding:10px 12px; border-radius:6px; background:rgba(180,131,240,.08);
+    box-shadow: inset 0 0 0 1px rgba(180,131,240,.3); font-size:14px; color:var(--c-text-soft); }
+  .setbonus b { color:#c9a8ff; }
+  .art-right { padding: 4px 4px 4px 20px; }
+  .art-right .h { display:flex; align-items:baseline; gap:10px; margin-bottom:10px; }
+  .art-right .h .ttl { font-family:var(--f-display); font-size:17px; color:var(--c-text-soft); }
+  .art-right .h .hint { font-size:13px; color:var(--c-text-mute); margin-left:auto; }
+  .inv { display:flex; flex-direction:column; gap:4px; max-height: 380px; overflow-y:auto; padding-right:4px; }
+  .inv-row { display:flex; align-items:center; gap:10px; padding:8px 10px; cursor:pointer; border-radius:5px; }
+  .inv-row:hover { background: rgba(255,255,255,.04); }
+  .inv-row .gem { width:22px; height:22px; transform:rotate(45deg); flex:none; background:var(--rc);
+    box-shadow: inset 0 0 0 2px rgba(0,0,0,.35); }
+  .inv-row .ii { flex:1; }
+  .inv-row .ii .t { font-size:16px; color:var(--c-text); }
+  .inv-row .ii .t .aff { font-size:12px; color:var(--c-gold); }
+  .inv-row .ii .e { font-size:13px; color:var(--c-text-mute); margin-top:2px; }
+  .inv-row.equipped { opacity:.5; }
+  .inv-row.equipped .st { font-size:12px; color:var(--c-hp-high); }
+  .rar-legend { display:flex; gap:14px; font-size:13px; color:var(--c-text-mute); margin-top:8px; }
+  .rar-legend i { display:inline-block; width:9px; height:9px; transform:rotate(45deg); margin-right:4px; vertical-align:middle; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav class="nav">
+    <div class="brand">던전크래프트<small>상점 · 장비 · 아티팩트 v1</small></div>
+    <ul>
+      <li class="grp">상점</li>
+      <li><a href="#shop">대장간 · 상점 UI</a></li>
+      <li class="grp">장비</li>
+      <li><a href="#gear">특색 장비 카탈로그</a></li>
+      <li class="grp">아티팩트</li>
+      <li><a href="#artsys">시스템 설계</a></li>
+      <li><a href="#artpanel">장착 패널</a></li>
+      <li><a href="#artcat">아티팩트 도감</a></li>
+    </ul>
+  </nav>
+  <main class="main">
+    <section class="block" id="shop" data-screen-label="상점 UI">
+      <div class="eyebrow">SHOP · BLACKSMITH</div>
+      <h1 class="title">대장간 · 상점 UI 개선</h1>
+      <p class="lede">기존 "골드 패널 + 리스트"를 <strong>2열 비교형</strong>으로. 왼쪽 목록 · 오른쪽 상세에서
+        <strong>장착 중 장비 대비 증감</strong>을 즉시 보여주고, 구매/판매/<strong>강화</strong> 탭을 분리했습니다.</p>
+      <div class="demo-wrap"><div class="frame-bevel ui shop" id="shopDemo"></div></div>
+    </section>
+
+    <section class="block" id="gear" data-screen-label="특색 장비">
+      <div class="eyebrow">DISTINCTIVE GEAR</div>
+      <h2 class="title">특색 있는 장비</h2>
+      <p class="lede">단순 +공격이 아니라 <strong>고유 효과</strong>로 빌드를 만드는 장비. 무기·방어구·악세사리.
+        <span class="off">NEW = 신규 제안 · 나머지는 이미 게임에 존재</span>.</p>
+      <div id="gearCat"></div>
+    </section>
+
+    <section class="block" id="artsys" data-screen-label="아티팩트 시스템">
+      <div class="eyebrow">ARTIFACT SYSTEM</div>
+      <h2 class="title">아티팩트 시스템 <span style="font-size:18px;color:var(--c-text-mute)">— 옥토패스식 서포트 어빌리티</span></h2>
+      <p class="lede">장비와 <strong>별개로</strong> 캐릭터마다 <strong>아티팩트 3슬롯</strong>. 무기/방어구/악세사리가
+        "능력치"라면, 아티팩트는 <strong>패시브 규칙</strong>을 바꿔 플레이스타일을 정의합니다.</p>
+      <div class="cards">
+        <div class="card"><h4>3슬롯 · 자유 조합</h4><p>캐릭터당 3칸. 전투 지속·공격 특화·생존·자원·카르마 계열을
+          자유 조합해 역할을 만든다. 슬롯은 성장으로 개방(1→2→3).</p></div>
+        <div class="card"><h4>클래스 친화</h4><p>일부 아티팩트는 특정 클래스에서 효과가 강화(친화 ✦). 범용으로도
+          쓰지만 "제 클래스"에서 진가. 옥토패스의 잡별 서포트 감성.</p></div>
+        <div class="card"><h4>조건부 트리거</h4><p>"HP 50% 이하 시", "약점 적중 시", "치명상 시 1회 생존" 등
+          상황을 읽는 패시브. 상성·상태·카르마 시스템과 맞물린다.</p></div>
+        <div class="card"><h4>세트 보너스</h4><p>같은 계열 2개 장착 시 추가 효과(선택적). 3슬롯 안에서
+          "특화 vs 균형"의 선택을 유도.</p></div>
+      </div>
+      <p class="note" style="margin-top:20px">획득: 보스 처치 · 숨겨진 상자 · 퀘스트 보상 · <b>카르마 분기</b>(자비/처단 전용).
+        판매 불가(수집 가치). 전투 밖에서 자유 교체.</p>
+    </section>
+
+    <section class="block" id="artpanel" data-screen-label="아티팩트 패널">
+      <div class="eyebrow">EQUIP PANEL</div>
+      <h2 class="title">아티팩트 장착 패널</h2>
+      <p class="lede">캐릭터 선택 → 3슬롯에 아티팩트 장착. 목록 항목에 커서를 올리면 효과·친화가 표시되고,
+        클릭으로 장착/해제합니다.</p>
+      <div class="demo-wrap"><div class="frame-bevel ui art-panel" id="artPanel"></div></div>
+    </section>
+
+    <section class="block" id="artcat" data-screen-label="아티팩트 도감">
+      <div class="eyebrow">ARTIFACT CATALOG</div>
+      <h2 class="title">아티팩트 도감</h2>
+      <p class="lede">제안 아티팩트 14종. <span style="color:#a7b0d8">■ 일반</span>
+        <span style="color:#56a8e8">■ 희귀</span> <span style="color:#ffd766">■ 전설</span>.</p>
+      <div id="artCat"></div>
+    </section>
+
+    <footer class="foot">던전크래프트 — 상점·장비·아티팩트 설계 보드 · 토큰은 css/tokens.css · 아이콘은 코드 생성.</footer>
+  </main>
+</div>
+
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<rect width="100" height="100" fill="#12152e"/>
+<rect x="34" y="30" width="32" height="32" fill="#ffd766" transform="rotate(45 50 46)"/>
+<rect x="42" y="38" width="16" height="16" fill="#12152e" transform="rotate(45 50 46)"/>
+<rect x="20" y="76" width="14" height="8" fill="#56a8e8"/><rect x="66" y="76" width="14" height="8" fill="#62c46a"/>
+</svg>
+</template>
+
+<script src="js/pixel.js"></script>
+<script src="js/armory.js"></script>
+</body>
+</html>

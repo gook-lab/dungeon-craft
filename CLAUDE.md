@@ -669,6 +669,35 @@ passes the result as `buildHeroUnit({passives})` → `makeUnit` field `unit.pass
 Reference accessories in items.js: antitoxin_charm/regen_ring/thorn_band/lucky_charm/
 aegis_pendant (보석상 stock). New passive: add `passive` to an item + a hook branch if it's a
 new effect kind + a battle.test case; FX is deferred (events emitted, animation TODO).
+**신규 passive 키(2026-07-20)**: `lifesteal`(가한 피해 % 회복)·`execute`(대상 HP≤30% 피해
+배수)·`thorns`(근접 피격 % 반사)·`bleedChance`(적중 시 % 출혈) — `equipPassives`가 병합+
+클램프. `execute`/`hpBelow50`/`weaknessDmg`는 **`condMult(attacker,target,weak)`** 곱연산
+(physicalDamage/skillDamage, **상성 뒤·크리 앞**); `spellDmg`는 magicDamage. `lifesteal`/
+`thorns`/`bleedChance`는 **`applyOnHit(state,att,tgt,dmg,melee,events,rng)`** — 리졸버 attack
+브랜치 dealDamage 직후 호출(**v1 기본공격만**, counter 선례; 물리 스킬 확장은 TODO). 언데드
+bleed 면역은 applyStatus가 처리. 모든 passive 읽기는 이 4지점(physical/skill/magicDamage +
+applyOnHit)에 집중 — 새 passive는 여기만 건드리면 되고, 훅 누락 시 조용히 무효화된다.
+
+**Artifact (유물, 수집형 유물 — 2026-07-20)**: 캐릭터별 판매불가 슬롯 유물. PURE 데이터
+`src/content/artifacts.js`(14종). **gear passive와 동일 shape로 병합**해 리졸버가 `unit.passives`
+한 곳만 읽는다 — battleScene `buildHeroWithArtifacts(p)`가 `mergePassives(gearPassives(equip),
+artifactPassives(equipped, refId).passive)` + `mods`(스탯)를 접고 `survive1hp`→**기존 lastStand
+재사용**. 스키마: `{id,name,rarity,cat:'지속|공격|생존|자원|카르마',affinity:classId|null,source,
+mods?,passive?,trigger?}`. **슬롯** `artifactSlotCount(level)` 1/8/16→1/2/3. **세트** `computeSetBonus`
+같은 cat 2→×1.2·3→×1.4(그 cat의 passive만, `CAT_PASSIVE`). **클래스 친화** `affinity===refId`면
+그 유물 효과 ×1.25(`ART_AFFINITY_MUL`). **유한 풀**: 한 유물=영웅 1명만(gear Gotcha #7 미러).
+- **trigger(scene-side)**: `hpRegenEnd/mpRegenEnd/goldBonus`→endBattle 정산, `fpGain`→
+  `game.gainFP`(Gotcha #14), `recruitBonus`→buildHeroWithArtifacts가 `actor.passives`로 접합해
+  리졸버 채용 롤이 읽음(캡 0.95).
+- **획득**: chest `loot:{artifact:'id'}`→`save.artifacts.owned`(fieldScene openChest). **장착 UI**:
+  `scenes/artifactScene.js`(유물 씬, 메뉴 X→유물). **save.artifacts{owned,equipped}**는 Gotcha #11
+  4지점. **카르마 유물은 배타 루트 맵에 배치** — mercy_relic→witchs_hut(swampBoss_spared),
+  brand→wraith_bog(swampBoss_slain): 포탈이 이미 requires 상호배타라 회차당 택1(수집 배타성),
+  content.test 도달성은 그대로 통과. **커버리지 가드**(artifacts.test): 14종 전부 상자 배치·중복
+  없음·passive/trigger 키 화이트리스트(REAL_PASSIVE/REAL_TRIGGER — eva류 미구현 키 조용한 무효화
+  방지). 밸런스 해니스는 아티팩트 미모델(bonds·4번째 유닛처럼 base 래더 위 opt-in — TODO: 정확
+  수치는 해니스 로드아웃 추가). 새 유물: ARTIFACTS + 배치(배타 루트면 게이트 맵) + 새 passive면
+  battle.js 4지점 훅 + 커버리지 가드 갱신.
 
 **Warp/fast-travel** (`scenes/warpScene.js` `WARP_POINTS`): each `{map, requires}` — `requires`
 is a boss flag (or `null` = always, e.g. town). The scene shows only points whose flag is
@@ -818,6 +847,18 @@ cosmetic/save, no resolver changes:
     carry `action:'shop'` in dialog.js. Any object with `obj.talk` is interactable, so a
     **prop** can carry `talk:'<id>'` to become an interaction point (the hut's 약솥 →
     `witch_spring` → `action:'heal'` → free full heal).
+13. **`save.artifacts` is a Gotcha #11 TOP-LEVEL field (2026-07-20)** — `{owned:[ids],
+    equipped:{refId:[id|null,...]}}`. Add to all FOUR save.js sites (freshSave `{owned:[],
+    equipped:{}}` + validateSave whitelist owned/equipped + toRuntime + runtimeToSave) +
+    the round-trip test seed. Artifacts are **non-sellable** — never add to shop stock; they
+    live only in `owned` (via chest `loot.artifact`) and are equipped in the 유물 씬.
+14. **`game.gainFP(n)` is the SINGLE gateway for all FP gains (2026-07-20)** — routes the
+    운명석(fatestone) `fpGain` multiplier via a fractional carry (`runtime._fpCarry`, runtime-
+    only) so +25% on +1 grants accrues deterministically(문턱마다 보너스 FP). ALL four FP-earn
+    sites go through it: `checkCrisisFP`/`checkFlawFP` (battleScene), item 운명의 모래시계
+    (battleScene), mercy +1 (main.js endBattle). A NEW FP source must call `game.gainFP`, NOT
+    mutate `runtime.fabula` directly — else it bypasses the fpGain multiplier AND the UI gauge
+    resync. FP is runtime-only (never persisted mid-battle); the resolver never reads it.
 
 ## Run Workflow
 `npx vitest run && npm run build && $B goto http://localhost:9153/ && $B screenshot`
