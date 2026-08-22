@@ -82,7 +82,7 @@ scripts/balance.js   헤드리스 전투 하네스
 
 **Source-available — 오픈소스가 아닙니다.** 코드를 읽을 수 있게 공개했을 뿐,
 사용 권한을 준 것은 아닙니다. 다른 프로젝트에 가져다 쓰거나 재배포·상업적 이용을
-하려면 사전 서면 허락이 필요합니다. 전문은 [LICENSE](LICENSE) 참조.
+하려면 사전 서면 허락이 필요합니다. 전문은 [LICENSE](LICENSE), 한국어 안내는 [LICENSE.ko.md](LICENSE.ko.md) 참조.
 
 효과음은 [ZzFX](https://github.com/KilledByAPixel/ZzFX)(MIT), 픽셀 아트 일부는 PixelLab으로
 생성했다. 서드파티 구성요소는 각자의 라이선스를 따른다.
