@@ -14,6 +14,10 @@
 > 형제 프로젝트: `../game` (Crypt Survivors — 뱀파이어 서바이버즈풍 오토배틀러).
 > 히어로/에셋/월드를 공유하지만 아키텍처는 완전히 다르다.
 
+## 스크린샷
+
+<img src="docs/screenshots/01-title.png" width="600">
+
 ## 실행
 
 ```bash
