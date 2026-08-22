@@ -17,7 +17,7 @@ See also: [DESIGN.md](DESIGN.md) (UI vocabulary) · [TODOS.md](TODOS.md) (deferr
 |---|---|
 | `npm install` | First-time install |
 | `npm run dev` | Dev server (http://localhost:9153/) |
-| `npm test` | Vitest unit tests (317+; must pass before committing) — `npx vitest run` |
+| `npm test` | Vitest unit tests (402 as of 2026-08-22; must pass before committing) — `npx vitest run` |
 | `npm run balance` | Headless battle harness — 3 passes: BASELINE (kill build, no bonds), MERCY (positive bonds: tanky + clutch FP), RUTHLESS (negative bonds: glass cannon + less FP). Read avgRounds/deaths; win% saturates under optimal AI. |
 | `npm run build` | Production bundle → `dist/` |
 

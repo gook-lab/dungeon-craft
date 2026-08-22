@@ -4,3 +4,7 @@ dist/
 *.log
 .gstack/
 .gstack/
+
+# 도구 산출물 (2026-08-22)
+.gstack/
+**/.gstack/

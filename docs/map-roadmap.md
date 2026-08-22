@@ -1,8 +1,8 @@
 # 맵 작업 로드맵 (HD-2D)
 
 > 다음 세션 핸드오프. 옥토패스풍 HD-2D 맵 룩 작업의 현재 상태 + 남은 작업.
-> 관련: [CLAUDE.md §9](../CLAUDE.md) (elevation 키트) · [TODOS.md](../TODOS.md) · `~/.gstack/projects/dragon-game/*-design-20260530-202911.md` (설계문서).
-> 작성: 2026-05-30. 테스트 기준선: **279 passing** (`npx vitest run`).
+> 관련: [CLAUDE.md §9](../CLAUDE.md) (elevation 키트) · [TODOS.md](../TODOS.md) · 설계문서(레포 밖, 로컬 gstack 산출물 — 공개 레포에는 없음).
+> 작성: 2026-05-30. 테스트 기준선: 작성 당시 **279 passing**. 2026-08-22 기준 **402 passing** (`npx vitest run`).
 
 ---
 
