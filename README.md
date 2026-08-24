@@ -1,6 +1,6 @@
 # 던전크래프트 (Dragon Crypt)
 
-**한국어** · [English](README.en.md)
+**한국어** | [English](README.en.md)
 
 > **About (EN)** — A Dragon Quest-style turn-based JRPG in plain ES modules,
 > PixiJS v8 and Vite. Its theme is mercy: any weakened enemy can be spared or

@@ -1,6 +1,6 @@
 # Dragon Crypt
 
-[한국어](README.md) · **English**
+[한국어](README.md) | **English**
 
 A Dragon Quest-style turn-based JRPG in plain ES modules, PixiJS v8, and Vite.
 
