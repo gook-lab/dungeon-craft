@@ -1,0 +1,8 @@
+flowchart TD
+  IN["battleScene — 커맨드 입력"] -->|"resolveAction(action, rng)"| RES["systems/battle.js — 순수 리졸버"]
+  RES -->|"{ events }"| ANIM["battleScene — 이벤트 재생 · 데미지 숫자"]
+  ANIM -->|castStart| FX["fx/spellFx — 코드 드로잉 주문 연출"]
+  ANIM -->|승리| ENDB["main.js — endBattle"]
+  ENDB -->|"recruited / mercied 폴드"| SAVE[("data/save.js — localStorage")]
+  ENDB -->|toneFromFlags| DLG["content/dialog — 자비/잔혹 톤 변주"]
+  BAL["scripts/balance.js — 3패스 하네스"] -.->|"같은 리졸버 · 렌더러 없음"| RES

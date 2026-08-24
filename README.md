@@ -1,5 +1,7 @@
 # 던전크래프트 (Dragon Crypt)
 
+**한국어** | [English](README.en.md)
+
 > **About (EN)** — A Dragon Quest-style turn-based JRPG in plain ES modules,
 > PixiJS v8 and Vite. Its theme is mercy: any weakened enemy can be spared or
 > recruited, and that choice quietly rewrites NPC dialogue, party bonds, boss
@@ -8,11 +10,11 @@
 
 드래곤 퀘스트풍 턴제 JRPG. 순수 ESM JavaScript + PixiJS v8 + Vite.
 
-이 게임의 주제는 **자비**다. 약해진 적은 죽일 수도, 살려 보낼 수도, 동료로 받을 수도 있다.
-그 선택은 미터기로 표시되지 않고, NPC 대사·파티 유대·보스 경로·엔딩으로 조용히 되돌아온다.
+이 게임의 주제는 **자비**입니다. 약해진 적은 죽일 수도, 살려 보낼 수도, 동료로 받을 수도 있습니다.
+그 선택은 미터기로 표시되지 않고, NPC 대사·파티 유대·보스 경로·엔딩으로 조용히 되돌아옵니다.
 
 > 형제 프로젝트: `../game` (Crypt Survivors — 뱀파이어 서바이버즈풍 오토배틀러).
-> 히어로/에셋/월드를 공유하지만 아키텍처는 완전히 다르다.
+> 히어로/에셋/월드를 공유하지만 아키텍처는 완전히 다릅니다.
 
 ## 스크린샷
 
@@ -30,7 +32,7 @@ npm run balance  # 헤드리스 밸런스 하네스 (아래 참조)
 
 ### 밸런스 하네스
 
-`npm run balance`는 렌더러 없이 전투만 시뮬레이션해 3패스를 돌린다.
+`npm run balance`는 렌더러 없이 전투만 시뮬레이션해 3패스를 돌립니다.
 
 | 패스 | 조건 | 보는 값 |
 |---|---|---|
@@ -38,7 +40,7 @@ npm run balance  # 헤드리스 밸런스 하네스 (아래 참조)
 | MERCY | 긍정 유대 (탱키 + 클러치 FP) | 생존력 상승폭 |
 | RUTHLESS | 부정 유대 (글래스캐논, HP 쿠션 없음) | 화력 상승폭 |
 
-승률은 최적 AI에서 포화하므로 **평균 라운드 수와 사망 수**를 읽는다.
+승률은 최적 AI에서 포화하기 때문에 **평균 라운드 수와 사망 수**를 읽습니다.
 
 ## 프로젝트 구조
 
@@ -64,13 +66,13 @@ scripts/balance.js   헤드리스 전투 하네스
 
 자세한 내용은 **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** 참조. 요약하면:
 
-1. **순수 전투 리졸버** — `systems/battle.js`는 PixiJS를 import하지 않고 세이브도 쓰지 않는다.
-   `resolveAction(state, action, rng)`이 상태를 변형하고 `{ events }`를 돌려주면, 씬은 그 이벤트를 읽어 애니메이션만 한다.
-2. **LIFO 씬 스택** — 최상단 씬만 `update(dt)`를 받고 전부 렌더한다. 씬끼리 서로 import하지 않는다.
-3. **자비 메커니즘** — `hp ≤ maxHp × 0.3`인 적은 살려보내기/영입 가능. 순수 술어 `canMercy` / `canRecruit`가 UI를 게이트한다.
-4. **톤 분기 대사** — 자비 비율이 `merciful / ruthless / mixed` 톤을 만들고, `${id}_${tone}` 변형이 있으면 자동으로 갈아끼운다. **비율은 절대 UI에 노출하지 않는다** (언더테일식).
-5. **Fabula Points + 유대** — Fabula Ultima에서 가져온 "자비 = 힘" 장치. 긍정 유대는 탱키+클러치, 부정 유대는 화력만 있고 HP 쿠션이 없는 글래스캐논.
-6. **맵 연결성 테스트** — 포탈 그래프 + 베이크된 충돌 위 BFS로 "벽 하나 때문에 클리어 불가"를 회귀 테스트로 잠근다.
+1. **순수 전투 리졸버** — `systems/battle.js`는 PixiJS를 import하지 않고 세이브도 안 씁니다.
+   `resolveAction(state, action, rng)`이 상태를 변형하고 `{ events }`를 돌려주면, 씬은 그 이벤트를 읽어 애니메이션만 합니다.
+2. **LIFO 씬 스택** — 최상단 씬만 `update(dt)`를 받고 전부 렌더합니다. 씬끼리 서로 import하지 않습니다.
+3. **자비 메커니즘** — `hp ≤ maxHp × 0.3`인 적은 살려보내기/영입 가능합니다. 순수 술어 `canMercy` / `canRecruit`가 UI를 게이트합니다.
+4. **톤 분기 대사** — 자비 비율이 `merciful / ruthless / mixed` 톤을 만들고, `${id}_${tone}` 변형이 있으면 자동으로 갈아끼웁니다. **비율은 절대 UI에 노출하지 않습니다** (언더테일식).
+5. **Fabula Points + 유대** — Fabula Ultima에서 가져온 "자비 = 힘" 장치. 긍정 유대는 탱키+클러치, 부정 유대는 화력만 있고 HP 쿠션이 없는 글래스캐논입니다.
+6. **맵 연결성 테스트** — 포탈 그래프 + 베이크된 충돌 위 BFS로 "벽 하나 때문에 클리어 불가"를 회귀 테스트로 잠깁니다.
 
 ## 문서
 
@@ -89,4 +91,4 @@ scripts/balance.js   헤드리스 전투 하네스
 하려면 사전 서면 허락이 필요합니다. 전문은 [LICENSE](LICENSE), 한국어 안내는 [LICENSE.ko.md](LICENSE.ko.md) 참조.
 
 효과음은 [ZzFX](https://github.com/KilledByAPixel/ZzFX)(MIT), 픽셀 아트 일부는 PixelLab으로
-생성했다. 서드파티 구성요소는 각자의 라이선스를 따른다.
+생성했습니다. 서드파티 구성요소는 각자의 라이선스를 따릅니다.
