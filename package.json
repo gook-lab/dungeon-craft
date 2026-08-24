@@ -10,12 +10,19 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "balance": "node scripts/balance.js"
+    "balance": "node scripts/balance.js",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "pixi.js": "^8.18.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.9.0",
+    "globals": "^17.11.0",
+    "prettier": "^3.9.6",
     "vite": "^7.3.3",
     "vitest": "^3.2.4"
   }
