@@ -5,4 +5,13 @@ flowchart TD
   ANIM -->|승리| ENDB["main.js — endBattle"]
   ENDB -->|"recruited / mercied 폴드"| SAVE[("data/save.js — localStorage")]
   ENDB -->|toneFromFlags| DLG["content/dialog — 자비/잔혹 톤 변주"]
-  BAL["scripts/balance.js — 3패스 하네스"] -.->|"같은 리졸버 · 렌더러 없음"| RES
+  BAL["scripts/balance.js — 3패스 하네스"] -.->|"런타임 밖 · 같은 리졸버를 렌더러 없이"| RES
+
+  classDef core fill:#e0e7ff,stroke:#4f46e5,color:#1e1b4b,stroke-width:3
+  classDef view fill:#ffffff,stroke:#475569,color:#0f172a
+  classDef store fill:#dcfce7,stroke:#16a34a,color:#052e16
+  classDef tool fill:#f1f5f9,stroke:#94a3b8,color:#334155
+  class RES core
+  class IN,ANIM,FX,DLG view
+  class SAVE store
+  class BAL tool
