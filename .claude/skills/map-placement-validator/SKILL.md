@@ -28,8 +28,8 @@ Write a throwaway script under the scratchpad (never in `src/`) and run it with 
 Import via absolute `file://` URLs — relative paths from a temp dir will not resolve.
 
 ```js
-import { getMap } from 'file:///Users/kyb-ontact/sonix/toy/dragon-game/src/content/maps/index.js';
-import { canStep } from 'file:///Users/kyb-ontact/sonix/toy/dragon-game/src/systems/field.js';
+import { getMap } from 'file://$HOME/sonix/toy/dragon-game/src/content/maps/index.js';
+import { canStep } from 'file://$HOME/sonix/toy/dragon-game/src/systems/field.js';
 
 function bake(map) {
   const { w } = map;
