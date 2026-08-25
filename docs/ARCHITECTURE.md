@@ -108,7 +108,7 @@ const { events } = resolveAction(state, action, rng)   // state를 변형하고 
 
 ---
 
-## 3. 자비 메커니즘 — 싸운다 / 살려보낸다 / 영입한다
+## 3. 자비 메커니즘 — 처치 / 스페어 / 영입 분기
 
 `hp ≤ maxHp × mercyThreshold`(기본 0.3)인 적은 **살려보내기(spare)** 또는
 **영입(recruit)** 대상이 됩니다. 순수 술어 `canMercy(t)` / `canRecruit(t)`가 UI를 게이트합니다.
