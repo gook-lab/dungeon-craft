@@ -1,17 +1,17 @@
-# 던전크래프트 (Dragon Crypt)
+# dungeon-craft
 
 **한국어** | [English](README.en.md)
 
-> **About (EN)** — A Dragon Quest-style turn-based JRPG in plain ES modules,
-> PixiJS v8 and Vite. Its theme is mercy: any weakened enemy can be spared or
-> recruited, and that choice quietly rewrites NPC dialogue, party bonds, boss
-> routes and the ending. The battle resolver is a pure function that never
-> imports the renderer, so the whole game balances headlessly in Node.
+순수 JavaScript와 PixiJS로 만든 드래곤 퀘스트풍 턴제 JRPG입니다.
 
-드래곤 퀘스트풍 턴제 JRPG. 순수 ESM JavaScript + PixiJS v8 + Vite.
+전투에서 약해진 적을 쓰러뜨리거나 살려 보내고, 일부는 동료로 영입할 수 있습니다. 선택의 누적 결과는 별도 점수 대신 NPC 대사·파티 관계·보스 경로와 엔딩의 변화로 나타납니다.
 
-이 게임의 주제는 **자비**입니다. 약해진 적은 죽일 수도, 살려 보낼 수도, 동료로 받을 수도 있습니다.
-그 선택은 미터기로 표시되지 않고, NPC 대사·파티 유대·보스 경로·엔딩으로 조용히 되돌아옵니다.
+## 프로젝트 특징
+
+- **선택이 이어지는 전투**: 적을 처치하거나 살려 보낸 결과가 이후 대사와 진행 경로에 반영됩니다.
+- **렌더링과 전투 계산 분리**: 전투 계산은 PixiJS에 의존하지 않아 Node 환경에서도 반복 검증할 수 있습니다.
+- **헤드리스 밸런스 검증**: 여러 전투 조건을 자동 실행해 평균 라운드와 사망 수의 변화를 비교합니다.
+- **맵 연결성 검사**: 포탈과 충돌 데이터를 그래프로 검사해 이동할 수 없는 구간을 테스트에서 찾습니다.
 
 > 형제 프로젝트: `../game` (Crypt Survivors — 뱀파이어 서바이버즈풍 오토배틀러).
 > 히어로/에셋/월드를 공유하지만 아키텍처는 완전히 다릅니다.
