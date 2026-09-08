@@ -15,6 +15,16 @@ Weakened enemies can be defeated, spared, or in some cases recruited. The accumu
 - **Headless balance checks**: automated combat passes compare average rounds and death counts across different builds.
 - **Map connectivity tests**: portal and collision data are checked as a graph to catch unreachable areas.
 
+## From problem to verification
+
+| Stage | Details |
+|---|---|
+| Problem | When combat rules are coupled to rendering, balance and map changes can only be checked by running the full game. |
+| Decision | Keep combat and movement rules as pure logic, while scenes receive calculation results and focus on presentation. |
+| Implementation | Build around seeded RNG, a pure battle resolver, a LIFO scene stack, and portal-graph and collision checks. |
+| Verification | Use Vitest for combat, progression, and map connectivity, then compare average rounds and deaths with the headless balance harness. |
+| Retrospective | Game feel still needs hands-on play, but renderer-free checks make rule and data changes much faster to tune safely. |
+
 > Sister project: `../game` (Crypt Survivors — a Vampire Survivors–style auto-battler).
 > We share heroes, assets, and world, but the architecture is completely different.
 
