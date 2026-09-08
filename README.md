@@ -6,6 +6,8 @@
 
 전투에서 약해진 적을 쓰러뜨리거나 살려 보내고, 일부는 동료로 영입할 수 있습니다. 선택의 누적 결과는 별도 점수 대신 NPC 대사·파티 관계·보스 경로와 엔딩의 변화로 나타납니다.
 
+<img src="docs/screenshots/cover.png" alt="dungeon-craft 타이틀 화면" width="100%">
+
 ## 프로젝트 특징
 
 - **선택이 이어지는 전투**: 적을 처치하거나 살려 보낸 결과가 이후 대사와 진행 경로에 반영됩니다.
@@ -25,7 +27,7 @@
 ```bash
 npm install
 npm run dev      # 개발 서버 http://localhost:9153/
-npm test         # Vitest 유닛 테스트 402개 (커밋 전 필수)
+npm test         # Vitest 유닛 테스트
 npm run build    # 프로덕션 번들 → dist/
 npm run balance  # 헤드리스 밸런스 하네스 (아래 참조)
 ```

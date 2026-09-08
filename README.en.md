@@ -1,10 +1,19 @@
-# Dragon Crypt
+# dungeon-craft
 
 [한국어](README.md) | **English**
 
-A Dragon Quest-style turn-based JRPG in plain ES modules, PixiJS v8, and Vite.
+A Dragon Quest-inspired turn-based JRPG built with plain JavaScript and PixiJS.
 
-The game's core theme is **mercy**. Weakened enemies can be spared, let go, or recruited as allies — and that choice quietly rewrites NPC dialogue, party bonds, boss routes, and the ending.
+Weakened enemies can be defeated, spared, or in some cases recruited. The accumulated choices appear through changes in NPC dialogue, party relationships, boss routes, and the ending rather than a visible score.
+
+<img src="docs/screenshots/cover.png" alt="dungeon-craft title screen" width="100%">
+
+## Project highlights
+
+- **Combat choices carry forward**: defeating or sparing an enemy changes later dialogue and progression routes.
+- **Rendering is separate from combat rules**: battle resolution does not depend on PixiJS and can run repeatedly in Node.
+- **Headless balance checks**: automated combat passes compare average rounds and death counts across different builds.
+- **Map connectivity tests**: portal and collision data are checked as a graph to catch unreachable areas.
 
 > Sister project: `../game` (Crypt Survivors — a Vampire Survivors–style auto-battler).
 > We share heroes, assets, and world, but the architecture is completely different.
@@ -18,7 +27,7 @@ The game's core theme is **mercy**. Weakened enemies can be spared, let go, or r
 ```bash
 npm install
 npm run dev      # dev server at http://localhost:9153/
-npm test         # Vitest unit tests: 402 test cases (required before committing)
+npm test         # Vitest unit tests
 npm run build    # production bundle → dist/
 npm run balance  # headless battle harness (see below)
 ```
