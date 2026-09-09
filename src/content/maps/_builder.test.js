@@ -33,7 +33,7 @@ describe('pillarHall', () => {
     const col = fillGrid(W, H, 0); borderWall(col, W, H);
     pillarHall(col, W, H, 2, 2, W - 3, H - 3, { spacing: 4, size: 2 });
     let interiorWalls = 0;
-    for (const [x, y] of openCells(col, W, H)) void 0;
+    expect(openCells(col, W, H).length).toBeGreaterThan(0);
     for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) if (col[y * W + x] === 1) interiorWalls++;
     expect(interiorWalls).toBeGreaterThan(0);
   });

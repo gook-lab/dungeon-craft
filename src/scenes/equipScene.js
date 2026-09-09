@@ -275,7 +275,6 @@ export class EquipScene {
 
     // HP / MP bars
     yy += 6;
-    const base = statsAtLevel(hero.refId, hero.level).stats;
     const hp = hero.hp != null ? hero.hp : cur.maxHp;
     const mp = hero.mp != null ? hero.mp : cur.maxMp;
     const hl = label('HP', FS.caption, HEX.textSoft); hl.x = x; hl.y = yy; this.container.addChild(hl);

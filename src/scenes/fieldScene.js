@@ -16,7 +16,7 @@ import { recordVisit, isTalkTarget } from '../content/questlines.js';
 import { getQuest, isQuestComplete } from '../content/quests.js';
 import { getArtifact } from '../content/artifacts.js';
 import { worldNode } from '../content/worldmap.js';
-import { statsAtLevel, xpToReach } from '../systems/progression.js';
+import { statsAtLevel } from '../systems/progression.js';
 import { loadSheet, makeSprite, swapTexture, shadowTexture } from '../engine/renderer.js';
 import { label, frame, hpbar, bar } from '../ui/uikit.js';
 import { HEX, NUM, FS, FONT } from '../ui/tokens.js';
@@ -883,7 +883,7 @@ export class FieldScene {
   // 보드 시안의 개울 건널목이 게임에서 '물 위를 걷는' 것처럼 보이던 것에 대응.
   buildWaterCrossings() {
     if (!this.map) return;
-    const { w, h, ground } = this.map;
+    const { w, ground } = this.map;
     const struct = this.structCollision || this.map.collision;
     const g = new PIXI.Graphics();
     let n = 0;
@@ -1001,7 +1001,7 @@ export class FieldScene {
       this.game.renderer.app.renderer.render({ container: this.world, target: this.farRT, clear: true });
       this.farBlurSprite.visible = true;
       this.farMask.visible = true;
-    } catch (e) {
+    } catch {
       if (this.farBlurSprite) this.farBlurSprite.visible = false;
     }
   }
@@ -1240,7 +1240,7 @@ export class FieldScene {
     this.ground.removeChildren();
     // 지면 틴트 — 형광 잔디를 전투 배경 톤으로 눌러 통일 (프롭·물은 별 레이어라 무관).
     this.ground.tint = GROUND_TINT[this.map.mood] ?? GROUND_TINT[this.map.tileset] ?? 0xffffff;
-    const { w, h, ground } = this.map;
+    const { w, ground } = this.map;
     const meta = TILESET_META[this.map.tileset];
     const cellRect = (id, x, y) => {
       const g = new PIXI.Graphics();
@@ -1303,7 +1303,7 @@ export class FieldScene {
   buildWalls() {
     this.walls.removeChildren();
     if (!this.map.walls) return;
-    const { w, h } = this.map;
+    const { w } = this.map;
     const col = this.structCollision;
     for (let i = 0; i < col.length; i++) {
       if (col[i] !== 1) continue;
@@ -1736,7 +1736,7 @@ export class FieldScene {
       this.tiltMesh.texture = this.tiltRT;
       this.tiltMesh.visible = true;
       this.world.renderable = false; // hide flat world from the main pass; the mesh shows it
-    } catch (e) {
+    } catch {
       this.tiltMesh.visible = false;
       this.world.renderable = true;
     }

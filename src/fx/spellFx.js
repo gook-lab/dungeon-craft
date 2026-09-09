@@ -122,7 +122,7 @@ export class SpellFx {
     for (let i = this.scheduled.length - 1; i >= 0; i--) {
       const s = this.scheduled[i];
       s.t -= dt;
-      if (s.t <= 0) { this.scheduled.splice(i, 1); try { s.fn(); } catch (e) { /* keep going */ } }
+      if (s.t <= 0) { this.scheduled.splice(i, 1); try { s.fn(); } catch { /* keep going */ } }
     }
     // current effect
     if (this.effect) {
@@ -1125,7 +1125,7 @@ export const DEFS = {
           }
         }
         if (t < 0.9 && Math.random() < 0.7) S.p({ x: cx + rnd(-14, 14), y: cy + rnd(-8, 8), vy: -rnd(4, 14), life: rnd(0.5, 1), max: 1, size: (rnd(3, 6) | 0), color: '#3a4160', shrink: true });
-        targets.forEach((e, i) => {
+        targets.forEach((e) => {
           if (t > 0.4 && t < 0.41) {
             const iceP = PAL.iceP || '#bfe6ff';
             S.floatSpr({ kind: 'arrowDown', x: e.x, y: e.y - 18, vy: -10, life: 0.8, max: 0.8, col: iceP });
@@ -1139,7 +1139,7 @@ export const DEFS = {
 
   /* --- Mage -------------------------------------------------------------- */
   arcanebolt(S) {
-    const tgt = S.primary(); const over = !!S._charge; const from = { x: S.caster.x + 6, y: S.caster.y - 13 }; let t = 0, proj = null, phase = 0;
+    const tgt = S.primary(); const over = !!S._charge; const from = { x: S.caster.x + 6, y: S.caster.y - 13 }; let t = 0, phase = 0;
     return {
       update(dt) {
         t += dt;

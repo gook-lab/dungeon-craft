@@ -4,7 +4,7 @@
 import * as PIXI from 'pixi.js';
 import { windowBox, label, numLabel, menuList, frame } from '../ui/uikit.js';
 import { HEX, FS, FONT } from '../ui/tokens.js';
-import { ITEMS, getItem, MAX_UPGRADE, upgradeCost, itemSummary, itemKindKR, passiveParts } from '../content/items.js';
+import { getItem, MAX_UPGRADE, upgradeCost, itemSummary, itemKindKR, passiveParts } from '../content/items.js';
 
 const STAT_KR = { atk: '공격', def: '수비', spd: '속도', maxHp: 'HP', maxMp: 'MP' };
 const CMP_STATS = ['atk', 'def', 'spd', 'maxHp', 'maxMp'];
@@ -256,7 +256,7 @@ export class ShopScene {
     const id = this.mode === 'sell' ? this.curIds[this.index] : this.curIds[this.index];
     const it = id && getItem(id);
     if (!it || !['weapon', 'armor', 'accessory'].includes(it.kind)) return;
-    const { w, h } = this.game.renderer.screen;
+    const { w } = this.game.renderer.screen;
     const px = Math.min(this._listRight + 30, w - 380);
     const pw = Math.min(360, w - px - 30);
     const py = this._listTop;
@@ -410,7 +410,6 @@ export class ShopScene {
   }
 
   flash(msg) {
-    const { w } = this.game.renderer.screen;
     const t = label(msg, FS.label, HEX.info);
     t.x = 270; t.y = 35;
     this.layer.addChild(t);

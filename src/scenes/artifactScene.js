@@ -5,8 +5,8 @@
 // X close (saves). Effects fold in at battle start (battleScene.buildHeroWithArtifacts).
 
 import * as PIXI from 'pixi.js';
-import { windowBox, label, numLabel, frame, divider } from '../ui/uikit.js';
-import { HEX, FS, NUM, FONT } from '../ui/tokens.js';
+import { windowBox, label, frame } from '../ui/uikit.js';
+import { HEX, FS } from '../ui/tokens.js';
 import { ARTIFACTS, getArtifact, artifactSlotCount, computeSetBonus } from '../content/artifacts.js';
 
 const HERO_KR = { knight: '기사', warrior: '전사', huntress: '사냥꾼', mage: '마법사', duelist: '쌍검사' };
