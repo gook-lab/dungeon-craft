@@ -23,8 +23,9 @@ function storage() {
 export function loadSettings() {
   if (S) return S;
   const st = storage();
-  let raw = {};
-  try { raw = st ? JSON.parse(st.getItem(KEY) || '{}') : {}; } catch { raw = {}; }
+  const raw = (() => {
+    try { return st ? JSON.parse(st.getItem(KEY) || '{}') : {}; } catch { return {}; }
+  })();
   S = { ...SETTINGS_DEFAULTS, ...(raw && typeof raw === 'object' ? raw : {}) };
   // 값 검증 (라디오는 알려진 값만).
   if (!(S.textSpeed in TEXT_SPEED_SEC)) S.textSpeed = SETTINGS_DEFAULTS.textSpeed;
