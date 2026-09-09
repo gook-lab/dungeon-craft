@@ -29,6 +29,9 @@ jobs:
       - name: 운영 의존성 보안 검사
         run: npm audit --omit=dev --audit-level=high
 
+      - name: lint
+        run: npm run lint
+
       - name: 유닛 테스트
         run: npx vitest run
 

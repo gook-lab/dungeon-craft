@@ -639,19 +639,6 @@ export const DEFS = {
     };
   },
 
-  /* 9. 전투의 함성 */
-  warcry(S) {
-    castHop(S); let t = 0, pulse = 0; const u = S.caster;
-    return {
-      update(dt) {
-        t += dt; pulse += dt;
-        if (Math.random() < 0.8) S.p({ x: u.x + rnd(-8, 8), y: u.y - rnd(0, 6), vy: -rnd(20, 55), life: rnd(0.4, 0.8), max: 0.8, size: 2, color: Math.random() < 0.5 ? PAL.red : PAL.gold, additive: true, shrink: true });
-        if (pulse > 0.22 && t < 0.9) { pulse = 0; S.floatSpr({ kind: 'ring', x: u.x, y: u.y - 10, life: 0.4, max: 0.4, r0: 4, grow: 22, col: PAL.gold }); S.doShake(1.5); }
-      },
-      done: (tt) => tt > 1.1,
-    };
-  },
-
   /* 10. 방벽 */
   shield_wall(S) {
     castHop(S); let t = 0, formed = false, hexDrawn = false; const u = S.caster;

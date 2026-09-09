@@ -2028,7 +2028,15 @@ export class BattleScene {
       else if (ev.type === 'taunt') this.queueMsg(`${nameOf(ev.actorId)}가 적의 시선을 끈다!`);
       else if (ev.type === 'state') this.queueMsg(`${nameOf(ev.actorId)}는 ${STATE_KR[ev.state] || ev.state}!`);
       else if (ev.type === 'defend') this.queueMsg(`${nameOf(ev.actorId)}는 방어 태세!`);
-      else if (ev.type === 'fizzle') this.queueMsg(ev.reason === 'stealth' ? '은신 상태에서만 쓸 수 있다!' : ev.reason === 'bond' ? '인연공격을 펼칠 수 없다!' : 'MP가 부족하다!');
+      else if (ev.type === 'fizzle') {
+        const message = {
+          stealth: '은신 상태에서만 쓸 수 있다!',
+          bond: '인연공격을 펼칠 수 없다!',
+          mercy: '아직 자비를 베풀 수 없다.',
+          recruit: '이 적은 영입할 수 없다.',
+        }[ev.reason] || 'MP가 부족하다!';
+        this.queueMsg(message);
+      }
       else if (ev.type === 'flee') this.queueMsg(ev.ok ? '도망쳤다!' : '도망치지 못했다!');
       else if (ev.type === 'death') this.queueMsg(`${nameOf(ev.unitId)}를 쓰러뜨렸다!`);
       else if (ev.type === 'inflict') this.queueMsg(`${nameOf(ev.targetId)}는 ${STATUS_KR[ev.status] || ev.status} 상태가 되었다!`);
@@ -2043,8 +2051,6 @@ export class BattleScene {
         if (rl) this.queueMsg(rl);
       }
       else if (ev.type === 'recruitFail') this.queueMsg(`${ev.name}는 아직 마음을 열지 않았다!`);
-      else if (ev.type === 'fizzle' && ev.reason === 'mercy') this.queueMsg('아직 자비를 베풀 수 없다.');
-      else if (ev.type === 'fizzle' && ev.reason === 'recruit') this.queueMsg('이 적은 영입할 수 없다.');
     }
   }
 

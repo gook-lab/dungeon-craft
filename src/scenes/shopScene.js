@@ -284,7 +284,7 @@ export class ShopScene {
     }
     // 특수효과(passive) 비교 — 신규 아이템의 passive 나열 (▸)
     for (const part of passiveParts(it.passive)) { const p = label(`▸ ${part}`, FS.caption, HEX.goldGlow); p.x = px + 20; p.y = ry; this.compareLayer.addChild(p); ry += 20; }
-    if (it.element) { const e = label(`▸ 속성: ${it.element}`, FS.caption, HEX.info); e.x = px + 20; e.y = ry; this.compareLayer.addChild(e); ry += 20; }
+    if (it.element) { const e = label(`▸ 속성: ${it.element}`, FS.caption, HEX.info); e.x = px + 20; e.y = ry; this.compareLayer.addChild(e); }
   }
 
   update() {
