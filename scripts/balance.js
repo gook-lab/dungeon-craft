@@ -11,7 +11,7 @@
 
 import {
   createBattle, currentActor, advanceTurn, isOver, resolveAction,
-  enemyChooseAction, buildEnemyUnit, living, findUnit, enrageBosses, tickStatus, canMercy,
+  enemyChooseAction, buildEnemyUnit, living, enrageBosses, tickStatus,
 } from '../src/systems/battle.js';
 import { buildHeroUnit } from '../src/systems/progression.js';
 import { STARTING_PARTY } from '../src/content/party.js';

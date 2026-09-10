@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import {
   physicalDamage, magicDamage, magicScale, MAGIC_SCALE_K, buildEnemyUnit, createBattle, startRound,
-  currentActor, advanceTurn, isOver, resolveAction, enemyChooseAction, spoils, living, enrageBosses,
+  advanceTurn, isOver, resolveAction, enemyChooseAction, spoils, living, enrageBosses,
   applyStatus, cureStatus, tickStatus, canMercy, canRecruit, makeUnit, branchOutcome, effectiveSpd,
-  elementMultiplier, skillDamage, effectiveDef, CRIT_MULT, CHARGE_MULT,
+  elementMultiplier, skillDamage, effectiveDef, CHARGE_MULT,
   resolveMonsterSkill, monsterSkillDamage,
 } from './battle.js';
-import { buildHeroUnit, buildAllyUnit } from './progression.js';
+import { buildHeroUnit } from './progression.js';
 import { equipPassives } from '../content/items.js';
 import { getSpell } from '../content/spells.js';
 import { createRng } from '../util/rng.js';
@@ -144,18 +144,14 @@ describe('resolveAction attack', () => {
   });
 
   it('heavy strike does more than normal', () => {
-    const e = buildEnemyUnit('skeleton_king');
-    const h1 = buildHeroUnit('knight', 1);
-    const h2 = buildHeroUnit('knight', 1);
-    const s1 = createBattle([h1], [buildEnemyUnit('walker')]);
-    // compare boss heavy vs normal directly via physicalDamage path
-    const normal = resolveAction(createBattle([buildHeroUnit('knight', 1)], [buildEnemyUnit('walker')]),
-      { type: 'attack', actorId: e.id, targetId: 'knight', heavy: false }, null);
-    // structural: heavy flag accepted without throwing, hp drops
-    const st = createBattle([buildHeroUnit('knight', 1)], [e]);
-    const before = findHeroHp(st);
-    resolveAction(st, { type: 'attack', actorId: e.id, targetId: 'knight', heavy: true }, null);
-    expect(findHeroHp(st)).toBeLessThan(before);
+    const normalBoss = buildEnemyUnit('skeleton_king');
+    const heavyBoss = buildEnemyUnit('skeleton_king');
+    const normalState = createBattle([buildHeroUnit('knight', 1)], [normalBoss]);
+    const heavyState = createBattle([buildHeroUnit('knight', 1)], [heavyBoss]);
+    const before = findHeroHp(normalState);
+    resolveAction(normalState, { type: 'attack', actorId: normalBoss.id, targetId: 'knight', heavy: false }, null);
+    resolveAction(heavyState, { type: 'attack', actorId: heavyBoss.id, targetId: 'knight', heavy: true }, null);
+    expect(before - findHeroHp(heavyState)).toBeGreaterThan(before - findHeroHp(normalState));
   });
 });
 
@@ -313,7 +309,7 @@ describe('boss phase 2 enrage', () => {
     boss.enraged = true;
     boss.skills = []; // isolate the basic-attack heavy cadence (boss now also has skills)
     const state = createBattle([buildHeroUnit('knight', 5)], [boss]);
-    const a2 = enemyChooseAction(state, boss.id, fixedRng()); // tick1
+    enemyChooseAction(state, boss.id, fixedRng()); // tick1
     const b2 = enemyChooseAction(state, boss.id, fixedRng()); // tick2 -> heavy (enraged %2)
     expect(b2.heavy).toBe(true);
   });
@@ -360,9 +356,6 @@ describe('status ailments', () => {
   });
 
   it('enemy attack can inflict its status', () => {
-    const spider = buildEnemyUnit('spider'); // poison 0.4
-    const hero = buildHeroUnit('knight', 5);
-    const state = createBattle([hero], [spider]);
     // force inflict by seeding rng low; try several seeds to find one that triggers
     let inflicted = false;
     for (let s = 1; s <= 30 && !inflicted; s++) {

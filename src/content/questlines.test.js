@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { condMet, isQuestComplete, getQuest, QUESTS } from './quests.js';
+import { condMet, isQuestComplete, QUESTS } from './quests.js';
 import {
   QUESTLINES, getQuestline, questlineState, isStageComplete, recordVisit, recordTalk,
   questlineProgress, advanceQuestlines, questlineUnlocked,

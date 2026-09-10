@@ -5,10 +5,10 @@
 // Equipment bonuses are folded by progression.buildHeroUnit at battle start.
 
 import * as PIXI from 'pixi.js';
-import { windowBox, label, numLabel, menuList, frame, bar, hpbar, divider } from '../ui/uikit.js';
+import { label, numLabel, menuList, frame, bar, hpbar, divider } from '../ui/uikit.js';
 import { HEX, FS, NUM, FONT } from '../ui/tokens.js';
 import { MAX_ACTIVE } from '../data/save.js';
-import { getItem, ITEMS, itemSummary, itemKindKR } from '../content/items.js';
+import { getItem, itemSummary, itemKindKR } from '../content/items.js';
 import { statsAtLevel } from '../systems/progression.js';
 import { xpToReach } from '../systems/progression.js';
 import { getMonster } from '../content/monsters.js';
@@ -77,7 +77,7 @@ export class MenuScene {
 
   renderStatus() {
     this.statusLayer.removeChildren();
-    const { w, h } = this.game.renderer.screen;
+    const { h } = this.game.renderer.screen;
     const party = this.game.runtime.party;
     // Cards are laid out at a fixed step; on a short/wide window (or a 4-unit
     // party) the stack can exceed screen height and the bottom card clips. Scale

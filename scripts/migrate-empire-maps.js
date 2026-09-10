@@ -4,7 +4,6 @@
  * Applies ground id remapping for empire maps: 0→8, 1→1, 2→8, 3→3, 4→9
  */
 
-const fs = require('fs');
 const path = require('path');
 
 const REMAP = {

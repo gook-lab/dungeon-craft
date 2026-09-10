@@ -23,21 +23,19 @@ import { EndingScene } from './scenes/endingScene.js';
 import { levelForXp, spellsLearnedBetween, statsAtLevel, xpToReach } from './systems/progression.js';
 import { spoils, branchOutcome } from './systems/battle.js';
 import { artifactPassives, artifactSlotCount } from './content/artifacts.js';
-import { addEmotion, NEGATIVE_EMOTIONS, bondKey, bondPolarity } from './systems/bonds.js';
+import { addEmotion, NEGATIVE_EMOTIONS, bondPolarity } from './systems/bonds.js';
 import { BOND_SKILLS, bondModForCombo, availableBondStrikes } from './content/bondSkills.js';
 import { getSpell } from './content/spells.js';
 import { getItem, rollDrops } from './content/items.js';
 import { getMonster } from './content/monsters.js';
 import { getQuest, isQuestComplete } from './content/quests.js';
 import { advanceQuestlines, recordTalk } from './content/questlines.js';
-import { getMap } from './content/maps/index.js';
 import { getDialog, toneFromFlags, tonedDialogId, toneCrossNote } from './content/dialog.js';
 
 // save ↔ runtime 매핑은 data/save.js의 toRuntime/runtimeToSave가 담당 (Gotcha #11
 // 네 지점이 그 파일 하나에 모여 라운드트립 테스트로 보호된다).
 
 const FABULA_CAP = 6;
-const BOND_CAP = 10;
 
 const memberName = (refId) => ({ knight: '기사', warrior: '전사', huntress: '사냥꾼', mage: '마법사', duelist: '쌍검사' }[refId] || refId);
 

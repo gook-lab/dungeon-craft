@@ -15,7 +15,6 @@ export function createWeather({ width = 800, height = 600 } = {}) {
 
   // --- Particle pool (reused across kind switches) ---
   const particles = [];
-  let particleCount = 0;
 
   // --- Storm flash state ---
   let flash = 0, nextBolt = 2.5 + Math.random() * 3.5;
@@ -40,11 +39,9 @@ export function createWeather({ width = 800, height = 600 } = {}) {
   // --- Initialization ---
   function seedParticles(newKind) {
     particles.length = 0;
-    let count = 0;
-
     if (newKind === 'rain' || newKind === 'storm') {
       // ~120 rain streaks (W/7)
-      count = Math.floor(w / 7);
+      const count = Math.floor(w / 7);
       for (let i = 0; i < count; i++) {
         particles.push({
           x: Math.random() * w,
@@ -55,7 +52,7 @@ export function createWeather({ width = 800, height = 600 } = {}) {
       }
     } else if (newKind === 'snow') {
       // ~90 snow flakes (W/14)
-      count = Math.floor(w / 14);
+      const count = Math.floor(w / 14);
       for (let i = 0; i < count; i++) {
         particles.push({
           x: Math.random() * w,
@@ -68,7 +65,7 @@ export function createWeather({ width = 800, height = 600 } = {}) {
       }
     } else if (newKind === 'embers') {
       // ~70 embers (W/22)
-      count = Math.floor(w / 22);
+      const count = Math.floor(w / 22);
       for (let i = 0; i < count; i++) {
         particles.push({
           x: Math.random() * w,
@@ -82,7 +79,7 @@ export function createWeather({ width = 800, height = 600 } = {}) {
       }
     } else if (newKind === 'fog') {
       // 느리게 흐르는 반투명 안개 덩어리 (늪 등) — 큰 타원 소수.
-      count = Math.ceil(w / 160) + 4;
+      const count = Math.ceil(w / 160) + 4;
       for (let i = 0; i < count; i++) {
         particles.push({
           x: Math.random() * w,
@@ -97,7 +94,6 @@ export function createWeather({ width = 800, height = 600 } = {}) {
       }
     }
 
-    particleCount = count;
 
     // Storm flash reset
     if (newKind === 'storm') {
@@ -105,25 +101,6 @@ export function createWeather({ width = 800, height = 600 } = {}) {
       nextBolt = 2.5 + Math.random() * 3.5;
       bolt = null;
     }
-  }
-
-  function drawStormBolt(g, startX, startY, boltW, boltH) {
-    // Pixelated lightning: zigzag from top to 72% down
-    g.strokeStyle = '#fff0b8';
-    g.lineWidth = 3;
-    g.beginPath();
-    let x = startX, y = startY;
-    g.moveTo(x, y);
-    while (y < boltH * 0.72) {
-      y += 18 + Math.random() * 16;
-      x += (Math.random() * 40 - 20);
-      g.lineTo(x, y);
-    }
-    g.stroke();
-    // Glow effect
-    g.strokeStyle = 'rgba(255,255,255,.5)';
-    g.lineWidth = 7;
-    g.stroke();
   }
 
   function updateAndDraw(dt) {

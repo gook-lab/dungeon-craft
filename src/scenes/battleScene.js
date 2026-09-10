@@ -24,7 +24,7 @@ import { artifactPassives, artifactSlotCount, mergePassives } from '../content/a
 import { statusDesc } from '../content/statusInfo.js';
 import { enemyUrl, heroUrl, heroWalkUrl, heroAttackUrl, structureUrl, ATTACK_FRAMES } from '../util/assets.js';
 import { makeSprite, swapTexture, preload, loadSheet, shadowTexture } from '../engine/renderer.js';
-import { windowBox, label, menuList, frame, hpbar, bar as statBar } from '../ui/uikit.js';
+import { label, frame, hpbar, bar as statBar } from '../ui/uikit.js';
 import { HEX, NUM, FS, FONT } from '../ui/tokens.js';
 import { statusTexture, fxTexture, statTexture } from '../ui/pixelIcons.js';
 import { createWeather, createEmberAura } from '../ui/weather.js';
@@ -51,7 +51,6 @@ const ELEM_INFO = {
   physical: ['#cfd8ec', '물리'],
 };
 const TARGET_KR = { one: '단일', allEnemies: '적 전체', self: '자신', oneAlly: '아군 1인', allAllies: '아군 전체' };
-const PANEL_FRAC = 0.24; // bottom command/message panel height as fraction of screen
 const FABULA_CAP = 6;   // 운명(Fabula Point) party-shared pool cap (matches save clamp)
 
 // Biome → weather kind mapping
@@ -1076,7 +1075,7 @@ export class BattleScene {
   // 인연공격 FX — a DUO choreography: the engine gets BOTH origins (caster + partner)
   // so the two heroes strike together. partner is an optional play() arg (null for
   // every existing single-caster spell — no caller threading). Cosmetic only.
-  playBondFx(action, events) {
+  playBondFx(action) {
     if (!this.spellFx || !action.comboId || !hasSpellFx(action.comboId)) return;
     const av = this.viewOf.get(action.actorId);
     if (!av) return;

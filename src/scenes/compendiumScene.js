@@ -129,7 +129,7 @@ export class CompendiumScene {
     return this.renderStatus(x, y, w);
   }
 
-  renderMonster(x, y, w) {
+  renderMonster(x, y) {
     const id = this.ids()[this.index];
     const m = MONSTERS[id];
     if (!this.seenSet().has(id)) {
@@ -154,7 +154,7 @@ export class CompendiumScene {
     line(`보상: ${m.xp} 경험치 · ${m.gold} G`, HEX.textMute);
   }
 
-  renderEquip(x, y, w) {
+  renderEquip(x, y) {
     const it = getItem(this.ids()[this.index]);
     if (!it) return;
     const spr = new PIXI.Sprite(iconTexture(iconKindForItem(it.kind), 4));

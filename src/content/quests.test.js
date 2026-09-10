@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { QUESTS, getQuest, isQuestComplete, questProgress } from './quests.js';
-import { SPELLS } from './spells.js';
 import { ITEMS } from './items.js';
 
 describe('quest data integrity', () => {

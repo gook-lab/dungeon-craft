@@ -8,7 +8,7 @@
 // a scale+fade-in title, staggered summary fade, and a pulsing prompt.
 
 import * as PIXI from 'pixi.js';
-import { label, frame } from '../ui/uikit.js';
+import { label } from '../ui/uikit.js';
 import { HEX, FS, FONT, NUM } from '../ui/tokens.js';
 import { toneFromFlags } from '../content/dialog.js';
 import { epilogueFor, karmaEpilogueLine } from '../content/epilogues.js';

@@ -20,7 +20,6 @@ export function zzfxContext() {
 // Play a sound from up to 20 synth parameters. Returns the
 // AudioBufferSourceNode (callers track polyphony via its `onended`), or
 // null when Web Audio is unavailable.
-// eslint-disable-next-line
 export function zzfx(p=1,k=.05,b=220,e=0,r=0,t=.1,q=0,D=1,u=0,y=0,v=0,z=0,l=0,E=0,A=0,F=0,c=0,w=1,m=0,B=0,N=0){
   let M=Math,d=2*M.PI,R=44100,G=u*=500*d/R/R,C=b*=(1-k+2*k*M.random(k=[]))*d/R,
   g=0,H=0,a=0,n=1,I=0,J=0,f=0,s=0,h=N<0?-1:1,x=d*h*N*2/R,L=M.cos(x),Z=M.sin,K=Z(x)/4,O=1+K,
