@@ -65,6 +65,9 @@ export function freshSave() {
     // karma: cumulative mercy/execute tally (mercy +1 / execute -1) for regional divergence.
     bossFate: {},
     karma: 0,
+    // 엔딩 열람 기록 — 각 톤(merciful/ruthless/mixed/true)별로 한 번이라도 봤는지 기록.
+    // 메뉴의 "후일담" 열람 잠금 해제 용도 (본 엔딩의 후일담만 볼 수 있음).
+    viewedEndings: [],
     // mercied/slain drive the playstyle-reactive dialogue + ending branch.
     flags: {
       bossDefeated: false, frostBossDefeated: false, swampBossDefeated: false,
@@ -197,6 +200,10 @@ export function validateSave(raw) {
     // reach/talk 트래커: 문자열만, dedupe. 구세이브(필드 부재) → [].
     visitedMaps: Array.isArray(d.visitedMaps) ? [...new Set(d.visitedMaps.filter((m) => typeof m === 'string'))] : [],
     talkedNpcs: Array.isArray(d.talkedNpcs) ? [...new Set(d.talkedNpcs.filter((n) => typeof n === 'string'))] : [],
+    // 엔딩 열람 기록: 톤별 필터링(merciful/ruthless/mixed/true만 유효), dedupe.
+    viewedEndings: Array.isArray(d.viewedEndings)
+      ? [...new Set(d.viewedEndings.filter((t) => ['merciful', 'ruthless', 'mixed', 'true'].includes(t)))]
+      : [],
     allies: vAllies,
     // Legacy single deploy slot — superseded by `active`, retained for old-save
     // round-trips (validated above as vActiveAlly).
@@ -291,6 +298,7 @@ export function toRuntime(save) {
     questlines: Object.fromEntries(Object.entries(save.questlines || {}).map(([k, v]) => [k, { ...v }])),
     visitedMaps: [...(save.visitedMaps || [])],
     talkedNpcs: [...(save.talkedNpcs || [])],
+    viewedEndings: [...(save.viewedEndings || [])],
     allies: (save.allies || []).map((a) => ({ ...a })),
     activeAlly: save.activeAlly || null,
     fabula: save.fabula || 0,
@@ -322,6 +330,7 @@ export function runtimeToSave(runtime) {
     questlines: Object.fromEntries(Object.entries(runtime.questlines || {}).map(([k, v]) => [k, { ...v }])),
     visitedMaps: [...(runtime.visitedMaps || [])],
     talkedNpcs: [...(runtime.talkedNpcs || [])],
+    viewedEndings: [...(runtime.viewedEndings || [])],
     allies: (runtime.allies || []).map((a) => ({ ...a })),
     activeAlly: runtime.activeAlly || null,
     fabula: runtime.fabula || 0,

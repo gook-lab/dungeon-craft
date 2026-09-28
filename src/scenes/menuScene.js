@@ -18,6 +18,7 @@ import { QUESTLINES, questlineState, questlineUnlocked } from '../content/questl
 import { EMOTION_KR, NEGATIVE_EMOTIONS, bondStrength, emotionCount, pairsFor } from '../systems/bonds.js';
 import { toneBand } from '../content/dialog.js';
 import { ALLY_COMBOS } from '../content/bondSkills.js';
+import { allyEpilogueFor, shouldShowAllyEpilogue } from '../content/allyEpilogues.js';
 import { EquipScene } from './equipScene.js';
 import { SettingsScene } from './settingsScene.js';
 import { CompendiumScene } from './compendiumScene.js';
@@ -156,9 +157,10 @@ export class MenuScene {
     this.menuLayer.removeChildren();
     const { w, h } = this.game.renderer.screen;
     let options;
-    if (this.mode === 'root') options = ['아이템', '장비', '편성', '유대', '퀘스트', '도감', '유물', '빠른 이동', '설정', '메인으로', '닫기'];
+    if (this.mode === 'root') options = ['아이템', '장비', '편성', '유대', '후일담', '퀘스트', '도감', '유물', '빠른 이동', '설정', '메인으로', '닫기'];
     else if (this.mode === 'quests') options = [...this.questLines(), '← 뒤로'];
     else if (this.mode === 'bonds') options = [...this.bondLines(), '← 뒤로'];
+    else if (this.mode === 'epilogues') options = [...this.epilogueLines(), '← 뒤로'];
     else if (this.mode === 'item') options = [...this.consumables().map(formatItem), '← 뒤로'];
     else if (this.mode === 'pickAlly') options = [...this.game.runtime.party.map((p) => memberName(p.refId)), '← 뒤로'];
     else if (this.mode === 'roster') options = [...this.rosterLabels(), '← 뒤로'];
@@ -301,6 +303,41 @@ export class MenuScene {
     return out;
   }
 
+  // 엔딩 후 동료들의 후일담 — 본 엔딩별로, 각 동료마다 유대와 자비 성향에 따라 달라지는 한두 줄.
+  // 한 번이라도 본 엔딩의 후일담만 열람 가능 (viewedEndings에 기록됨).
+  epilogueLines() {
+    const rt = this.game.runtime;
+    const viewed = rt.viewedEndings || [];
+    if (!viewed.length) return ['아직 본 엔딩이 없다', '(게임을 완료해 엔딩을 본다)'];
+
+    const out = [];
+    const TONE_KR = { merciful: '자비의 결말', ruthless: '정복의 결말', mixed: '여정의 끝', true: '진정한 결말' };
+
+    for (const tone of viewed) {
+      out.push(`【${TONE_KR[tone] || tone}】`);
+      const allies = rt.allies || [];
+      const bonds = rt.bonds || {};
+
+      if (!allies.length) {
+        out.push('  (동료가 없다)');
+        out.push('');
+        continue;
+      }
+
+      for (const ally of allies) {
+        const epilogue = allyEpilogueFor(ally.refId, tone, bonds);
+        if (epilogue) {
+          const name = getMonster(ally.refId)?.name || ally.refId;
+          out.push(`  • ${name}`);
+          out.push(`    ${epilogue}`);
+        }
+      }
+      out.push('');
+    }
+
+    return out.length > 1 ? out.slice(0, -1) : out; // 마지막 빈 줄 제거
+  }
+
   consumables() {
     return Object.keys(this.game.runtime.inventory)
       .filter((id) => getItem(id) && getItem(id).kind === 'consumable' && this.game.runtime.inventory[id] > 0);
@@ -346,16 +383,18 @@ export class MenuScene {
       else if (this.index === 1) { this.game.scenes.push(new EquipScene(this.game)); return; }
       else if (this.index === 2) { this.mode = 'roster'; }
       else if (this.index === 3) { this.mode = 'bonds'; }
-      else if (this.index === 4) { this.mode = 'quests'; }
-      else if (this.index === 5) { this.game.scenes.push(new CompendiumScene(this.game)); return; }
-      else if (this.index === 6) { this.game.scenes.push(new ArtifactScene(this.game)); return; }  // 유물
-      else if (this.index === 7) { this.game.scenes.pop(); this.game.openFastTravel(); return; }   // 빠른 이동
-      else if (this.index === 8) { this.game.scenes.push(new SettingsScene(this.game)); return; }  // 설정
-      else if (this.index === 9) { this.game.saveNow(); this.game.toTitle(); return; }             // 메인으로 (저장 후 타이틀)
+      else if (this.index === 4) { this.mode = 'epilogues'; }  // 후일담
+      else if (this.index === 5) { this.mode = 'quests'; }
+      else if (this.index === 6) { this.game.scenes.push(new CompendiumScene(this.game)); return; }
+      else if (this.index === 7) { this.game.scenes.push(new ArtifactScene(this.game)); return; }  // 유물
+      else if (this.index === 8) { this.game.scenes.pop(); this.game.openFastTravel(); return; }   // 빠른 이동
+      else if (this.index === 9) { this.game.scenes.push(new SettingsScene(this.game)); return; }  // 설정
+      else if (this.index === 10) { this.game.saveNow(); this.game.toTitle(); return; }             // 메인으로 (저장 후 타이틀)
       else { this.game.scenes.pop(); this.game.resumeField(); return; }
       this.index = 0; this.renderMenu(); return;
     }
     if (this.mode === 'bonds') { this.mode = 'root'; this.index = 0; this.renderMenu(); return; }
+    if (this.mode === 'epilogues') { this.mode = 'root'; this.index = 0; this.renderMenu(); return; }
     if (this.mode === 'quests') { this.mode = 'root'; this.index = 0; this.renderMenu(); return; }
     if (this.mode === 'roster') {
       const members = this.rosterMembers();

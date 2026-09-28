@@ -409,6 +409,7 @@ describe('toRuntime ∘ runtimeToSave round-trip (Gotcha #11 게이트)', () => 
       questlines: { ql_act1: { stage: 2, status: 'active' } },
       visitedMaps: ['town', 'wild', 'darkforest'],
       talkedNpcs: ['enoch_act1'],
+      viewedEndings: ['merciful', 'mixed'],
       runegates: ['town', 'wild', 'dungeon'],
       playtime: 4200,
       artifacts: { owned: ['lens', 'rearward'], equipped: { huntress: ['lens', null], knight: ['unbroken'] } },
@@ -450,5 +451,30 @@ describe('ngPlus (회차+) save field', () => {
     writeSave({ ...freshSave(), ngPlus: 2 }, s);
     expect(loadSave(s).ngPlus).toBe(2);
     expect(runtimeToSave(toRuntime(validateSave({ ...freshSave(), ngPlus: 2 }))).ngPlus).toBe(2);
+  });
+});
+
+describe('viewedEndings (엔딩 열람 기록) save field', () => {
+  it('fresh save starts empty; old save defaults to []', () => {
+    expect(freshSave().viewedEndings).toEqual([]);
+    expect(validateSave({ gold: 10 }).viewedEndings).toEqual([]);
+  });
+
+  it('filters to valid tones only (merciful|ruthless|mixed|true), dedupes', () => {
+    expect(validateSave({ viewedEndings: ['merciful', 'ruthless'] }).viewedEndings).toEqual(['merciful', 'ruthless']);
+    expect(validateSave({ viewedEndings: ['merciful', 'invalid', 'merciful'] }).viewedEndings).toEqual(['merciful']);
+    expect(validateSave({ viewedEndings: ['true', 'mixed'] }).viewedEndings).toEqual(['true', 'mixed']);
+  });
+
+  it('ignores non-array input', () => {
+    expect(validateSave({ viewedEndings: 'merciful' }).viewedEndings).toEqual([]);
+    expect(validateSave({ viewedEndings: null }).viewedEndings).toEqual([]);
+  });
+
+  it('round-trips through write/load and toRuntime/runtimeToSave', () => {
+    const s = fakeStorage();
+    writeSave({ ...freshSave(), viewedEndings: ['merciful', 'mixed'] }, s);
+    expect(loadSave(s).viewedEndings).toEqual(['merciful', 'mixed']);
+    expect(runtimeToSave(toRuntime(validateSave({ ...freshSave(), viewedEndings: ['merciful', 'ruthless'] }))).viewedEndings).toEqual(['merciful', 'ruthless']);
   });
 });

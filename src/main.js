@@ -199,6 +199,10 @@ async function main() {
   // "이어하기" drops the player back into the swamp for post-game free roam).
   game.toEnding = (tone) => {
     game.audio?.setMusic('off');
+    // 엔딩 열람 기록: 후일담 메뉴 잠금 해제용
+    if (!game.runtime.viewedEndings.includes(tone)) {
+      game.runtime.viewedEndings.push(tone);
+    }
     scenes.push(new EndingScene(game), { tone });
   };
   game.toTitle = () => {
