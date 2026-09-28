@@ -1,6 +1,5 @@
 import { expect, it, describe } from 'vitest';
 import { ALLY_EPILOGUES, allyEpilogueFor } from './allyEpilogues.js';
-import { bondStrength } from '../systems/bonds.js';
 
 describe('allyEpilogues', () => {
   it('has epilogue data for recruitable allies', () => {

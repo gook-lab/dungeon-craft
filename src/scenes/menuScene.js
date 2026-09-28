@@ -18,7 +18,7 @@ import { QUESTLINES, questlineState, questlineUnlocked } from '../content/questl
 import { EMOTION_KR, NEGATIVE_EMOTIONS, bondStrength, emotionCount, pairsFor } from '../systems/bonds.js';
 import { toneBand } from '../content/dialog.js';
 import { ALLY_COMBOS } from '../content/bondSkills.js';
-import { allyEpilogueFor, shouldShowAllyEpilogue } from '../content/allyEpilogues.js';
+import { allyEpilogueFor } from '../content/allyEpilogues.js';
 import { EquipScene } from './equipScene.js';
 import { SettingsScene } from './settingsScene.js';
 import { CompendiumScene } from './compendiumScene.js';
