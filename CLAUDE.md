@@ -413,7 +413,7 @@ whole status column scales to fit screen height (`statusLayer.scale`).
 ### 11. Audio asset layer (util/audio.js, 2026-07-14)
 SFX/BGM transcoded from the Unity sibling's packs (MagicArsenal + 25 RPG Game Tracks +
 Resources/Bgm) via **afconvert** (macOS builtin, no ffmpeg) → m4a in `public/audio/`
-(32 files, ~16MB). The layer sits on the shared zzfx `AudioContext`; **every path falls
+(32 files, ~16MB; local only — untracked since 2026-11-26 because Asset Store packs may not be redistributed, so clones and the public deploy run on the ZzFX fallback). The layer sits on the shared zzfx `AudioContext`; **every path falls
 back to ZzFX** (file missing / not-yet-decoded / disabled → identical to pre-port
 behavior), so headless/test runs are unaffected. Maps: `ASSET_BGM` (mode → basename;
 field modes are `field_<region>` keyed by `map.mood || map.tileset`, same lookup as

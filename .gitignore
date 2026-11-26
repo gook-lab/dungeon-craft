@@ -8,3 +8,6 @@ dist/
 # 도구 산출물 (2026-08-22)
 .gstack/
 **/.gstack/
+
+# Unity Asset Store 팩을 변환한 음원 — 재배포 불가라 레포에서 뺌(2026-11-26). 로컬에만 두고, 없으면 ZzFX 합성음으로 돈다.
+public/audio/*.m4a
