@@ -24,7 +24,7 @@ export const NUM = Object.fromEntries(
   Object.entries(HEX).map(([k, v]) => [k, parseInt(v.slice(1), 16)]),
 );
 
-// --- Typography sizes (px). Galmuri is crispest at these integer steps. ---
+// --- Typography sizes (px). The pixel faces are crispest at these integer steps. ---
 export const FS = {
   display: 30, // 화면 타이틀 / 페이즈 배너
   command: 24, // 명령바
@@ -35,16 +35,19 @@ export const FS = {
   num: 24,     // HP/MP/데미지 수치
 };
 
-// --- Font families (Galmuri webfont, monospace fallback until it loads). ---
+// --- Font families (monospace fallback until they load). ---
+// CryptPixel* are Galmuri 2.40.3 (OFL 1.1) cut down to the characters the game
+// draws and renamed, since the license reserves the name "Galmuri". The
+// @font-face rules sit in index.html; scripts/build-font-subset.mjs rebuilds the
+// files and src/ui/fontSubset.test.js fails when src/ needs a character they lack.
 export const FONT = {
-  display: 'Galmuri14, Galmuri11, monospace',
-  ui: 'Galmuri11, monospace',
-  mono: 'GalmuriMono11, Galmuri11, monospace',
-  small: 'Galmuri9, Galmuri11, monospace',
+  display: 'CryptPixel14, CryptPixel11, monospace',
+  ui: 'CryptPixel11, monospace',
+  mono: 'CryptPixelMono11, CryptPixel11, monospace',
 };
 
-// Galmuri faces that must be loaded before first paint (see ui/font.js).
-export const GALMURI_FACES = ['Galmuri11', 'Galmuri14', 'Galmuri9', 'GalmuriMono11'];
+// Faces that must be loaded before first paint (see ui/font.js).
+export const FONT_FACES = ['CryptPixel11', 'CryptPixel14', 'CryptPixelMono11'];
 
 // HP fill colour by fraction — mirrors share hpbar high/mid/low thresholds.
 export function hpHex(frac) {

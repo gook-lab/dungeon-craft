@@ -28,7 +28,7 @@ export function label(str, size = FS.label, fill = HEX.text, opts = {}) {
   return new PIXI.Text({ text: str, style: textStyle(size, fill, opts) });
 }
 
-// Number/stat text in the monospace Galmuri face.
+// Number/stat text in the monospace pixel face.
 export function numLabel(str, size = FS.stat, fill = HEX.text) {
   return label(str, size, fill, { font: FONT.mono });
 }

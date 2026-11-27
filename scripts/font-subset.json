@@ -1,0 +1,21 @@
+{
+  "source": "galmuri@2.40.3",
+  "codePoints": 1187,
+  "faces": {
+    "CryptPixel11": {
+      "from": "Galmuri11",
+      "bytes": 28008,
+      "notInSource": "⏱☣☾♛✓✦❄"
+    },
+    "CryptPixel14": {
+      "from": "Galmuri14",
+      "bytes": 31380,
+      "notInSource": "π↪⇄⇒∈−≈≠≤≥⏱▸☣☾♛✓✦❄"
+    },
+    "CryptPixelMono11": {
+      "from": "GalmuriMono11",
+      "bytes": 26740,
+      "notInSource": "⏱☣☾♛✓✦❄"
+    }
+  }
+}
