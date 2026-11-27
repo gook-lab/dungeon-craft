@@ -9,7 +9,7 @@ import { createRng } from './util/rng.js';
 import { createAudio } from './util/audio.js';
 import { ensureFonts } from './ui/font.js';
 import { loadSave, writeSave, freshSave, clearSave, hasSave, slotSummary, SAVE_SLOTS, MAX_ACTIVE, toRuntime, runtimeToSave } from './data/save.js';
-import { TitleScene } from './scenes/titleScene.js';
+import { TitleScene, preloadKeyArt } from './scenes/titleScene.js';
 import { CharacterSelectScene } from './scenes/characterSelectScene.js';
 import { FieldScene } from './scenes/fieldScene.js';
 import { BattleScene } from './scenes/battleScene.js';
@@ -39,9 +39,28 @@ const FABULA_CAP = 6;
 
 const memberName = (refId) => ({ knight: '기사', warrior: '전사', huntress: '사냥꾼', mage: '마법사', duelist: '쌍검사' }[refId] || refId);
 
+// Boot loader bridge (index.html #boot). Real progress: renderer up + each Galmuri
+// face settled + title key art decoded. Absent (tests / other hosts) → no-op.
+function createBootProgress() {
+  const boot = typeof window !== 'undefined' ? window.__boot : null;
+  const st = { renderer: 0, fonts: 0, art: 0 };
+  const push = () => boot?.progress(0.2 + 0.1 * st.renderer + 0.55 * st.fonts + 0.15 * st.art,
+    st.fonts < 1 ? '글꼴을 불러오고 있어요' : '크립트 문을 여는 중이에요');
+  push();
+  return {
+    set(key, v) { st[key] = v; push(); },
+    ready() { boot?.ready(); },
+  };
+}
+
 async function main() {
+  const progress = createBootProgress();
+  // Network-bound loads start first and run alongside the renderer init.
+  const fontsReady = ensureFonts((n, total) => progress.set('fonts', n / total));
+  const artReady = preloadKeyArt().then((tex) => { progress.set('art', 1); return tex; });
   const mount = document.getElementById('game');
   const renderer = await createRenderer(mount);
+  progress.set('renderer', 1);
   const input = createInput();
   const scenes = createSceneManager(renderer.root);
   const rng = createRng(((Date.now ? Date.now() : 1) & 0x7fffffff) || 1);
@@ -53,8 +72,9 @@ async function main() {
   game.runtime = toRuntime(loadSave()); // placeholder until a slot is chosen
   game.field = null;
 
-  // Load Galmuri font before first render so PIXI.Text bakes with the correct face.
-  await ensureFonts();
+  // Load Galmuri font before first render so PIXI.Text bakes with the correct face;
+  // the title key art is awaited too so the first title frame is complete.
+  await Promise.all([fontsReady, artReady]);
 
   // Unlock Web Audio on the first user gesture (autoplay policy).
   const unlockOnce = () => { audio.unlock(); window.removeEventListener('keydown', unlockOnce); };
@@ -704,8 +724,13 @@ async function main() {
     }
   };
 
-  // Boot at title.
+  // Boot at title. Two frames later the title is on screen → drop the boot loader
+  // (the `dc-title` mark is what first-load measurements read).
   scenes.push(new TitleScene(game));
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    performance.mark?.('dc-title');
+    progress.ready();
+  }));
 
 
 
@@ -786,4 +811,7 @@ async function main() {
   }
 }
 
-main();
+main().catch((err) => {
+  window.__boot?.fail();
+  throw err;
+});

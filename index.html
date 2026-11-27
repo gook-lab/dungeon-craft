@@ -7,9 +7,250 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <title>Dragon Crypt</title>
+    <meta
+      name="description"
+      content="드래곤 크립트 — 약해진 적을 베어 끝낼지, 살려 보내거나 동료로 맞을지 고르는 턴제 파티 RPG."
+    />
+    <meta name="theme-color" content="#0a0b16" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="드래곤 크립트 · Dragon Crypt" />
+    <meta
+      property="og:description"
+      content="베어 끝낼 것인가, 길 잃은 영혼을 구할 것인가 — 자비가 힘이 되는 턴제 파티 RPG."
+    />
+    <meta property="og:url" content="https://dungeon-craft-nine.vercel.app/" />
+    <meta
+      property="og:image"
+      content="https://dungeon-craft-nine.vercel.app/og-image.jpg"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="비 내리는 크립트에서 기사가 칼끝을 내리고 무릎 꿇은 고블린에게 손을 내미는 장면"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <!-- Galmuri: 렌더를 막지 않게 print → all 로 늦게 붙인다. ui/font.js 가 이 링크의
+         load 를 기다린 뒤 글꼴을 불러온다(그 전에 fonts.load 를 부르면 빈 결과로 끝난다). -->
+    <link
+      id="galmuri-css"
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css"
+      media="print"
+      onload="this.media = 'all'"
+    />
     <link rel="stylesheet" href="/src/ui/style.css" />
+    <style>
+      #boot {
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+        display: grid;
+        place-items: end center;
+        padding: 0 16px max(48px, env(safe-area-inset-bottom));
+        background: #0a0b16;
+        color: #f3edda;
+        font-family:
+          system-ui,
+          -apple-system,
+          "Apple SD Gothic Neo",
+          "Malgun Gothic",
+          sans-serif;
+        transition: opacity 0.35s ease;
+      }
+      #boot.is-done {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .boot-art {
+        position: absolute;
+        inset: 0;
+        background: url("/key-art.webp") center 55% / cover no-repeat;
+        opacity: 0.42;
+      }
+      .boot-art::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(10, 11, 22, 0.55) 0%,
+          rgba(10, 11, 22, 0.2) 40%,
+          rgba(10, 11, 22, 0.92) 78%
+        );
+      }
+      .boot-card {
+        position: relative;
+        width: min(360px, 100%);
+        text-align: center;
+      }
+      .boot-title {
+        margin: 0 0 14px;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        color: #ffd766;
+        text-shadow:
+          0 2px 0 #05060f,
+          0 0 18px rgba(255, 215, 102, 0.25);
+      }
+      .boot-bar {
+        position: relative;
+        height: 8px;
+        overflow: hidden;
+        border: 2px solid #39406e;
+        background: #12152e;
+      }
+      .boot-fill {
+        position: absolute;
+        inset: 0;
+        background: #ffd766;
+        transform-origin: left;
+        transform: scaleX(0.04);
+        transition: transform 0.25s ease;
+      }
+      /* 진행률을 모르는 동안(진입 스크립트가 아직 안 돌았을 때)은 무한 표시. */
+      #boot:not(.is-known) .boot-fill {
+        width: 30%;
+        transform: none;
+        animation: boot-sweep 1.2s ease-in-out infinite;
+      }
+      @keyframes boot-sweep {
+        from {
+          left: -30%;
+        }
+        to {
+          left: 100%;
+        }
+      }
+      #boot.is-failed .boot-bar {
+        display: none;
+      }
+      .boot-msg {
+        margin: 10px 0 0;
+        font-size: 14px;
+        color: #a7b0d8;
+        min-height: 1.4em;
+      }
+      .boot-alert {
+        margin-top: 14px;
+        font-size: 14px;
+        color: #f3edda;
+      }
+      .boot-alert p {
+        margin: 0 0 10px;
+      }
+      .boot-alert button {
+        font: inherit;
+        font-weight: 700;
+        color: #0a0b16;
+        background: #ffd766;
+        border: 0;
+        padding: 9px 18px;
+        cursor: pointer;
+      }
+      .boot-alert button:focus-visible {
+        outline: 2px solid #fff0b8;
+        outline-offset: 3px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #boot,
+        .boot-fill {
+          transition: none;
+        }
+        #boot:not(.is-known) .boot-fill {
+          animation: none;
+          left: 0;
+          width: 100%;
+          opacity: 0.35;
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="boot" role="status" aria-live="polite">
+      <div class="boot-art" aria-hidden="true"></div>
+      <div class="boot-card">
+        <p class="boot-title">드래곤 크립트</p>
+        <div class="boot-bar" aria-hidden="true">
+          <span class="boot-fill" id="boot-fill"></span>
+        </div>
+        <p class="boot-msg" id="boot-msg">모험을 준비하고 있어요</p>
+        <div class="boot-alert" id="boot-slow" hidden>
+          <p>연결이 느려요. 조금 더 기다리거나 다시 불러올 수 있어요.</p>
+          <button type="button" onclick="location.reload()">
+            다시 불러오기
+          </button>
+        </div>
+        <div class="boot-alert" id="boot-fail" hidden>
+          <p>게임을 불러오지 못했어요. 다시 불러오면 대부분 해결돼요.</p>
+          <button type="button" onclick="location.reload()">
+            다시 불러오기
+          </button>
+        </div>
+      </div>
+    </div>
+    <script>
+      // 첫 화면 전 로딩 막. main.js 가 __boot.progress / ready / fail 을 부른다.
+      (function () {
+        var boot = document.getElementById("boot");
+        var fill = document.getElementById("boot-fill");
+        var msg = document.getElementById("boot-msg");
+        var slow = document.getElementById("boot-slow");
+        var fail = document.getElementById("boot-fail");
+        var settled = false;
+        var slowTimer = setTimeout(function () {
+          if (!settled) slow.hidden = false;
+        }, 15000);
+        window.__boot = {
+          progress: function (frac, text) {
+            if (settled) return;
+            boot.classList.add("is-known");
+            fill.style.transform =
+              "scaleX(" + Math.max(0.04, Math.min(1, frac)) + ")";
+            if (text) msg.textContent = text;
+          },
+          ready: function () {
+            if (settled) return;
+            settled = true;
+            clearTimeout(slowTimer);
+            document.documentElement.dataset.boot = "ready";
+            boot.classList.add("is-done");
+            setTimeout(function () {
+              boot.hidden = true;
+            }, 400);
+          },
+          fail: function () {
+            if (settled) return;
+            settled = true;
+            clearTimeout(slowTimer);
+            document.documentElement.dataset.boot = "failed";
+            boot.classList.add("is-failed");
+            slow.hidden = true;
+            fail.hidden = false;
+            msg.textContent = "";
+          },
+        };
+        // 진입 스크립트(또는 미리 받는 청크) 로드 실패 — 자원 오류는 버블링되지 않아 capture 로 받는다.
+        window.addEventListener(
+          "error",
+          function (e) {
+            var t = e.target;
+            if (!t || t === window) return;
+            if (
+              t.tagName === "SCRIPT" ||
+              (t.tagName === "LINK" && t.rel === "modulepreload")
+            )
+              window.__boot.fail();
+          },
+          true,
+        );
+      })();
+    </script>
+    <script nomodule>
+      window.__boot.fail();
+    </script>
     <div id="game"></div>
     <script type="module" src="/src/main.js"></script>
   </body>
