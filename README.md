@@ -110,4 +110,7 @@ scripts/balance.js   헤드리스 전투 하네스
 하려면 사전 서면 허락이 필요합니다. 전문은 [LICENSE](LICENSE), 한국어 안내는 [LICENSE.ko.md](LICENSE.ko.md) 참조.
 
 효과음은 [ZzFX](https://github.com/KilledByAPixel/ZzFX)(MIT), 픽셀 아트 일부는 PixelLab으로
-생성했습니다. 서드파티 구성요소는 각자의 라이선스를 따릅니다.
+생성했습니다. 게임 글꼴은 [Galmuri](https://github.com/quiple/galmuri) 2.40.3(OFL 1.1)에서
+게임에 나오는 글자만 남긴 서브셋으로, 예약 글꼴 이름을 피해 `CryptPixel*` 로 이름을 바꿨습니다.
+글꼴 파일은 이 레포의 라이선스가 아니라 OFL 1.1 을 따릅니다([public/fonts/](public/fonts/)).
+서드파티 구성요소는 각자의 라이선스를 따릅니다.

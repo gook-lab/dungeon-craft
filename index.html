@@ -30,18 +30,31 @@
       content="비 내리는 크립트에서 기사가 칼끝을 내리고 무릎 꿇은 고블린에게 손을 내미는 장면"
     />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-    <!-- Galmuri: 렌더를 막지 않게 print → all 로 늦게 붙인다. ui/font.js 가 이 링크의
-         load 를 기다린 뒤 글꼴을 불러온다(그 전에 fonts.load 를 부르면 빈 결과로 끝난다). -->
-    <link
-      id="galmuri-css"
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css"
-      media="print"
-      onload="this.media = 'all'"
-    />
+    <!-- 글꼴: Galmuri 를 게임에 나오는 글자만 남겨 이름을 바꾼 서브셋(public/fonts/, OFL 1.1).
+         JS 를 기다리지 않고 HTML 을 읽는 즉시 받기 시작한다. ui/font.js 가 첫 그림 전에 기다린다. -->
+    <link rel="preload" href="/fonts/CryptPixel11.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/CryptPixel14.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/CryptPixelMono11.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/src/ui/style.css" />
     <style>
+      @font-face {
+        font-family: CryptPixel11;
+        font-weight: 400;
+        font-display: swap;
+        src: url("/fonts/CryptPixel11.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: CryptPixel14;
+        font-weight: 400;
+        font-display: swap;
+        src: url("/fonts/CryptPixel14.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: CryptPixelMono11;
+        font-weight: 400;
+        font-display: swap;
+        src: url("/fonts/CryptPixelMono11.woff2") format("woff2");
+      }
       #boot {
         position: fixed;
         inset: 0;

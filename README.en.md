@@ -100,4 +100,4 @@ For details, see **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**. In brief:
 
 **Source-available — not open source.** We've published the code to read, but haven't granted permission to use it. If you want to use it in another project, redistribute it, or build commercial products from it, you'll need written permission first. Full license in [LICENSE](LICENSE); Korean summary in [LICENSE.ko.md](LICENSE.ko.md).
 
-Sound effects are from [ZzFX](https://github.com/KilledByAPixel/ZzFX) (MIT); pixel art was partly generated with PixelLab. Third-party components follow their own licenses.
+Sound effects are from [ZzFX](https://github.com/KilledByAPixel/ZzFX) (MIT); pixel art was partly generated with PixelLab. The game font is a subset of [Galmuri](https://github.com/quiple/galmuri) 2.40.3 (OFL 1.1) cut down to the characters the game draws and renamed `CryptPixel*` because "Galmuri" is a Reserved Font Name; the font files stay under OFL 1.1, not this repo's license ([public/fonts/](public/fonts/)). Third-party components follow their own licenses.

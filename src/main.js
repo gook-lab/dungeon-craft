@@ -39,7 +39,7 @@ const FABULA_CAP = 6;
 
 const memberName = (refId) => ({ knight: '기사', warrior: '전사', huntress: '사냥꾼', mage: '마법사', duelist: '쌍검사' }[refId] || refId);
 
-// Boot loader bridge (index.html #boot). Real progress: renderer up + each Galmuri
+// Boot loader bridge (index.html #boot). Real progress: renderer up + each pixel-font
 // face settled + title key art decoded. Absent (tests / other hosts) → no-op.
 function createBootProgress() {
   const boot = typeof window !== 'undefined' ? window.__boot : null;
@@ -72,7 +72,7 @@ async function main() {
   game.runtime = toRuntime(loadSave()); // placeholder until a slot is chosen
   game.field = null;
 
-  // Load Galmuri font before first render so PIXI.Text bakes with the correct face;
+  // Load the pixel fonts before first render so PIXI.Text bakes with the correct face;
   // the title key art is awaited too so the first title frame is complete.
   await Promise.all([fontsReady, artReady]);
 
