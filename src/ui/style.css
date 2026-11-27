@@ -1,4 +1,4 @@
-@import url('https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css');
+/* Galmuri 글꼴 CSS 는 index.html 의 #galmuri-css 링크가 렌더를 막지 않게 붙인다. */
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0b16; }
